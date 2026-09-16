@@ -1,0 +1,464 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AA2E3F44EA609A07BF8D1F82 /* runtime/Shortest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B195FEA9B7E948B5DF3B7E21 /* runtime/Shortest.cpp */; };
+		59C6E2AD256053BE27E81E40 /* src/Ast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30307F574764066D5EE15CD8 /* src/Ast.cpp */; };
+		D0B6555C5E35D377BA3E0DCB /* src/Builtin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 97E3390E25970C5A0342472F /* src/Builtin.cpp */; };
+		EA5FF733A1D9A99AB659285E /* src/Check.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0901303781D33A1A3EAB8462 /* src/Check.cpp */; };
+		EAC8447EE8FB3BE56B2B748E /* src/CodeGen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E2A47605292B20D8C410A56E /* src/CodeGen.cpp */; };
+		F3F509B5BEA2B63806E86A29 /* src/Diag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6FB71B9FE84080E54FD37D6D /* src/Diag.cpp */; };
+		87E1438F5E0F21536D811CF1 /* src/Driver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5EB5CA72B86B4E87A673EF84 /* src/Driver.cpp */; };
+		B3B58E394327B534D007874E /* src/Lexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9CF031406EE1DD9485C4BA3D /* src/Lexer.cpp */; };
+		5B30594E544C1E038663CA40 /* src/Parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CFDD3A92A26BFD2888F07E53 /* src/Parser.cpp */; };
+		BEDB7A7B75C1291F94A9DA74 /* src/Resolve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DE54D8763C62836BEDB4858C /* src/Resolve.cpp */; };
+		4E63CFEB223F6063F629410E /* src/Target.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C14FB0270E32BCE6A029CC2C /* src/Target.cpp */; };
+		90C4FBE5EC1A3DE5DAE697A1 /* src/Type.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0CF1F1632A53D18EADA1F08B /* src/Type.cpp */; };
+		A45DC5B1C4209FF72F679396 /* src/backend/Arm64Darwin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1D379CB68B7B096E7C1D1F03 /* src/backend/Arm64Darwin.cpp */; };
+		3AB5913BD32D2FBD22B61831 /* src/backend/Emitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA842397EEE08645CBF0A4B6 /* src/backend/Emitter.cpp */; };
+		C85450FD793973D2CE9E3222 /* src/backend/Spelling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 97F09AFC0AA38A8A04DE9345 /* src/backend/Spelling.cpp */; };
+		4AC536ECE1F6545D7D8F1067 /* src/backend/Tms6747.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7BBF83D8D6B8A7FC4D6DF50F /* src/backend/Tms6747.cpp */; };
+		C6488B664BB11BF747289EF9 /* src/backend/X86_64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE87171411E45DCD7C2A1A7C /* src/backend/X86_64.cpp */; };
+		A669587D3E94EE6CB1249BB8 /* src/backend/X86_64Linux.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F08BD4D08CCA81D827656938 /* src/backend/X86_64Linux.cpp */; };
+		025E27BE7A159BDA1B6FCF2B /* src/backend/X86_64Windows.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4680FEDE33A9AE4FA966E075 /* src/backend/X86_64Windows.cpp */; };
+		E6D5CBF0B9AC9FD515D6E60F /* src/main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5ED8449B58A6C4DCC07A9E94 /* src/main.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		B195FEA9B7E948B5DF3B7E21 /* runtime/Shortest.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = runtime/Shortest.cpp; sourceTree = "<group>"; };
+		30307F574764066D5EE15CD8 /* src/Ast.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Ast.cpp; sourceTree = "<group>"; };
+		97E3390E25970C5A0342472F /* src/Builtin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Builtin.cpp; sourceTree = "<group>"; };
+		0901303781D33A1A3EAB8462 /* src/Check.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Check.cpp; sourceTree = "<group>"; };
+		E2A47605292B20D8C410A56E /* src/CodeGen.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/CodeGen.cpp; sourceTree = "<group>"; };
+		6FB71B9FE84080E54FD37D6D /* src/Diag.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Diag.cpp; sourceTree = "<group>"; };
+		5EB5CA72B86B4E87A673EF84 /* src/Driver.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Driver.cpp; sourceTree = "<group>"; };
+		9CF031406EE1DD9485C4BA3D /* src/Lexer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Lexer.cpp; sourceTree = "<group>"; };
+		CFDD3A92A26BFD2888F07E53 /* src/Parser.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Parser.cpp; sourceTree = "<group>"; };
+		DE54D8763C62836BEDB4858C /* src/Resolve.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Resolve.cpp; sourceTree = "<group>"; };
+		C14FB0270E32BCE6A029CC2C /* src/Target.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Target.cpp; sourceTree = "<group>"; };
+		0CF1F1632A53D18EADA1F08B /* src/Type.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Type.cpp; sourceTree = "<group>"; };
+		1D379CB68B7B096E7C1D1F03 /* src/backend/Arm64Darwin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/Arm64Darwin.cpp; sourceTree = "<group>"; };
+		FA842397EEE08645CBF0A4B6 /* src/backend/Emitter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/Emitter.cpp; sourceTree = "<group>"; };
+		97F09AFC0AA38A8A04DE9345 /* src/backend/Spelling.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/Spelling.cpp; sourceTree = "<group>"; };
+		7BBF83D8D6B8A7FC4D6DF50F /* src/backend/Tms6747.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/Tms6747.cpp; sourceTree = "<group>"; };
+		AE87171411E45DCD7C2A1A7C /* src/backend/X86_64.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/X86_64.cpp; sourceTree = "<group>"; };
+		F08BD4D08CCA81D827656938 /* src/backend/X86_64Linux.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/X86_64Linux.cpp; sourceTree = "<group>"; };
+		4680FEDE33A9AE4FA966E075 /* src/backend/X86_64Windows.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/X86_64Windows.cpp; sourceTree = "<group>"; };
+		5ED8449B58A6C4DCC07A9E94 /* src/main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/main.cpp; sourceTree = "<group>"; };
+		978B1B3B80F42BFC7B29E6CA /* runtime/Debug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runtime/Debug.h; sourceTree = "<group>"; };
+		AC618D3B0C6BB93586806709 /* runtime/Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runtime/Internal.h; sourceTree = "<group>"; };
+		3D541BCE774B87F24DEEBFB6 /* runtime/Shortest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runtime/Shortest.h; sourceTree = "<group>"; };
+		E0008D7B6286A6D62113817B /* runtime/shmrt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runtime/shmrt.h; sourceTree = "<group>"; };
+		31D92DEFE4B563F3C2B8F8E9 /* src/Ast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Ast.h; sourceTree = "<group>"; };
+		02431D9D517619355F74750B /* src/Builtin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Builtin.h; sourceTree = "<group>"; };
+		DBE164A8F3706413BAB572C3 /* src/Check.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Check.h; sourceTree = "<group>"; };
+		4E2A5F48D4B7FC81C018216E /* src/CodeGen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/CodeGen.h; sourceTree = "<group>"; };
+		C8051BBBF38CD975FAA89C4E /* src/Diag.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Diag.h; sourceTree = "<group>"; };
+		D08F9BC6D7149867B26FBDEB /* src/Driver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Driver.h; sourceTree = "<group>"; };
+		334350E1CB772C075C7C92C7 /* src/Parser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Parser.h; sourceTree = "<group>"; };
+		538CAB31859745F8D146ED05 /* src/Resolve.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Resolve.h; sourceTree = "<group>"; };
+		8761BD51353C336B318D93E5 /* src/Target.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Target.h; sourceTree = "<group>"; };
+		434225D1DBB18017273F7248 /* src/Token.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Token.h; sourceTree = "<group>"; };
+		449316AEEC632DDF9F0755B1 /* src/Type.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Type.h; sourceTree = "<group>"; };
+		5D0A9371C09C368710D78D49 /* src/backend/Arm64Darwin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/Arm64Darwin.h; sourceTree = "<group>"; };
+		990A15B1715DDF27A8CEB533 /* src/backend/Emitter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/Emitter.h; sourceTree = "<group>"; };
+		7BB42B4202968E6326734CC6 /* src/backend/Spelling.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/Spelling.h; sourceTree = "<group>"; };
+		2EA34AE75A9BDBDDB96DCFF1 /* src/backend/Tms6747.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/Tms6747.h; sourceTree = "<group>"; };
+		75BC19544D91766F79E7FF3B /* src/backend/X86_64.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/X86_64.h; sourceTree = "<group>"; };
+		2E28904CB2FC6961A2D0F42E /* src/backend/X86_64Linux.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/X86_64Linux.h; sourceTree = "<group>"; };
+		A26C2E36CB65E5A3BDE3B768 /* src/backend/X86_64Windows.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/X86_64Windows.h; sourceTree = "<group>"; };
+		67AAF99CC753BFC75AAF3EAD /* shci.exe */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = shci.exe; sourceTree = BUILT_PRODUCTS_DIR; };
+		39639ADA9821E32E80B83258 /* cxx1i.exe.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = cxx1i.exe.xcodeproj; path = "../Compiler-Cppi/cxx1.xcodeproj"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXContainerItemProxy section */
+		7ECB5021E1C9D7A03BC1C5F8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 39639ADA9821E32E80B83258 /* cxx1i.exe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B0DEE53FB510C2BF164ECD03;
+			remoteInfo = cxx1i.exe;
+		};
+		239CA0FD22F1CC99C26BC928 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 39639ADA9821E32E80B83258 /* cxx1i.exe.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 9BDE0D6970DFE91E74C9FC29;
+			remoteInfo = cxx1i.exe;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		876AF45313F36F5DA47CF5F4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C79EF7AB2888DFC3020D4C3C = {
+			isa = PBXGroup;
+			children = (
+				838969CE344FDAEB239F99BB /* Sources */,
+				39639ADA9821E32E80B83258 /* cxx1i.exe.xcodeproj */,
+				287B8F37C5D23BC16E0E80A2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		838969CE344FDAEB239F99BB /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				B195FEA9B7E948B5DF3B7E21 /* runtime/Shortest.cpp */,
+				30307F574764066D5EE15CD8 /* src/Ast.cpp */,
+				97E3390E25970C5A0342472F /* src/Builtin.cpp */,
+				0901303781D33A1A3EAB8462 /* src/Check.cpp */,
+				E2A47605292B20D8C410A56E /* src/CodeGen.cpp */,
+				6FB71B9FE84080E54FD37D6D /* src/Diag.cpp */,
+				5EB5CA72B86B4E87A673EF84 /* src/Driver.cpp */,
+				9CF031406EE1DD9485C4BA3D /* src/Lexer.cpp */,
+				CFDD3A92A26BFD2888F07E53 /* src/Parser.cpp */,
+				DE54D8763C62836BEDB4858C /* src/Resolve.cpp */,
+				C14FB0270E32BCE6A029CC2C /* src/Target.cpp */,
+				0CF1F1632A53D18EADA1F08B /* src/Type.cpp */,
+				1D379CB68B7B096E7C1D1F03 /* src/backend/Arm64Darwin.cpp */,
+				FA842397EEE08645CBF0A4B6 /* src/backend/Emitter.cpp */,
+				97F09AFC0AA38A8A04DE9345 /* src/backend/Spelling.cpp */,
+				7BBF83D8D6B8A7FC4D6DF50F /* src/backend/Tms6747.cpp */,
+				AE87171411E45DCD7C2A1A7C /* src/backend/X86_64.cpp */,
+				F08BD4D08CCA81D827656938 /* src/backend/X86_64Linux.cpp */,
+				4680FEDE33A9AE4FA966E075 /* src/backend/X86_64Windows.cpp */,
+				5ED8449B58A6C4DCC07A9E94 /* src/main.cpp */,
+				978B1B3B80F42BFC7B29E6CA /* runtime/Debug.h */,
+				AC618D3B0C6BB93586806709 /* runtime/Internal.h */,
+				3D541BCE774B87F24DEEBFB6 /* runtime/Shortest.h */,
+				E0008D7B6286A6D62113817B /* runtime/shmrt.h */,
+				31D92DEFE4B563F3C2B8F8E9 /* src/Ast.h */,
+				02431D9D517619355F74750B /* src/Builtin.h */,
+				DBE164A8F3706413BAB572C3 /* src/Check.h */,
+				4E2A5F48D4B7FC81C018216E /* src/CodeGen.h */,
+				C8051BBBF38CD975FAA89C4E /* src/Diag.h */,
+				D08F9BC6D7149867B26FBDEB /* src/Driver.h */,
+				334350E1CB772C075C7C92C7 /* src/Parser.h */,
+				538CAB31859745F8D146ED05 /* src/Resolve.h */,
+				8761BD51353C336B318D93E5 /* src/Target.h */,
+				434225D1DBB18017273F7248 /* src/Token.h */,
+				449316AEEC632DDF9F0755B1 /* src/Type.h */,
+				5D0A9371C09C368710D78D49 /* src/backend/Arm64Darwin.h */,
+				990A15B1715DDF27A8CEB533 /* src/backend/Emitter.h */,
+				7BB42B4202968E6326734CC6 /* src/backend/Spelling.h */,
+				2EA34AE75A9BDBDDB96DCFF1 /* src/backend/Tms6747.h */,
+				75BC19544D91766F79E7FF3B /* src/backend/X86_64.h */,
+				2E28904CB2FC6961A2D0F42E /* src/backend/X86_64Linux.h */,
+				A26C2E36CB65E5A3BDE3B768 /* src/backend/X86_64Windows.h */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+		287B8F37C5D23BC16E0E80A2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				67AAF99CC753BFC75AAF3EAD /* shci.exe */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DE1DE0B7B8F110077C3961EB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DD4AB28C5658160CCA7A4AEA /* cxx1i.exe */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXReferenceProxy section */
+		DD4AB28C5658160CCA7A4AEA /* cxx1i.exe */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = cxx1i.exe;
+			remoteRef = 7ECB5021E1C9D7A03BC1C5F8 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXNativeTarget section */
+		E2B705156EA9B32DAB3E58FD /* shci.exe */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7250F947A3EFB9DD5D684849;
+			buildPhases = (
+				3ABACC9FA9FBF57179ABE4F5 /* Sources */,
+				876AF45313F36F5DA47CF5F4 /* Frameworks */,
+				58D9D205F50D1B4B3A8583FC /* the Shalimar runtime, beside shci.exe */,
+				6691D8D0016767831EC71BFE /* put the finished program in RStudio's directory */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				44FA8D4C6D426AF50575250F /* PBXTargetDependency */,
+			);
+			name = shci.exe;
+			productName = shci.exe;
+			productReference = 67AAF99CC753BFC75AAF3EAD /* shci.exe */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXTargetDependency section */
+		44FA8D4C6D426AF50575250F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = cxx1i.exe;
+			targetProxy = 239CA0FD22F1CC99C26BC928 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXProject section */
+		8ADA952F0B98A5BB95E9E34E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = 8E32E86A56A83E47E2E26CB3;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C79EF7AB2888DFC3020D4C3C;
+			productRefGroup = 287B8F37C5D23BC16E0E80A2 /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = DE1DE0B7B8F110077C3961EB /* Products */;
+					ProjectRef = 39639ADA9821E32E80B83258 /* cxx1i.exe.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				E2B705156EA9B32DAB3E58FD /* shci.exe */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		58D9D205F50D1B4B3A8583FC /* the Shalimar runtime, beside shci.exe */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/runtime/Shortest.cpp",
+				"$(SRCROOT)/runtime/Failure.cpp",
+				"$(SRCROOT)/runtime/Numbers.cpp",
+				"$(SRCROOT)/runtime/Array.cpp",
+				"$(SRCROOT)/runtime/Console.cpp",
+				"$(SRCROOT)/runtime/Runtime.cpp",
+				"$(SRCROOT)/runtime/Debug.cpp",
+				"$(SRCROOT)/runtime/shmrt.h",
+				"$(SRCROOT)/runtime/Internal.h",
+				"$(SRCROOT)/runtime/Shortest.h",
+				"$(SRCROOT)/runtime/Debug.h",
+				"$(BUILT_PRODUCTS_DIR)/cxx1i.exe",
+			);
+			name = "the Shalimar runtime, beside shci.exe";
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/lib/shmrt-arm64-darwin.a",
+				"$(BUILT_PRODUCTS_DIR)/lib/shmrt-arm64-darwin-debug.a",
+				"$(BUILT_PRODUCTS_DIR)/lib/shmrt-tms6747/Shortest.s",
+				"$(BUILT_PRODUCTS_DIR)/lib/shmrt-tms6747/Failure.s",
+				"$(BUILT_PRODUCTS_DIR)/lib/shmrt-tms6747/Numbers.s",
+				"$(BUILT_PRODUCTS_DIR)/lib/shmrt-tms6747/Array.s",
+				"$(BUILT_PRODUCTS_DIR)/lib/shmrt-tms6747/Console.s",
+				"$(BUILT_PRODUCTS_DIR)/lib/shmrt-tms6747/Runtime.s",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\ncxx=\"$(xcrun --find clang++)\"\nar=\"$(xcrun --find ar)\"\nflags=\"-std=c++14 -Wall -Wextra -Werror -pedantic -O2\"\nlib=\"$BUILT_PRODUCTS_DIR/lib\"\nmkdir -p \"$lib\"\nmkdir -p \"$DERIVED_FILE_DIR/runtime\"\n\"$cxx\" $flags -c \"$SRCROOT/runtime/Shortest.cpp\" -o \"$DERIVED_FILE_DIR/runtime/Shortest.o\"\n\"$cxx\" $flags -c \"$SRCROOT/runtime/Failure.cpp\" -o \"$DERIVED_FILE_DIR/runtime/Failure.o\"\n\"$cxx\" $flags -c \"$SRCROOT/runtime/Numbers.cpp\" -o \"$DERIVED_FILE_DIR/runtime/Numbers.o\"\n\"$cxx\" $flags -c \"$SRCROOT/runtime/Array.cpp\" -o \"$DERIVED_FILE_DIR/runtime/Array.o\"\n\"$cxx\" $flags -c \"$SRCROOT/runtime/Console.cpp\" -o \"$DERIVED_FILE_DIR/runtime/Console.o\"\n\"$cxx\" $flags -c \"$SRCROOT/runtime/Runtime.cpp\" -o \"$DERIVED_FILE_DIR/runtime/Runtime.o\"\nrm -f \"$lib/shmrt-arm64-darwin.a\"\n\"$ar\" rcs \"$lib/shmrt-arm64-darwin.a\" \"$DERIVED_FILE_DIR/runtime\"/*.o\nmkdir -p \"$DERIVED_FILE_DIR/runtime-debug\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Shortest.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Shortest.o\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Failure.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Failure.o\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Numbers.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Numbers.o\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Array.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Array.o\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Console.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Console.o\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Runtime.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Runtime.o\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Debug.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Debug.o\"\nrm -f \"$lib/shmrt-arm64-darwin-debug.a\"\n\"$ar\" rcs \"$lib/shmrt-arm64-darwin-debug.a\" \"$DERIVED_FILE_DIR/runtime-debug\"/*.o\ncxx1i=\"$BUILT_PRODUCTS_DIR/cxx1i.exe\"\ntest -x \"$cxx1i\" || { echo \"shc.xcodeproj: no cxx1i.exe beside the output - the C6000 runtime is its output\" >&2; exit 1; }\nrm -rf \"$lib/shmrt-tms6747\"\nmkdir -p \"$lib/shmrt-tms6747\"\n\"$cxx1i\" -S -arch tms6747 -nologo \"$SRCROOT/runtime/Shortest.cpp\" -o \"$lib/shmrt-tms6747/Shortest.s\"\n\"$cxx1i\" -S -arch tms6747 -nologo \"$SRCROOT/runtime/Failure.cpp\" -o \"$lib/shmrt-tms6747/Failure.s\"\n\"$cxx1i\" -S -arch tms6747 -nologo \"$SRCROOT/runtime/Numbers.cpp\" -o \"$lib/shmrt-tms6747/Numbers.s\"\n\"$cxx1i\" -S -arch tms6747 -nologo \"$SRCROOT/runtime/Array.cpp\" -o \"$lib/shmrt-tms6747/Array.s\"\n\"$cxx1i\" -S -arch tms6747 -nologo \"$SRCROOT/runtime/Console.cpp\" -o \"$lib/shmrt-tms6747/Console.s\"\n\"$cxx1i\" -S -arch tms6747 -nologo \"$SRCROOT/runtime/Runtime.cpp\" -o \"$lib/shmrt-tms6747/Runtime.s\"\n";
+		};
+		6691D8D0016767831EC71BFE /* put the finished program in RStudio's directory */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "put the finished program in RStudio's directory";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\ndest=\"$SRCROOT/../../RStudio\"\nmkdir -p \"$dest\"\ncp -f \"$BUILT_PRODUCTS_DIR/$PRODUCT_NAME\" \"$dest/.$PRODUCT_NAME.new\"\nmv -f \"$dest/.$PRODUCT_NAME.new\" \"$dest/$PRODUCT_NAME\"\ncodesign --force --sign - \"$dest/$PRODUCT_NAME\"\nmkdir -p \"$dest/lib\"\ncp -f \"$BUILT_PRODUCTS_DIR\"/lib/*.a \"$dest/lib/\"\nrm -rf \"$dest/lib/shmrt-tms6747\"\ncp -R \"$BUILT_PRODUCTS_DIR/lib/shmrt-tms6747\" \"$dest/lib/\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3ABACC9FA9FBF57179ABE4F5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA2E3F44EA609A07BF8D1F82 /* runtime/Shortest.cpp in Sources */,
+				59C6E2AD256053BE27E81E40 /* src/Ast.cpp in Sources */,
+				D0B6555C5E35D377BA3E0DCB /* src/Builtin.cpp in Sources */,
+				EA5FF733A1D9A99AB659285E /* src/Check.cpp in Sources */,
+				EAC8447EE8FB3BE56B2B748E /* src/CodeGen.cpp in Sources */,
+				F3F509B5BEA2B63806E86A29 /* src/Diag.cpp in Sources */,
+				87E1438F5E0F21536D811CF1 /* src/Driver.cpp in Sources */,
+				B3B58E394327B534D007874E /* src/Lexer.cpp in Sources */,
+				5B30594E544C1E038663CA40 /* src/Parser.cpp in Sources */,
+				BEDB7A7B75C1291F94A9DA74 /* src/Resolve.cpp in Sources */,
+				4E63CFEB223F6063F629410E /* src/Target.cpp in Sources */,
+				90C4FBE5EC1A3DE5DAE697A1 /* src/Type.cpp in Sources */,
+				A45DC5B1C4209FF72F679396 /* src/backend/Arm64Darwin.cpp in Sources */,
+				3AB5913BD32D2FBD22B61831 /* src/backend/Emitter.cpp in Sources */,
+				C85450FD793973D2CE9E3222 /* src/backend/Spelling.cpp in Sources */,
+				4AC536ECE1F6545D7D8F1067 /* src/backend/Tms6747.cpp in Sources */,
+				C6488B664BB11BF747289EF9 /* src/backend/X86_64.cpp in Sources */,
+				A669587D3E94EE6CB1249BB8 /* src/backend/X86_64Linux.cpp in Sources */,
+				025E27BE7A159BDA1B6FCF2B /* src/backend/X86_64Windows.cpp in Sources */,
+				E6D5CBF0B9AC9FD515D6E60F /* src/main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		BAE25C7AA5868EB081D8126B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				OBJROOT = "$(TMPDIR)/rstudio-xcode";
+				SYMROOT = "$(TMPDIR)/rstudio-xcode";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
+				CODE_SIGN_STYLE = Automatic;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_NAME = shci.exe;
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/src $(SRCROOT)/runtime";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wextra",
+					"-pedantic",
+				);
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_OPTIMIZATION_LEVEL = 0;
+			};
+			name = Debug;
+		};
+		8C7DFD9E3D8FB3C6176C2F11 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				OBJROOT = "$(TMPDIR)/rstudio-xcode";
+				SYMROOT = "$(TMPDIR)/rstudio-xcode";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
+				CODE_SIGN_STYLE = Automatic;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_NAME = shci.exe;
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/src $(SRCROOT)/runtime";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wextra",
+					"-pedantic",
+				);
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_OPTIMIZATION_LEVEL = 2;
+			};
+			name = Release;
+		};
+		0558A993EF225C1E610066EE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				OBJROOT = "$(TMPDIR)/rstudio-xcode";
+				SYMROOT = "$(TMPDIR)/rstudio-xcode";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
+				CODE_SIGN_STYLE = Automatic;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_NAME = shci.exe;
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/src $(SRCROOT)/runtime";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wextra",
+					"-pedantic",
+				);
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_OPTIMIZATION_LEVEL = 0;
+			};
+			name = Debug;
+		};
+		C7B886D5C1CFE275724A0BB0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				OBJROOT = "$(TMPDIR)/rstudio-xcode";
+				SYMROOT = "$(TMPDIR)/rstudio-xcode";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
+				CODE_SIGN_STYLE = Automatic;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_NAME = shci.exe;
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/src $(SRCROOT)/runtime";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wextra",
+					"-pedantic",
+				);
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_OPTIMIZATION_LEVEL = 2;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8E32E86A56A83E47E2E26CB3 /* project */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BAE25C7AA5868EB081D8126B /* Debug */,
+				8C7DFD9E3D8FB3C6176C2F11 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		7250F947A3EFB9DD5D684849 /* target */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0558A993EF225C1E610066EE /* Debug */,
+				C7B886D5C1CFE275724A0BB0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 8ADA952F0B98A5BB95E9E34E /* Project object */;
+}

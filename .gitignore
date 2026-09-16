@@ -1,0 +1,19 @@
+obj/
+lib/
+shc.exe
+*.o
+*.s
+*.asm
+tests/out/
+.DS_Store
+
+# Xcode's per-user state, which is not the project
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/
+tests/out-examples/
+tests/out-abi/
+tests/out-foreign/
+
+# The library examples' built programs.
+examples/*/prog
+examples/*/prog.exe

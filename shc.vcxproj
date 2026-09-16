@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <ProjectGuid>{39F445EC-2E3B-CB68-9D8C-B98B85AC2258}</ProjectGuid>
+    <RootNamespace>shci</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup>
+    <TargetName>shci</TargetName>
+  </PropertyGroup>
+  <!-- OutDir is left to the C++ default on purpose: this project's
+       own x64\$(Configuration)\ when built alone, and the solution's
+       output directory when built from one - which is what puts the
+       editor and the compilers it drives in one place. -->
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <PostBuildEvent>
+      <Message>building the Shalimar runtime beside shci.exe</Message>
+      <Command>if not exist "$(OutDir)lib" mkdir "$(OutDir)lib"
+if not exist "$(IntDir)rt" mkdir "$(IntDir)rt"
+if not exist "$(IntDir)rtd" mkdir "$(IntDir)rtd"
+cl /nologo /std:c++14 /W4 /WX /EHsc /permissive- /O2 /D_CRT_SECURE_NO_WARNINGS /Fo"$(IntDir)rt\\" /c "$(ProjectDir)runtime\Shortest.cpp" "$(ProjectDir)runtime\Failure.cpp" "$(ProjectDir)runtime\Numbers.cpp" "$(ProjectDir)runtime\Array.cpp" "$(ProjectDir)runtime\Console.cpp" "$(ProjectDir)runtime\Runtime.cpp"
+if errorlevel 1 exit /b 1
+lib /nologo /out:"$(OutDir)lib\shmrt-x86_64-windows.lib" "$(IntDir)rt\Shortest.obj" "$(IntDir)rt\Failure.obj" "$(IntDir)rt\Numbers.obj" "$(IntDir)rt\Array.obj" "$(IntDir)rt\Console.obj" "$(IntDir)rt\Runtime.obj"
+if errorlevel 1 exit /b 1
+cl /nologo /std:c++14 /W4 /WX /EHsc /permissive- /O2 /D_CRT_SECURE_NO_WARNINGS /DSHM_DEBUG=1 /Fo"$(IntDir)rtd\\" /c "$(ProjectDir)runtime\Shortest.cpp" "$(ProjectDir)runtime\Failure.cpp" "$(ProjectDir)runtime\Numbers.cpp" "$(ProjectDir)runtime\Array.cpp" "$(ProjectDir)runtime\Console.cpp" "$(ProjectDir)runtime\Runtime.cpp" "$(ProjectDir)runtime\Debug.cpp"
+if errorlevel 1 exit /b 1
+lib /nologo /out:"$(OutDir)lib\shmrt-x86_64-windows-debug.lib" "$(IntDir)rtd\Shortest.obj" "$(IntDir)rtd\Failure.obj" "$(IntDir)rtd\Numbers.obj" "$(IntDir)rtd\Array.obj" "$(IntDir)rtd\Console.obj" "$(IntDir)rtd\Runtime.obj" "$(IntDir)rtd\Debug.obj"
+if errorlevel 1 exit /b 1
+if not exist "$(OutDir)cxx1i.exe" echo shc.vcxproj: no cxx1i.exe in $(OutDir) - the C6000 runtime is its output; build RStudio.sln, which builds it first
+if not exist "$(OutDir)cxx1i.exe" exit /b 1
+if not exist "$(OutDir)lib\shmrt-tms6747" mkdir "$(OutDir)lib\shmrt-tms6747"
+"$(OutDir)cxx1i.exe" -S -arch tms6747 -nologo "$(ProjectDir)runtime\Shortest.cpp" -o "$(OutDir)lib\shmrt-tms6747\Shortest.s"
+if errorlevel 1 exit /b 1
+"$(OutDir)cxx1i.exe" -S -arch tms6747 -nologo "$(ProjectDir)runtime\Failure.cpp" -o "$(OutDir)lib\shmrt-tms6747\Failure.s"
+if errorlevel 1 exit /b 1
+"$(OutDir)cxx1i.exe" -S -arch tms6747 -nologo "$(ProjectDir)runtime\Numbers.cpp" -o "$(OutDir)lib\shmrt-tms6747\Numbers.s"
+if errorlevel 1 exit /b 1
+"$(OutDir)cxx1i.exe" -S -arch tms6747 -nologo "$(ProjectDir)runtime\Array.cpp" -o "$(OutDir)lib\shmrt-tms6747\Array.s"
+if errorlevel 1 exit /b 1
+"$(OutDir)cxx1i.exe" -S -arch tms6747 -nologo "$(ProjectDir)runtime\Console.cpp" -o "$(OutDir)lib\shmrt-tms6747\Console.s"
+if errorlevel 1 exit /b 1
+"$(OutDir)cxx1i.exe" -S -arch tms6747 -nologo "$(ProjectDir)runtime\Runtime.cpp" -o "$(OutDir)lib\shmrt-tms6747\Runtime.s"
+if errorlevel 1 exit /b 1</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="runtime\Shortest.cpp" />
+    <ClCompile Include="src\Ast.cpp" />
+    <ClCompile Include="src\Builtin.cpp" />
+    <ClCompile Include="src\Check.cpp" />
+    <ClCompile Include="src\CodeGen.cpp" />
+    <ClCompile Include="src\Diag.cpp" />
+    <ClCompile Include="src\Driver.cpp" />
+    <ClCompile Include="src\Lexer.cpp" />
+    <ClCompile Include="src\Parser.cpp" />
+    <ClCompile Include="src\Resolve.cpp" />
+    <ClCompile Include="src\Target.cpp" />
+    <ClCompile Include="src\Type.cpp" />
+    <ClCompile Include="src\backend\Arm64Darwin.cpp" />
+    <ClCompile Include="src\backend\Emitter.cpp" />
+    <ClCompile Include="src\backend\Spelling.cpp" />
+    <ClCompile Include="src\backend\Tms6747.cpp" />
+    <ClCompile Include="src\backend\X86_64.cpp" />
+    <ClCompile Include="src\backend\X86_64Linux.cpp" />
+    <ClCompile Include="src\backend\X86_64Windows.cpp" />
+    <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>
