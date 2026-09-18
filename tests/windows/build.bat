@@ -3,6 +3,8 @@ rem Assembles one case's MASM with ml64, links it against the runtime, and runs
 rem it. Driven by tests\remote-windows.sh, one case per invocation:
 rem
 rem   build.bat <name>        assembles work\<name>.asm and runs work\<name>.exe
+rem   build.bat <name> <asm>  the same through another assembler that takes ml64's
+rem                           command line - the project's own, as SHC_AS names it
 rem
 rem The two commands are shc's own, from src\Driver.cpp - if they drift apart,
 rem this suite stops testing what shc does on this target:
@@ -31,7 +33,9 @@ if not exist %1.asm (
     exit /b 1
 )
 
-ml64 /nologo /c /Fo%1.obj %1.asm
+set ASM=ml64
+if not "%~2"=="" set ASM=%~2
+%ASM% /nologo /c /Fo%1.obj %1.asm
 if errorlevel 1 exit /b 1
 
 link /nologo /subsystem:console /out:%1.exe %1.obj ..\shmrt.lib

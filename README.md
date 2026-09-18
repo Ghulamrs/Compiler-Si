@@ -148,6 +148,8 @@ committed, so neither of the other machines needs Swift or the app.
 ./tests/run.sh              the host suite: tests/cases and tests/load
 ./tests/remote-linux.sh     build with real g++ and run the suite on the box
 ./tests/remote-windows.sh   assemble with ml64 and run on the Windows box
+SHC_AS='C:\masm-tests\build\asm-win.exe' ./tests/remote-windows.sh
+                            the same through the project's own assembler
 ./tests/build-windows.sh    build shc itself there, with cl
 ./tests/record.sh           re-record expected output from the interpreter
 ./tests/cross.sh            finding the rest of the program in the other files
@@ -173,7 +175,7 @@ passes the host suite, and is refused only when it reaches real g++.
 | --- | --- | --- |
 | this Mac | — | writing; `arm64-darwin` natively |
 | Linux box | `ssh -i ~/Documents/Claude/myMorningWalk.pem ec2-user@52.202.164.123` | real g++; `x86_64-linux` natively |
-| Windows box | `ssh windows` | `ml64` and `link`; `x86_64-windows` natively |
+| Windows box | `ssh windows` | `ml64` and `link`, or the project's assembler through `SHC_AS`; `x86_64-windows` natively |
 
 The Windows shell is PowerShell, `git` is not on its `PATH`, and nested
 quotes mangle: the far side runs a `.bat` under `cmd`, which is the only

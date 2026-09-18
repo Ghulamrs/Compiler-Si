@@ -517,7 +517,12 @@ int Driver::run(const std::vector<std::string> &arguments) {
     const std::string objectPath =
         objectOnly_ ? (named ? output_ : output_ + ".obj") : output_ + ".obj";
 
-    std::string command = "ml64 /nologo /c /Fo" + shellQuote(objectPath) + " " +
+    // The assembler is ml64 unless SHC_AS names another that takes its
+    // command line - the project's own does, and RIDE names it this way, as
+    // it names cc1i's and cxx1i's through CC1_AS and CXX1_AS.
+    const char *as = std::getenv("SHC_AS");
+    const std::string assembler = (as != nullptr && as[0] != '\0') ? shellQuote(as) : "ml64";
+    std::string command = assembler + " /nologo /c /Fo" + shellQuote(objectPath) + " " +
                           shellQuote(assemblyPath);
     int status = shell(command);
     if (status != 0) {
@@ -575,7 +580,8 @@ void Driver::noteWindowsToolchain() {
 #ifdef _WIN32
     std::cerr <<
         "shc: ml64 and link ship with Visual Studio and are on PATH only inside\n"
-        "     a Developer Command Prompt, or after vcvars64.bat has been run.\n";
+        "     a Developer Command Prompt, or after vcvars64.bat has been run;\n"
+        "     SHC_AS names another assembler that takes ml64's command line.\n";
 #endif
 }
 

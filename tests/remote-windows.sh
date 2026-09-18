@@ -59,6 +59,11 @@ ssh -n "$HOSTNAME_" "$REMOTE\\setup.bat" | grep -q RUNTIME_BUILT || {
 # by tests/run.sh. Only cases that produce a program travel.
 # Two parallel arrays rather than one associative one: the bash macOS ships
 # is 3.2, which has no 'declare -A'.
+# SHC_AS=<path on the box> sends every case through that assembler instead of
+# ml64 - the project's own, at C:\masm-tests\build\asm-win.exe once MASM's
+# tests/windows.sh has built it there - which is what RIDE does with it.
+ASM_THERE=${SHC_AS:-}
+[ -n "$ASM_THERE" ] && echo "assembling with $ASM_THERE"
 names=()
 sources=()
 skipped=0
@@ -86,7 +91,7 @@ for i in "${!names[@]}"; do
     # there, so they are joined in the order the recorded file has them.
     diagnostics=$(./shc.exe "$case" --target=x86_64-windows -S \
                        -o "$WORK/$name.asm" 2>/dev/null)
-    got=$(ssh -n "$HOSTNAME_" "$REMOTE\\build.bat $name" 2>&1 | \
+    got=$(ssh -n "$HOSTNAME_" "$REMOTE\\build.bat $name $ASM_THERE" 2>&1 | \
           sed -n '/---RUN---/,$p' | tail -n +2 | sed 's/\r$//')
     [ -n "$diagnostics" ] && got="$diagnostics
 $got"
