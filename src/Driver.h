@@ -38,6 +38,10 @@ private:
     void usage() const;
 
     std::string defaultRuntimeObject(const std::string &targetName) const;
+    // The tms6747 target, on any host: asm6x on the assembly, and TI's lnk6x
+    // over the objects and the runtime's, where CCS is.
+    int finishTi(const std::string &assemblyPath, bool named);
+    static std::vector<std::string> assemblyFilesIn(const std::string &directory);
 
     static void noteWindowsToolchain();
     static std::string stem(const std::string &path);

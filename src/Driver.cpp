@@ -57,7 +57,13 @@ void Driver::usage() const {
         "  -S                 stop after writing assembly\n"
         "  -c                 stop after assembling\n"
         "  --target=<name>    arm64-darwin | x86_64-linux | x86_64-windows | tms6747\n"
-        "  --runtime=<path>   the runtime archive to link against\n"
+        "                     (tms6747 is assembled on any host by asm6x, the\n"
+        "                     project's C6000 assembler - SHC_AS, or the one beside\n"
+        "                     shc - and linked into a .out by TI's lnk6x where CCS\n"
+        "                     is: SHC_TI names its C6000 compiler directory,\n"
+        "                     SHC_TILIB one holding rts6740_elf_eh.lib)\n"
+        "  --runtime=<path>   the runtime archive to link against; for tms6747 the\n"
+        "                     directory of its assembly, lib/shmrt-tms6747\n"
         "  --with=<path>      a library holding what 'uses' declared;\n"
         "                     repeatable, linked in the order given\n"
         "  --no-search        do not look in the other files beside this one\n"
@@ -114,14 +120,14 @@ bool Driver::looksLikeShalimar(const std::string &name) {
     return false;
 }
 
-std::vector<std::string> Driver::shalimarFilesIn(const std::string &directory) {
+static std::vector<std::string> filesIn(const std::string &directory, bool (*take)(const std::string &)) {
     std::vector<std::string> found;
 #ifdef _WIN32
     WIN32_FIND_DATAA entry;
     HANDLE handle = FindFirstFileA((directory + "\\*").c_str(), &entry);
     if (handle == INVALID_HANDLE_VALUE) return found;
     do {
-        if (looksLikeShalimar(entry.cFileName))
+        if (take(entry.cFileName))
             found.push_back(directory + "\\" + entry.cFileName);
     } while (FindNextFileA(handle, &entry));
     FindClose(handle);
@@ -129,13 +135,29 @@ std::vector<std::string> Driver::shalimarFilesIn(const std::string &directory) {
     DIR *open = opendir(directory.c_str());
     if (!open) return found;
     while (struct dirent *entry = readdir(open)) {
-        if (looksLikeShalimar(entry->d_name))
+        if (take(entry->d_name))
             found.push_back(directory + "/" + entry->d_name);
     }
     closedir(open);
 #endif
     std::sort(found.begin(), found.end());
     return found;
+}
+
+std::vector<std::string> Driver::shalimarFilesIn(const std::string &directory) {
+    return filesIn(directory, looksLikeShalimar);
+}
+
+// The C6000 runtime is a directory of assembly, one .s per runtime source -
+// macOS leaves "name 2.s" copies beside files it rewrites, and those are not
+// part of it.
+static bool looksLikeAssembly(const std::string &name) {
+    return name.size() > 2 && name.compare(name.size() - 2, 2, ".s") == 0 &&
+           name.find(' ') == std::string::npos;
+}
+
+std::vector<std::string> Driver::assemblyFilesIn(const std::string &directory) {
+    return filesIn(directory, looksLikeAssembly);
 }
 
 #ifdef _WIN32
@@ -271,6 +293,10 @@ std::string Driver::defaultRuntimeObject(const std::string &targetName) const {
 #else
     const char *extension = ".a";
 #endif
+    // The C6000 runtime is not an archive but a directory of the assembly
+    // cxx1i wrote for it, lib/shmrt-tms6747, which asm6x assembles with the
+    // program.
+    if (targetName == "tms6747") extension = "";
     const std::string leaf =
         "/shmrt-" + targetName + (debug_ ? "-debug" : "") + extension;
     const std::string here = programDirectory(program_);
@@ -488,11 +514,13 @@ int Driver::run(const std::vector<std::string> &arguments) {
     generator.run(*program, input_, names);
 
     const bool named = !output_.empty();
+    const bool ti = target->name() == "tms6747";
     if (output_.empty()) {
         output_ = stem(input_);
 
+        if (ti) { if (!assemblyOnly_ && !objectOnly_) output_ += ".out"; }
 #ifdef _WIN32
-        if (!assemblyOnly_ && !objectOnly_) output_ += ".exe";
+        else if (!assemblyOnly_ && !objectOnly_) output_ += ".exe";
 #endif
     }
 
@@ -503,6 +531,8 @@ int Driver::run(const std::vector<std::string> &arguments) {
         return 2;
     }
     if (assemblyOnly_) return 0;
+
+    if (ti) return finishTi(assemblyPath, named);
 
     if (!target->isHost()) {
         std::cerr << "shc: " << targetName_ << " assembly is in " << assemblyPath
@@ -574,6 +604,130 @@ int Driver::run(const std::vector<std::string> &arguments) {
     std::remove(assemblyPath.c_str());
     return status == 0 ? 0 : 2;
 #endif
+}
+
+// The linker command file lnk6x needs: one flat memory for the C6747 and
+// every section the compilers and TI's runtime write placed in it - the same
+// file RIDE, cxx1i and VM6747's tests link with.
+static const char *const kTiLinkCommands =
+    "--rom_model\n"
+    "--stack_size=0x4000\n"
+    "--heap_size=0x100000\n"
+    "MEMORY\n"
+    "{\n"
+    "    RAM : origin = 0xC0000000, length = 0x04000000\n"
+    "}\n"
+    "SECTIONS\n"
+    "{\n"
+    "    .text        > RAM\n"
+    "    .const       > RAM\n"
+    "    .data        > RAM\n"
+    "    .bss         > RAM\n"
+    "    .far         > RAM\n"
+    "    .fardata     > RAM\n"
+    "    .neardata    > RAM\n"
+    "    .rodata      > RAM\n"
+    "    .cinit       > RAM\n"
+    "    .init_array  > RAM\n"
+    "    .switch      > RAM\n"
+    "    .cio         > RAM\n"
+    "    .stack       > RAM\n"
+    "    .sysmem      > RAM\n"
+    "    .vm6747.eh   > RAM\n"
+    "}\n";
+
+static std::string environment(const char *name) {
+    const char *value = std::getenv(name);
+    return value != nullptr ? std::string(value) : std::string();
+}
+
+// **The tms6747 target reaches an object on any host and a program where CCS
+// is.** asm6x, the project's own C6000 assembler, takes the assembly: SHC_AS
+// names it, else the one beside this program (as RIDE lays them out), else
+// asm6x on PATH. Without -c the object, the runtime directory's objects and
+// the libraries go to TI's lnk6x - SHC_TI names CCS's C6000 compiler
+// directory, SHC_TILIB one holding rts6740_elf_eh.lib, SHC_LD the linker -
+// into a .out.
+int Driver::finishTi(const std::string &assemblyPath, bool named) {
+    std::string assembler = environment("SHC_AS");
+    if (assembler.empty()) {
+        const std::string here = programDirectory(program_);
+        if (exists(here + "/asm6x.exe")) assembler = here + "/asm6x.exe";
+        else if (exists(here + "/asm6x")) assembler = here + "/asm6x";
+        else assembler = "asm6x";
+    }
+    const std::string objectPath =
+        objectOnly_ ? (named ? output_ : output_ + ".obj") : output_ + ".obj";
+    std::string command = shellQuote(assembler) + " " + shellQuote(assemblyPath) +
+                          " -o " + shellQuote(objectPath);
+    int status = shell(command);
+    std::remove(assemblyPath.c_str());
+    if (status != 0) {
+        std::cerr << "shc: the assembler failed - the command was:\n  " << command << "\n"
+                  << "     asm6x is the project's C6000 assembler; SHC_AS names it\n";
+        return 2;
+    }
+    if (objectOnly_) return 0;
+
+    // the runtime: every .s of the directory, assembled beside the program's object
+    std::vector<std::string> made;
+    made.push_back(objectPath);
+    if (runtimeObject_.empty()) runtimeObject_ = defaultRuntimeObject("tms6747");
+    std::vector<std::string> runtime = assemblyFilesIn(runtimeObject_);
+    if (runtime.empty()) {
+        std::cerr << "shc: no C6000 runtime at " << runtimeObject_
+                  << " - a directory of the assembly cxx1i wrote for it, lib/shmrt-tms6747;"
+                     " --runtime= names it\n";
+        std::remove(objectPath.c_str());
+        return 2;
+    }
+    for (size_t i = 0; i < runtime.size(); ++i) {
+        const std::string object = output_ + "-rt" + std::to_string(i) + ".obj";
+        command = shellQuote(assembler) + " " + shellQuote(runtime[i]) + " -o " + shellQuote(object);
+        if (shell(command) != 0) {
+            std::cerr << "shc: the assembler failed on the runtime - the command was:\n  " << command << "\n";
+            for (size_t k = 0; k < made.size(); ++k) std::remove(made[k].c_str());
+            return 2;
+        }
+        made.push_back(object);
+    }
+
+    std::string linker = environment("SHC_LD");
+    const std::string ti = environment("SHC_TI");
+    if (linker.empty()) {
+        if (!ti.empty()) linker = exists(ti + "/bin/lnk6x.exe") ? ti + "/bin/lnk6x.exe" : ti + "/bin/lnk6x";
+        else linker = "lnk6x";
+    }
+    std::vector<std::string> libraryDirs;
+    if (!ti.empty()) libraryDirs.push_back(ti + "/lib");
+    const std::string tilib = environment("SHC_TILIB");
+    if (!tilib.empty()) libraryDirs.push_back(tilib);
+    std::string rts = "rts6740_elf.lib";
+    for (size_t i = 0; i < libraryDirs.size(); ++i)
+        if (exists(libraryDirs[i] + "/rts6740_elf_eh.lib")) rts = "rts6740_elf_eh.lib";
+    const std::string commandFile = output_ + ".lnk.cmd";
+    if (!writeFile(commandFile, kTiLinkCommands)) {
+        std::cerr << "shc: cannot write " << commandFile << "\n";
+        for (size_t k = 0; k < made.size(); ++k) std::remove(made[k].c_str());
+        return 2;
+    }
+    command = shellQuote(linker) + " -mv6740 --abi=eabi";
+    for (size_t i = 0; i < libraryDirs.size(); ++i) command += " -i " + shellQuote(libraryDirs[i]);
+    command += " " + shellQuote(commandFile);
+    for (size_t k = 0; k < made.size(); ++k) command += " " + shellQuote(made[k]);
+    for (size_t i = 0; i < libraries_.size(); ++i) command += " " + shellQuote(libraries_[i]);
+    command += " -l " + rts + " -o " + shellQuote(output_);
+    status = shell(command);
+    for (size_t k = 0; k < made.size(); ++k) std::remove(made[k].c_str());
+    std::remove(commandFile.c_str());
+    if (status != 0) {
+        std::cerr << "shc: the linker failed - the command was:\n  " << command << "\n"
+                  << "     lnk6x and rts6740_elf.lib are TI's, under CCS's C6000 compiler\n"
+                     "     directory: SHC_TI names it, SHC_TILIB a directory holding\n"
+                     "     rts6740_elf_eh.lib, SHC_LD the linker itself\n";
+        return 2;
+    }
+    return 0;
 }
 
 void Driver::noteWindowsToolchain() {
