@@ -564,7 +564,11 @@ int Driver::run(const std::vector<std::string> &arguments) {
     std::remove(assemblyPath.c_str());
     if (objectOnly_) return 0;
 
-    command = "link /nologo /subsystem:console /out:" + shellQuote(output_) + " " +
+    // And the linker the same way: SHC_LD names one that takes link.exe's
+    // command line - the project's own does - else Microsoft's.
+    const char *ld = std::getenv("SHC_LD");
+    const std::string linker = (ld != nullptr && ld[0] != '\0') ? shellQuote(ld) : "link";
+    command = linker + " /nologo /subsystem:console /out:" + shellQuote(output_) + " " +
               shellQuote(objectPath);
     for (std::size_t i = 0; i < libraries_.size(); ++i)
         command += " " + shellQuote(libraries_[i]);
