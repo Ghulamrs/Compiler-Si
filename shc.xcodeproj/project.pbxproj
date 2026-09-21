@@ -298,7 +298,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\ndest=\"$SRCROOT/../../RStudio\"\nmkdir -p \"$dest\"\ncp -f \"$BUILT_PRODUCTS_DIR/$PRODUCT_NAME\" \"$dest/.$PRODUCT_NAME.new\"\nmv -f \"$dest/.$PRODUCT_NAME.new\" \"$dest/$PRODUCT_NAME\"\ncodesign --force --sign - \"$dest/$PRODUCT_NAME\"\nmkdir -p \"$dest/lib\"\ncp -f \"$BUILT_PRODUCTS_DIR\"/lib/*.a \"$dest/lib/\"\nrm -rf \"$dest/lib/shmrt-tms6747\"\ncp -R \"$BUILT_PRODUCTS_DIR/lib/shmrt-tms6747\" \"$dest/lib/\"\n";
+			shellScript = "set -e\ndest=\"$SRCROOT/../../RIDE\"\nmkdir -p \"$dest\"\ncp -f \"$BUILT_PRODUCTS_DIR/$PRODUCT_NAME\" \"$dest/.$PRODUCT_NAME.new\"\nmv -f \"$dest/.$PRODUCT_NAME.new\" \"$dest/$PRODUCT_NAME\"\ncodesign --force --sign - \"$dest/$PRODUCT_NAME\"\nmkdir -p \"$dest/lib\"\ncp -f \"$BUILT_PRODUCTS_DIR\"/lib/*.a \"$dest/lib/\"\nrm -rf \"$dest/lib/shmrt-tms6747\"\ncp -R \"$BUILT_PRODUCTS_DIR/lib/shmrt-tms6747\" \"$dest/lib/\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
