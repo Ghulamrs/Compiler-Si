@@ -51,6 +51,7 @@ SOURCES := \
   src/Target.cpp \
   src/backend/Emitter.cpp \
   src/backend/Spelling.cpp \
+  src/backend/Optimize.cpp \
   src/backend/Arm64Darwin.cpp \
   src/backend/X86_64.cpp \
   src/backend/X86_64Linux.cpp \

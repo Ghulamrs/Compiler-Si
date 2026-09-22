@@ -335,6 +335,12 @@ bool Driver::parseArguments(const std::vector<std::string> &arguments) {
             libraries_.push_back(a.substr(7));
         } else if (a == "--no-search") {
             search_ = false;
+        } else if (a == "-O0") {
+            optimize_ = 0;
+        } else if (a == "-O1") {
+            optimize_ = 1;
+        } else if (a == "-O2") {
+            optimize_ = 2;
         } else if (a == "--debug") {
             debug_ = true;
         } else if (a == "--version") {
@@ -510,6 +516,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
     }
 
     std::unique_ptr<Emitter> emitter = target->newEmitter();
+    emitter->setOptimize(optimize_);
     CodeGen generator(*emitter);
     generator.run(*program, input_, names);
 

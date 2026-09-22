@@ -17,6 +17,9 @@ public:
 
     virtual std::string symbol(const std::string &name) const = 0;
 
+    // -O0, -O1 or -O2. A target with no optimizer ignores it.
+    virtual void setOptimize(int) {}
+
     virtual void beginModule(const std::string &sourceName) = 0;
     virtual void endModule() = 0;
 
@@ -76,9 +79,12 @@ public:
 
 protected:
 
-    void instruction(const std::string &line) { text_ += "\t" + line + "\n"; }
+    // **Virtual, so a target that buffers can write its buffer out first.**
+    // Everything that is not a buffered instruction goes through one of
+    // these, so overriding them is enough to keep the order right.
+    virtual void instruction(const std::string &line) { text_ += "\t" + line + "\n"; }
 
-    void raw(const std::string &line) { text_ += line + "\n"; }
+    virtual void raw(const std::string &line) { text_ += line + "\n"; }
     void blank() { text_ += "\n"; }
 
     virtual void noteExternal(const std::string &) {}

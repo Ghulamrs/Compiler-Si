@@ -3,6 +3,7 @@
 
 #include "Emitter.h"
 #include "Ins.h"
+#include "Optimize.h"
 #include "Spelling.h"
 
 #include <string>
@@ -59,11 +60,36 @@ public:
     void jump(int id) override;
     void jumpIfZero(int id) override;
 
+    void setOptimize(int level) override { optimize_ = level; }
+
 protected:
     // **The structured funnel.** Every x86 instruction goes through here as a
     // record; the spelling turns it into text at the last moment, which is
-    // where an optimizer for this compiler would sit.
-    void emit(const Ins &i) { instruction(spelling_.render(i)); }
+    // where the optimizer sits.
+
+    // Buffered, not spelled: optimizeRun sees the whole straight-line stretch.
+    void emit(const Ins &i) { run_.push_back(i); }
+
+    // **Anything unbuffered writes the buffer out first**, which is what makes
+    // a run a stretch with no branch into or out of it.
+    void instruction(const std::string &line) override {
+        flushRun();
+        Emitter::instruction(line);
+    }
+    void raw(const std::string &line) override {
+        flushRun();
+        Emitter::raw(line);
+    }
+    void flushRun() {
+        if (run_.empty()) return;
+        if (optimize_ >= 1) optimizeRun(run_);
+        std::vector<Ins> done;
+        done.swap(run_);
+        for (const Ins &i : done) Emitter::instruction(spelling_.render(i));
+    }
+
+    std::vector<Ins> run_;
+    int optimize_ = 0;
 
     // The three the spelling names itself, because each syntax writes them
     // its own way: a `lea` whose source is an address, the widening that is

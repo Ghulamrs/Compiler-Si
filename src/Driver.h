@@ -33,6 +33,8 @@ private:
     bool objectOnly_ = false;
 
     bool debug_ = false;
+    // -O0, -O1 or -O2: how hard the emitter optimizes what it writes.
+    int optimize_ = 0;
 
     bool parseArguments(const std::vector<std::string> &arguments);
     void usage() const;
