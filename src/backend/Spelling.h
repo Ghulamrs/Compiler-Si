@@ -14,9 +14,17 @@ enum class Reg {
     Xmm8
 };
 
+struct Operand;
+struct Ins;
+
 class Spelling {
 public:
     virtual ~Spelling() = default;
+
+    // **One rendering for every spelling**, written in terms of the answers
+    // below: an operand says what it is and this turns it into that syntax.
+    std::string render(const Operand &o) const;
+    std::string render(const Ins &i) const;
 
     virtual std::string reg(Reg r, int width) const = 0;
     virtual std::string imm(int64_t value) const = 0;

@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Emitter.h"
+#include "Ins.h"
 #include "Spelling.h"
 
 #include <string>
@@ -59,6 +60,22 @@ public:
     void jumpIfZero(int id) override;
 
 protected:
+    // **The structured funnel.** Every x86 instruction goes through here as a
+    // record; the spelling turns it into text at the last moment, which is
+    // where an optimizer for this compiler would sit.
+    void emit(const Ins &i) { instruction(spelling_.render(i)); }
+
+    // The three the spelling names itself, because each syntax writes them
+    // its own way: a `lea` whose source is an address, the widening that is
+    // `movsxd` on one side and `movslq` on the other, and a call.
+    void emitLea(const Operand &from, const Operand &to) {
+        instruction(spelling_.loadAddress(spelling_.render(from), spelling_.render(to)));
+    }
+    void emitWiden(const Operand &from, const Operand &to) {
+        instruction(spelling_.widen32To64(spelling_.render(from), spelling_.render(to)));
+    }
+    void emitCall(const std::string &target) { instruction(spelling_.call(target)); }
+
     const Spelling &spelling_;
     const Abi &abi_;
 
@@ -76,7 +93,7 @@ protected:
     virtual void emitGlobalBlock(int slots) = 0;
     virtual std::string globalsLabel() const = 0;
 
-    std::string slotOperand(int slot, int width) const;
+    Operand slotOperand(int slot, int width) const;
 
     std::string prologue(int slots);
     void emitEpilogue(int slots);

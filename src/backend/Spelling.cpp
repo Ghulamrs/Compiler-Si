@@ -1,5 +1,7 @@
 #include "Spelling.h"
 
+#include "Ins.h"
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -236,6 +238,28 @@ std::string MasmSpelling::dataReference(const std::string &label) const {
 std::string MasmSpelling::frameSlot(int offset, int width) const {
     const char *size = width == 8 ? "QWORD" : (width == 1 ? "BYTE" : "DWORD");
     return std::string(size) + " PTR [rsp+" + std::to_string(offset) + "]";
+}
+// **Rendering a structured instruction**, and it is deliberately not virtual:
+// every spelling already answers what an operand looks like, so the shape of
+// an instruction is the same question asked of different answers.
+std::string Spelling::render(const Operand &o) const {
+    switch (o.kind) {
+    case Operand::Register:  return reg(o.reg, o.width);
+    case Operand::Immediate: return imm(o.value);
+    case Operand::Wide:      return wideImm(o.bits);
+    case Operand::Frame:     return frameSlot(static_cast<int>(o.value), o.width);
+    case Operand::Indirect:  return indirect(o.reg, o.width);
+    case Operand::Offset:    return offsetFrom(o.reg, static_cast<int>(o.value), o.width);
+    case Operand::Data:      return dataReference(o.text);
+    case Operand::None:      break;
+    }
+    return std::string();
+}
+
+std::string Spelling::render(const Ins &i) const {
+    if (i.operands == 0) return i.mnemonic;
+    if (i.operands == 1) return unary(i.mnemonic, i.width, render(i.a));
+    return binary(i.mnemonic, i.width, render(i.a), render(i.b));
 }
 
 }
