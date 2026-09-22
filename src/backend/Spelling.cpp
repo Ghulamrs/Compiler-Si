@@ -1,7 +1,78 @@
 #include "Spelling.h"
 
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
 namespace shalimar {
 namespace {
+
+// **What MASM calls each instruction this compiler emits**, and the whole
+// point of the table is the ones that are *not* the same word: the AT&T base
+// the emitter passes is not always Microsoft's name for it.
+
+// A mnemonic that is not here is refused by name rather than written out and
+// left for the assembler, because the failure then names the compiler that
+// wrote it and the instruction it meant. An optimizer added later will emit
+// mnemonics the emitter never did, and this is what will catch them.
+struct MasmName {
+    const char *att;
+    const char *masm;
+};
+
+const MasmName kMasmNames[] = {
+    // The moves, integer and floating - `movq` between an xmm and a general
+    // register is `movq` here too, and `movsd`/`movapd` keep their names.
+    { "mov", "mov" },       { "movq", "movq" },
+    { "movsd", "movsd" },   { "movss", "movss" },
+    { "movapd", "movapd" }, { "movaps", "movaps" },
+    // The sign and zero extensions, which are the ones that differ: AT&T's
+    // movs/movz against Microsoft's movsx/movzx, and movslq against movsxd.
+    { "movslq", "movsxd" }, { "movsbl", "movsx" }, { "movswl", "movsx" },
+    { "movzbl", "movzx" },  { "movzwl", "movzx" },
+    { "cltq", "cdqe" },     { "cqto", "cqo" },     { "cltd", "cdq" },
+    // Arithmetic, logic and the stack.
+    { "add", "add" },   { "sub", "sub" },   { "imul", "imul" },
+    { "idiv", "idiv" }, { "div", "div" },   { "neg", "neg" },
+    { "and", "and" },   { "or", "or" },     { "xor", "xor" },
+    { "not", "not" },   { "shl", "shl" },   { "shr", "shr" },
+    { "sar", "sar" },   { "inc", "inc" },   { "dec", "dec" },
+    { "cmp", "cmp" },   { "test", "test" }, { "lea", "lea" },
+    { "push", "push" }, { "pop", "pop" },   { "leave", "leave" },
+    // Floating arithmetic and the comparisons that set the flags from it.
+    { "addsd", "addsd" }, { "subsd", "subsd" },
+    { "mulsd", "mulsd" }, { "divsd", "divsd" },
+    { "sqrtsd", "sqrtsd" }, { "xorpd", "xorpd" }, { "xorps", "xorps" },
+    { "ucomisd", "ucomisd" }, { "comisd", "comisd" }, { "pxor", "pxor" },
+    { "cvtsi2sd", "cvtsi2sd" }, { "cvtsi2sdq", "cvtsi2sd" },
+    { "cvttsd2si", "cvttsd2si" }, { "cvttsd2siq", "cvttsd2si" },
+    { "cvtsd2ss", "cvtsd2ss" }, { "cvtss2sd", "cvtss2sd" },
+    // The transfers of control that are written as instructions here.
+    { "call", "call" }, { "ret", "ret" }, { "jmp", "jmp" },
+    { "je", "je" },   { "jne", "jne" }, { "jl", "jl" },   { "jge", "jge" },
+    { "jle", "jle" }, { "jg", "jg" },   { "jb", "jb" },   { "jbe", "jbe" },
+    { "ja", "ja" },   { "jae", "jae" }, { "jp", "jp" },   { "jnp", "jnp" },
+    { "jns", "jns" }, { "js", "js" },
+    // The conditional sets, whose names are the same on both sides.
+    { "sete", "sete" },   { "setne", "setne" }, { "setl", "setl" },
+    { "setle", "setle" }, { "setg", "setg" },   { "setge", "setge" },
+    { "seta", "seta" },   { "setae", "setae" }, { "setb", "setb" },
+    { "setbe", "setbe" }, { "setp", "setp" },   { "setnp", "setnp" },
+};
+
+[[noreturn]] void giveUp(const char *mnemonic) {
+    std::fprintf(stderr,
+                 "shc: masm: an instruction this spelling does not know\n"
+                 "  for: %s\n", mnemonic);
+    std::exit(1);
+}
+
+// The MASM name for an AT&T mnemonic, or a refusal naming the instruction.
+const char *masmNameFor(const char *mnemonic) {
+    for (const MasmName &e : kMasmNames)
+        if (std::strcmp(mnemonic, e.att) == 0) return e.masm;
+    giveUp(mnemonic);
+}
 
 struct RegNames {
     const char *wide;
@@ -123,12 +194,12 @@ std::string MasmSpelling::wideImm(uint64_t value) const {
 
 std::string MasmSpelling::binary(const char *mnemonic, int,
                                  const std::string &src, const std::string &dst) const {
-    return std::string(mnemonic) + "\t" + dst + ", " + src;
+    return std::string(masmNameFor(mnemonic)) + "\t" + dst + ", " + src;
 }
 
 std::string MasmSpelling::unary(const char *mnemonic, int,
                                 const std::string &operand) const {
-    return std::string(mnemonic) + "\t" + operand;
+    return std::string(masmNameFor(mnemonic)) + "\t" + operand;
 }
 
 std::string MasmSpelling::call(const std::string &target) const {
