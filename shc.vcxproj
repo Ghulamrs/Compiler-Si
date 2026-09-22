@@ -94,6 +94,7 @@ if errorlevel 1 exit /b 1</Command>
     <ClCompile Include="src\Type.cpp" />
     <ClCompile Include="src\backend\Arm64Darwin.cpp" />
     <ClCompile Include="src\backend\Emitter.cpp" />
+    <ClCompile Include="src\backend\Optimize.cpp" />
     <ClCompile Include="src\backend\Spelling.cpp" />
     <ClCompile Include="src\backend\Tms6747.cpp" />
     <ClCompile Include="src\backend\X86_64.cpp" />
