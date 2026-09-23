@@ -62,7 +62,7 @@ cl /nologo /std:c++14 /W4 /WX /EHsc /permissive- /O2 /D_CRT_SECURE_NO_WARNINGS /
 if errorlevel 1 exit /b 1
 lib /nologo /out:"$(OutDir)lib\shmrt-x86_64-windows-debug.lib" "$(IntDir)rtd\Shortest.obj" "$(IntDir)rtd\Failure.obj" "$(IntDir)rtd\Numbers.obj" "$(IntDir)rtd\Array.obj" "$(IntDir)rtd\Console.obj" "$(IntDir)rtd\Runtime.obj" "$(IntDir)rtd\Debug.obj"
 if errorlevel 1 exit /b 1
-if not exist "$(OutDir)cxx1i.exe" echo shc.vcxproj: no cxx1i.exe in $(OutDir) - the C6000 runtime is its output; build RStudio.sln, which builds it first
+if not exist "$(OutDir)cxx1i.exe" echo shc.vcxproj: no cxx1i.exe in $(OutDir) - the C6000 runtime is its output; build RIDE.sln, which builds it first
 if not exist "$(OutDir)cxx1i.exe" exit /b 1
 if not exist "$(OutDir)lib\shmrt-tms6747" mkdir "$(OutDir)lib\shmrt-tms6747"
 "$(OutDir)cxx1i.exe" -S -arch tms6747 -nologo "$(ProjectDir)runtime\Shortest.cpp" -o "$(OutDir)lib\shmrt-tms6747\Shortest.s"
