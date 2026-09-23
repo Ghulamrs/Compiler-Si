@@ -1,4 +1,5 @@
 #include "Driver.h"
+#include "Name.h"
 
 #include "Check.h"
 #include "CodeGen.h"
@@ -49,7 +50,7 @@ const char *Driver::bannerLine() { return "©2026 G. R. Akhtar - Shalimar 1.2"; 
 
 void Driver::usage() const {
     std::cerr <<
-        "shc " << shcVersion() << " - the Shalimar compiler\n"
+        program::kName << " " << shcVersion() << " - the Shalimar compiler\n"
         "\n"
         "usage: shc [options] file.shm\n"
         "\n"
@@ -58,10 +59,10 @@ void Driver::usage() const {
         "  -c                 stop after assembling\n"
         "  --target=<name>    arm64-darwin | x86_64-linux | x86_64-windows | tms6747\n"
         "                     (tms6747 is assembled on any host by asm6x, the\n"
-        "                     project's C6000 assembler - SHC_AS, or the one beside\n"
+        "                     project's C6000 assembler - SHALIMAR_AS, or the one beside\n"
         "                     shc - and linked into a .out by TI's lnk6x where CCS\n"
-        "                     is: SHC_TI names its C6000 compiler directory,\n"
-        "                     SHC_TILIB one holding rts6740_elf_eh.lib)\n"
+        "                     is: SHALIMAR_TI names its C6000 compiler directory,\n"
+        "                     SHALIMAR_TILIB one holding rts6740_elf_eh.lib)\n"
         "  --runtime=<path>   the runtime archive to link against; for tms6747 the\n"
         "                     directory of its assembly, lib/shmrt-tms6747\n"
         "  --with=<path>      a library holding what 'uses' declared;\n"
@@ -170,7 +171,7 @@ static std::string findVcvars() {
     char folder[MAX_PATH];
     char temp[MAX_PATH];
     if (GetTempPathA(MAX_PATH, folder) != 0 &&
-        GetTempFileNameA(folder, "shc", 0, temp) != 0) {
+        GetTempFileNameA(folder, program::kName, 0, temp) != 0) {
         std::string ask =
             "\"\"C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe\""
             " -latest -products * -property installationPath > \"";
@@ -226,7 +227,7 @@ int Driver::shell(const std::string &command) {
     char folder[MAX_PATH];
     char script[MAX_PATH];
     if (GetTempPathA(MAX_PATH, folder) == 0 ||
-        GetTempFileNameA(folder, "shc", 0, script) == 0) {
+        GetTempFileNameA(folder, program::kName, 0, script) == 0) {
         return std::system(("\"" + command + "\"").c_str());
     }
     std::string batch = script;
@@ -294,7 +295,7 @@ std::string Driver::defaultRuntimeObject(const std::string &targetName) const {
     const char *extension = ".a";
 #endif
     // The C6000 runtime is not an archive but a directory of the assembly
-    // cxx1i wrote for it, lib/shmrt-tms6747, which asm6x assembles with the
+    // cpp11 wrote for it, lib/shmrt-tms6747, which asm6x assembles with the
     // program.
     if (targetName == "tms6747") extension = "";
     const std::string leaf =
@@ -354,7 +355,7 @@ bool Driver::parseArguments(const std::vector<std::string> &arguments) {
         } else if (a == "-nologo") {
             quiet_ = true;
         } else if (!a.empty() && a[0] == '-') {
-            std::cerr << "shc: unknown option " << a << "\n";
+            std::cerr << program::kName << ": unknown option " << a << "\n";
             return false;
         } else if (input_.empty()) {
             input_ = a;
@@ -372,7 +373,7 @@ bool Driver::parseArguments(const std::vector<std::string> &arguments) {
 }
 
 int Driver::run(const std::vector<std::string> &arguments) {
-    program_ = arguments.empty() ? "shc" : arguments[0];
+    program_ = arguments.empty() ? program::kName : arguments[0];
     // **A question answered is not a failure.** --version and --help are
     // requests this program can satisfy, so they leave with 0; a bad argument
     // leaves with 2. Both used to be 2, which is why a script asking three
@@ -385,7 +386,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
 
     std::unique_ptr<Target> target = Target::forName(targetName_);
     if (!target) {
-        std::cerr << "shc: unknown target " << targetName_ << "\n";
+        std::cerr << program::kName << ": unknown target " << targetName_ << "\n";
         return 2;
     }
 
@@ -408,7 +409,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
     for (size_t i = 0; i < files.size(); ++i) {
         std::string source;
         if (!readFile(files[i], source)) {
-            std::cerr << "shc: cannot read " << files[i] << "\n";
+            std::cerr << program::kName << ": cannot read " << files[i] << "\n";
             return 2;
         }
 
@@ -416,7 +417,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
         if (lexed.failed) {
 
             if (i > 0) {
-                std::cerr << "shc: ignoring " << names[i] << ": " << lexed.error << "\n";
+                std::cerr << program::kName << ": ignoring " << names[i] << ": " << lexed.error << "\n";
                 continue;
             }
             diagnostics.error(static_cast<int>(i), lexed.errorLine, lexed.error);
@@ -434,7 +435,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
                 std::string why;
                 quiet.writeTo(why);
                 if (!why.empty() && why[why.size() - 1] == '\n') why.resize(why.size() - 1);
-                std::cerr << "shc: ignoring " << names[i] << ": " << why << "\n";
+                std::cerr << program::kName << ": ignoring " << names[i] << ": " << why << "\n";
                 continue;
             }
             Unit other;
@@ -453,7 +454,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
     if (!units.empty() && units[0].program) program = std::move(units[0].program);
     if (diagnostics.hasUnsupported()) {
         for (const Message &m : diagnostics.unsupportedItems()) {
-            std::cerr << "shc: not compiled yet: " << m.text
+            std::cerr << program::kName << ": not compiled yet: " << m.text
                       << " (line " << m.line << ")\n";
         }
         return 3;
@@ -478,7 +479,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
         program = std::move(units[0].program);
 
         for (const std::string &from : resolver.used())
-            std::cerr << "shc: also compiled " << from << "\n";
+            std::cerr << program::kName << ": also compiled " << from << "\n";
     }
 
     Checker checker(diagnostics);
@@ -491,7 +492,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
 
     if (diagnostics.hasUnsupported()) {
         for (const Message &m : diagnostics.unsupportedItems()) {
-            std::cerr << "shc: not compiled yet: " << m.text
+            std::cerr << program::kName << ": not compiled yet: " << m.text
                       << " (line " << m.line << ")\n";
         }
         return 3;
@@ -508,7 +509,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
     // else will link, and they are entitled to bring the library themselves.
     if (!program->foreign().empty() && libraries_.empty() &&
         !objectOnly_ && !assemblyOnly_) {
-        std::cerr << "shc: '" << program->foreign()[0].name
+        std::cerr << program::kName << ": '" << program->foreign()[0].name
                   << "' is declared with 'uses' and comes from a library, but no\n"
                      "     library was named. Add --with=<path> - see"
                      " docs/FOREIGN.md.\n";
@@ -534,7 +535,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
     const std::string assemblyPath =
         assemblyOnly_ ? output_ : output_ + target->assemblyExtension();
     if (!writeFile(assemblyPath, emitter->text())) {
-        std::cerr << "shc: cannot write " << assemblyPath << "\n";
+        std::cerr << program::kName << ": cannot write " << assemblyPath << "\n";
         return 2;
     }
     if (assemblyOnly_) return 0;
@@ -542,7 +543,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
     if (ti) return finishTi(assemblyPath, named);
 
     if (!target->isHost()) {
-        std::cerr << "shc: " << targetName_ << " assembly is in " << assemblyPath
+        std::cerr << program::kName << ": " << targetName_ << " assembly is in " << assemblyPath
                   << "; this host can only assemble " << Target::hostName() << "\n";
         return 2;
     }
@@ -554,16 +555,16 @@ int Driver::run(const std::vector<std::string> &arguments) {
     const std::string objectPath =
         objectOnly_ ? (named ? output_ : output_ + ".obj") : output_ + ".obj";
 
-    // The assembler is ml64 unless SHC_AS names another that takes its
+    // The assembler is ml64 unless SHALIMAR_AS names another that takes its
     // command line - the project's own does, and RIDE names it this way, as
-    // it names cc1i's and cxx1i's through CC1_AS and CXX1_AS.
-    const char *as = std::getenv("SHC_AS");
+    // it names c90's and cpp11's through C90_AS and CPP11_AS.
+    const char *as = std::getenv(program::env("AS").c_str());
     const std::string assembler = (as != nullptr && as[0] != '\0') ? shellQuote(as) : "ml64";
     std::string command = assembler + " /nologo /c /Fo" + shellQuote(objectPath) + " " +
                           shellQuote(assemblyPath);
     int status = shell(command);
     if (status != 0) {
-        std::cerr << "shc: the assembler failed - the command was:\n  " << command << "\n";
+        std::cerr << program::kName << ": the assembler failed - the command was:\n  " << command << "\n";
         noteWindowsToolchain();
         std::remove(assemblyPath.c_str());
         return 2;
@@ -571,9 +572,9 @@ int Driver::run(const std::vector<std::string> &arguments) {
     std::remove(assemblyPath.c_str());
     if (objectOnly_) return 0;
 
-    // And the linker the same way: SHC_LD names one that takes link.exe's
+    // And the linker the same way: SHALIMAR_LD names one that takes link.exe's
     // command line - the project's own does - else Microsoft's.
-    const char *ld = std::getenv("SHC_LD");
+    const char *ld = std::getenv(program::env("LD").c_str());
     const std::string linker = (ld != nullptr && ld[0] != '\0') ? shellQuote(ld) : "link";
     command = linker + " /nologo /subsystem:console /out:" + shellQuote(output_) + " " +
               shellQuote(objectPath);
@@ -584,7 +585,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
 
     std::remove(objectPath.c_str());
     if (status != 0) {
-        std::cerr << "shc: the linker failed - the command was:\n  " << command << "\n";
+        std::cerr << program::kName << ": the linker failed - the command was:\n  " << command << "\n";
         noteWindowsToolchain();
         return 2;
     }
@@ -619,7 +620,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
 
 // The linker command file lnk6x needs: one flat memory for the C6747 and
 // every section the compilers and TI's runtime write placed in it - the same
-// file RIDE, cxx1i and VM6747's tests link with.
+// file RIDE, cpp11 and VM6747's tests link with.
 static const char *const kTiLinkCommands =
     "--rom_model\n"
     "--stack_size=0x4000\n"
@@ -653,14 +654,14 @@ static std::string environment(const char *name) {
 }
 
 // **The tms6747 target reaches an object on any host and a program where CCS
-// is.** asm6x, the project's own C6000 assembler, takes the assembly: SHC_AS
+// is.** asm6x, the project's own C6000 assembler, takes the assembly: SHALIMAR_AS
 // names it, else the one beside this program (as RIDE lays them out), else
 // asm6x on PATH. Without -c the object, the runtime directory's objects and
-// the libraries go to TI's lnk6x - SHC_TI names CCS's C6000 compiler
-// directory, SHC_TILIB one holding rts6740_elf_eh.lib, SHC_LD the linker -
+// the libraries go to TI's lnk6x - SHALIMAR_TI names CCS's C6000 compiler
+// directory, SHALIMAR_TILIB one holding rts6740_elf_eh.lib, SHALIMAR_LD the linker -
 // into a .out.
 int Driver::finishTi(const std::string &assemblyPath, bool named) {
-    std::string assembler = environment("SHC_AS");
+    std::string assembler = environment(program::env("AS").c_str());
     if (assembler.empty()) {
         const std::string here = programDirectory(program_);
         if (exists(here + "/asm6x.exe")) assembler = here + "/asm6x.exe";
@@ -674,8 +675,8 @@ int Driver::finishTi(const std::string &assemblyPath, bool named) {
     int status = shell(command);
     std::remove(assemblyPath.c_str());
     if (status != 0) {
-        std::cerr << "shc: the assembler failed - the command was:\n  " << command << "\n"
-                  << "     asm6x is the project's C6000 assembler; SHC_AS names it\n";
+        std::cerr << program::kName << ": the assembler failed - the command was:\n  " << command << "\n"
+                  << "     asm6x is the project's C6000 assembler; SHALIMAR_AS names it\n";
         return 2;
     }
     if (objectOnly_) return 0;
@@ -686,8 +687,8 @@ int Driver::finishTi(const std::string &assemblyPath, bool named) {
     if (runtimeObject_.empty()) runtimeObject_ = defaultRuntimeObject("tms6747");
     std::vector<std::string> runtime = assemblyFilesIn(runtimeObject_);
     if (runtime.empty()) {
-        std::cerr << "shc: no C6000 runtime at " << runtimeObject_
-                  << " - a directory of the assembly cxx1i wrote for it, lib/shmrt-tms6747;"
+        std::cerr << program::kName << ": no C6000 runtime at " << runtimeObject_
+                  << " - a directory of the assembly cpp11 wrote for it, lib/shmrt-tms6747;"
                      " --runtime= names it\n";
         std::remove(objectPath.c_str());
         return 2;
@@ -696,29 +697,29 @@ int Driver::finishTi(const std::string &assemblyPath, bool named) {
         const std::string object = output_ + "-rt" + std::to_string(i) + ".obj";
         command = shellQuote(assembler) + " " + shellQuote(runtime[i]) + " -o " + shellQuote(object);
         if (shell(command) != 0) {
-            std::cerr << "shc: the assembler failed on the runtime - the command was:\n  " << command << "\n";
+            std::cerr << program::kName << ": the assembler failed on the runtime - the command was:\n  " << command << "\n";
             for (size_t k = 0; k < made.size(); ++k) std::remove(made[k].c_str());
             return 2;
         }
         made.push_back(object);
     }
 
-    std::string linker = environment("SHC_LD");
-    const std::string ti = environment("SHC_TI");
+    std::string linker = environment(program::env("LD").c_str());
+    const std::string ti = environment(program::env("TI").c_str());
     if (linker.empty()) {
         if (!ti.empty()) linker = exists(ti + "/bin/lnk6x.exe") ? ti + "/bin/lnk6x.exe" : ti + "/bin/lnk6x";
         else linker = "lnk6x";
     }
     std::vector<std::string> libraryDirs;
     if (!ti.empty()) libraryDirs.push_back(ti + "/lib");
-    const std::string tilib = environment("SHC_TILIB");
+    const std::string tilib = environment(program::env("TILIB").c_str());
     if (!tilib.empty()) libraryDirs.push_back(tilib);
     std::string rts = "rts6740_elf.lib";
     for (size_t i = 0; i < libraryDirs.size(); ++i)
         if (exists(libraryDirs[i] + "/rts6740_elf_eh.lib")) rts = "rts6740_elf_eh.lib";
     const std::string commandFile = output_ + ".lnk.cmd";
     if (!writeFile(commandFile, kTiLinkCommands)) {
-        std::cerr << "shc: cannot write " << commandFile << "\n";
+        std::cerr << program::kName << ": cannot write " << commandFile << "\n";
         for (size_t k = 0; k < made.size(); ++k) std::remove(made[k].c_str());
         return 2;
     }
@@ -732,10 +733,10 @@ int Driver::finishTi(const std::string &assemblyPath, bool named) {
     for (size_t k = 0; k < made.size(); ++k) std::remove(made[k].c_str());
     std::remove(commandFile.c_str());
     if (status != 0) {
-        std::cerr << "shc: the linker failed - the command was:\n  " << command << "\n"
+        std::cerr << program::kName << ": the linker failed - the command was:\n  " << command << "\n"
                   << "     lnk6x and rts6740_elf.lib are TI's, under CCS's C6000 compiler\n"
-                     "     directory: SHC_TI names it, SHC_TILIB a directory holding\n"
-                     "     rts6740_elf_eh.lib, SHC_LD the linker itself\n";
+                     "     directory: SHALIMAR_TI names it, SHALIMAR_TILIB a directory holding\n"
+                     "     rts6740_elf_eh.lib, SHALIMAR_LD the linker itself\n";
         return 2;
     }
     return 0;
@@ -743,10 +744,9 @@ int Driver::finishTi(const std::string &assemblyPath, bool named) {
 
 void Driver::noteWindowsToolchain() {
 #ifdef _WIN32
-    std::cerr <<
-        "shc: ml64 and link ship with Visual Studio and are on PATH only inside\n"
+    std::cerr << program::kName << ": ml64 and link ship with Visual Studio and are on PATH only inside\n"
         "     a Developer Command Prompt, or after vcvars64.bat has been run;\n"
-        "     SHC_AS names another assembler that takes ml64's command line.\n";
+        "     " << program::env("AS") << " names another assembler that takes ml64's command line.\n";
 #endif
 }
 

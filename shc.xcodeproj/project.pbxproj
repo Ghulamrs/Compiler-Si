@@ -7,98 +7,99 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AA2E3F44EA609A07BF8D1F82 /* runtime/Shortest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B195FEA9B7E948B5DF3B7E21 /* runtime/Shortest.cpp */; };
-		59C6E2AD256053BE27E81E40 /* src/Ast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30307F574764066D5EE15CD8 /* src/Ast.cpp */; };
-		D0B6555C5E35D377BA3E0DCB /* src/Builtin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 97E3390E25970C5A0342472F /* src/Builtin.cpp */; };
-		EA5FF733A1D9A99AB659285E /* src/Check.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0901303781D33A1A3EAB8462 /* src/Check.cpp */; };
-		EAC8447EE8FB3BE56B2B748E /* src/CodeGen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E2A47605292B20D8C410A56E /* src/CodeGen.cpp */; };
-		F3F509B5BEA2B63806E86A29 /* src/Diag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6FB71B9FE84080E54FD37D6D /* src/Diag.cpp */; };
-		87E1438F5E0F21536D811CF1 /* src/Driver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5EB5CA72B86B4E87A673EF84 /* src/Driver.cpp */; };
-		B3B58E394327B534D007874E /* src/Lexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9CF031406EE1DD9485C4BA3D /* src/Lexer.cpp */; };
-		5B30594E544C1E038663CA40 /* src/Parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CFDD3A92A26BFD2888F07E53 /* src/Parser.cpp */; };
-		BEDB7A7B75C1291F94A9DA74 /* src/Resolve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DE54D8763C62836BEDB4858C /* src/Resolve.cpp */; };
-		4E63CFEB223F6063F629410E /* src/Target.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C14FB0270E32BCE6A029CC2C /* src/Target.cpp */; };
-		90C4FBE5EC1A3DE5DAE697A1 /* src/Type.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0CF1F1632A53D18EADA1F08B /* src/Type.cpp */; };
-		A45DC5B1C4209FF72F679396 /* src/backend/Arm64Darwin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1D379CB68B7B096E7C1D1F03 /* src/backend/Arm64Darwin.cpp */; };
-		3AB5913BD32D2FBD22B61831 /* src/backend/Emitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA842397EEE08645CBF0A4B6 /* src/backend/Emitter.cpp */; };
-		3C3445BEFD11625065BD998A /* src/backend/Optimize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 96FFFBA283A475CAFAB98DB4 /* src/backend/Optimize.cpp */; };
-		C85450FD793973D2CE9E3222 /* src/backend/Spelling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 97F09AFC0AA38A8A04DE9345 /* src/backend/Spelling.cpp */; };
-		4AC536ECE1F6545D7D8F1067 /* src/backend/Tms6747.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7BBF83D8D6B8A7FC4D6DF50F /* src/backend/Tms6747.cpp */; };
-		C6488B664BB11BF747289EF9 /* src/backend/X86_64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE87171411E45DCD7C2A1A7C /* src/backend/X86_64.cpp */; };
-		A669587D3E94EE6CB1249BB8 /* src/backend/X86_64Linux.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F08BD4D08CCA81D827656938 /* src/backend/X86_64Linux.cpp */; };
-		025E27BE7A159BDA1B6FCF2B /* src/backend/X86_64Windows.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4680FEDE33A9AE4FA966E075 /* src/backend/X86_64Windows.cpp */; };
-		E6D5CBF0B9AC9FD515D6E60F /* src/main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5ED8449B58A6C4DCC07A9E94 /* src/main.cpp */; };
+		ADE91CF24B4D93281973FA66 /* runtime/Shortest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07961E601B2E7B18D4FFA2EB /* runtime/Shortest.cpp */; };
+		619BA2382D3C55C38DC332F5 /* src/Ast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4067FA032414C58CDFF09197 /* src/Ast.cpp */; };
+		BB9E2956B32EFABA3625329A /* src/Builtin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4457330CFE897A6333262BC8 /* src/Builtin.cpp */; };
+		5AEF009B515799C3E09F577C /* src/Check.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA1C91C3A573568CAFFA2E51 /* src/Check.cpp */; };
+		E2DF0F17651DBF73CBA77084 /* src/CodeGen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8333F305045625DA8F9AD2 /* src/CodeGen.cpp */; };
+		D8F14E620C131B4E66C3CC37 /* src/Diag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F3BE9F99F531BED613BB75FA /* src/Diag.cpp */; };
+		E8078FD1C114A929F3A89172 /* src/Driver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A26F1A3EB789D8B562D9E850 /* src/Driver.cpp */; };
+		F0352AEA9474CC12BEA0AAF2 /* src/Lexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B52EED773B7DEC9BD423B577 /* src/Lexer.cpp */; };
+		FABC9AD25D09ADFFDCE241A9 /* src/Parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA3555B7AF0374EAD0B9BEB5 /* src/Parser.cpp */; };
+		F3AB0D874E5D7CBEAB47E2CE /* src/Resolve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D05D5125621CE57CE82DC3E /* src/Resolve.cpp */; };
+		E1DBE71064F979CFC6AD7494 /* src/Target.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 424952BF3295504AE675C25B /* src/Target.cpp */; };
+		48518DEF6B9A035855D3EC8B /* src/Type.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 235AA93B142CE8C8F5D85904 /* src/Type.cpp */; };
+		0686AC0897AA471726A714A0 /* src/backend/Arm64Darwin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 121A6282D1700165E22B17B6 /* src/backend/Arm64Darwin.cpp */; };
+		C2EB00417335160D211704B0 /* src/backend/Emitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 203F3D938FBEC0F74D9082B6 /* src/backend/Emitter.cpp */; };
+		0259CB1C28AC0BC2F7F87A3F /* src/backend/Optimize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A79CB0C228E7D447214D950 /* src/backend/Optimize.cpp */; };
+		375735E2F39E6EE8161B44BF /* src/backend/Spelling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 970F2537CE7DD71B0362F31A /* src/backend/Spelling.cpp */; };
+		9F779710F713B32FD3E90C1B /* src/backend/Tms6747.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18ACF8C91B243A4921E9F39A /* src/backend/Tms6747.cpp */; };
+		37FF9A130B73F12E238EC581 /* src/backend/X86_64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7E32B3F7334D36B5EC061CFA /* src/backend/X86_64.cpp */; };
+		FCF93AD2019225D111FF146B /* src/backend/X86_64Linux.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CFDED3177E548D6DEF4B1313 /* src/backend/X86_64Linux.cpp */; };
+		232F25F0ACD8306CF9A1DC67 /* src/backend/X86_64Windows.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B1AFCFD0C64BFF1EB58BE401 /* src/backend/X86_64Windows.cpp */; };
+		C2101F3FC6E45033CFAD914E /* src/main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2600352227A308253C32D3E0 /* src/main.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		B195FEA9B7E948B5DF3B7E21 /* runtime/Shortest.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = runtime/Shortest.cpp; sourceTree = "<group>"; };
-		30307F574764066D5EE15CD8 /* src/Ast.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Ast.cpp; sourceTree = "<group>"; };
-		97E3390E25970C5A0342472F /* src/Builtin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Builtin.cpp; sourceTree = "<group>"; };
-		0901303781D33A1A3EAB8462 /* src/Check.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Check.cpp; sourceTree = "<group>"; };
-		E2A47605292B20D8C410A56E /* src/CodeGen.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/CodeGen.cpp; sourceTree = "<group>"; };
-		6FB71B9FE84080E54FD37D6D /* src/Diag.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Diag.cpp; sourceTree = "<group>"; };
-		5EB5CA72B86B4E87A673EF84 /* src/Driver.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Driver.cpp; sourceTree = "<group>"; };
-		9CF031406EE1DD9485C4BA3D /* src/Lexer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Lexer.cpp; sourceTree = "<group>"; };
-		CFDD3A92A26BFD2888F07E53 /* src/Parser.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Parser.cpp; sourceTree = "<group>"; };
-		DE54D8763C62836BEDB4858C /* src/Resolve.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Resolve.cpp; sourceTree = "<group>"; };
-		C14FB0270E32BCE6A029CC2C /* src/Target.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Target.cpp; sourceTree = "<group>"; };
-		0CF1F1632A53D18EADA1F08B /* src/Type.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Type.cpp; sourceTree = "<group>"; };
-		1D379CB68B7B096E7C1D1F03 /* src/backend/Arm64Darwin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/Arm64Darwin.cpp; sourceTree = "<group>"; };
-		FA842397EEE08645CBF0A4B6 /* src/backend/Emitter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/Emitter.cpp; sourceTree = "<group>"; };
-		96FFFBA283A475CAFAB98DB4 /* src/backend/Optimize.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/Optimize.cpp; sourceTree = "<group>"; };
-		97F09AFC0AA38A8A04DE9345 /* src/backend/Spelling.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/Spelling.cpp; sourceTree = "<group>"; };
-		7BBF83D8D6B8A7FC4D6DF50F /* src/backend/Tms6747.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/Tms6747.cpp; sourceTree = "<group>"; };
-		AE87171411E45DCD7C2A1A7C /* src/backend/X86_64.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/X86_64.cpp; sourceTree = "<group>"; };
-		F08BD4D08CCA81D827656938 /* src/backend/X86_64Linux.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/X86_64Linux.cpp; sourceTree = "<group>"; };
-		4680FEDE33A9AE4FA966E075 /* src/backend/X86_64Windows.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/X86_64Windows.cpp; sourceTree = "<group>"; };
-		5ED8449B58A6C4DCC07A9E94 /* src/main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/main.cpp; sourceTree = "<group>"; };
-		978B1B3B80F42BFC7B29E6CA /* runtime/Debug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runtime/Debug.h; sourceTree = "<group>"; };
-		AC618D3B0C6BB93586806709 /* runtime/Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runtime/Internal.h; sourceTree = "<group>"; };
-		3D541BCE774B87F24DEEBFB6 /* runtime/Shortest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runtime/Shortest.h; sourceTree = "<group>"; };
-		E0008D7B6286A6D62113817B /* runtime/shmrt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runtime/shmrt.h; sourceTree = "<group>"; };
-		31D92DEFE4B563F3C2B8F8E9 /* src/Ast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Ast.h; sourceTree = "<group>"; };
-		02431D9D517619355F74750B /* src/Builtin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Builtin.h; sourceTree = "<group>"; };
-		DBE164A8F3706413BAB572C3 /* src/Check.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Check.h; sourceTree = "<group>"; };
-		4E2A5F48D4B7FC81C018216E /* src/CodeGen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/CodeGen.h; sourceTree = "<group>"; };
-		C8051BBBF38CD975FAA89C4E /* src/Diag.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Diag.h; sourceTree = "<group>"; };
-		D08F9BC6D7149867B26FBDEB /* src/Driver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Driver.h; sourceTree = "<group>"; };
-		334350E1CB772C075C7C92C7 /* src/Parser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Parser.h; sourceTree = "<group>"; };
-		538CAB31859745F8D146ED05 /* src/Resolve.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Resolve.h; sourceTree = "<group>"; };
-		8761BD51353C336B318D93E5 /* src/Target.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Target.h; sourceTree = "<group>"; };
-		434225D1DBB18017273F7248 /* src/Token.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Token.h; sourceTree = "<group>"; };
-		449316AEEC632DDF9F0755B1 /* src/Type.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Type.h; sourceTree = "<group>"; };
-		5D0A9371C09C368710D78D49 /* src/backend/Arm64Darwin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/Arm64Darwin.h; sourceTree = "<group>"; };
-		990A15B1715DDF27A8CEB533 /* src/backend/Emitter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/Emitter.h; sourceTree = "<group>"; };
-		F6E1B3F1413E9415A82E0E4D /* src/backend/Ins.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/Ins.h; sourceTree = "<group>"; };
-		153E42BC44876C6B87904BE2 /* src/backend/Optimize.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/Optimize.h; sourceTree = "<group>"; };
-		7BB42B4202968E6326734CC6 /* src/backend/Spelling.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/Spelling.h; sourceTree = "<group>"; };
-		2EA34AE75A9BDBDDB96DCFF1 /* src/backend/Tms6747.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/Tms6747.h; sourceTree = "<group>"; };
-		75BC19544D91766F79E7FF3B /* src/backend/X86_64.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/X86_64.h; sourceTree = "<group>"; };
-		2E28904CB2FC6961A2D0F42E /* src/backend/X86_64Linux.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/X86_64Linux.h; sourceTree = "<group>"; };
-		A26C2E36CB65E5A3BDE3B768 /* src/backend/X86_64Windows.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/X86_64Windows.h; sourceTree = "<group>"; };
-		67AAF99CC753BFC75AAF3EAD /* shci.exe */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = shci.exe; sourceTree = BUILT_PRODUCTS_DIR; };
-		39639ADA9821E32E80B83258 /* cxx1i.exe.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = cxx1i.exe.xcodeproj; path = "../Compiler-Cppi/cxx1.xcodeproj"; sourceTree = "<group>"; };
+		07961E601B2E7B18D4FFA2EB /* runtime/Shortest.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = runtime/Shortest.cpp; sourceTree = "<group>"; };
+		4067FA032414C58CDFF09197 /* src/Ast.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Ast.cpp; sourceTree = "<group>"; };
+		4457330CFE897A6333262BC8 /* src/Builtin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Builtin.cpp; sourceTree = "<group>"; };
+		EA1C91C3A573568CAFFA2E51 /* src/Check.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Check.cpp; sourceTree = "<group>"; };
+		6F8333F305045625DA8F9AD2 /* src/CodeGen.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/CodeGen.cpp; sourceTree = "<group>"; };
+		F3BE9F99F531BED613BB75FA /* src/Diag.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Diag.cpp; sourceTree = "<group>"; };
+		A26F1A3EB789D8B562D9E850 /* src/Driver.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Driver.cpp; sourceTree = "<group>"; };
+		B52EED773B7DEC9BD423B577 /* src/Lexer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Lexer.cpp; sourceTree = "<group>"; };
+		FA3555B7AF0374EAD0B9BEB5 /* src/Parser.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Parser.cpp; sourceTree = "<group>"; };
+		0D05D5125621CE57CE82DC3E /* src/Resolve.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Resolve.cpp; sourceTree = "<group>"; };
+		424952BF3295504AE675C25B /* src/Target.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Target.cpp; sourceTree = "<group>"; };
+		235AA93B142CE8C8F5D85904 /* src/Type.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/Type.cpp; sourceTree = "<group>"; };
+		121A6282D1700165E22B17B6 /* src/backend/Arm64Darwin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/Arm64Darwin.cpp; sourceTree = "<group>"; };
+		203F3D938FBEC0F74D9082B6 /* src/backend/Emitter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/Emitter.cpp; sourceTree = "<group>"; };
+		2A79CB0C228E7D447214D950 /* src/backend/Optimize.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/Optimize.cpp; sourceTree = "<group>"; };
+		970F2537CE7DD71B0362F31A /* src/backend/Spelling.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/Spelling.cpp; sourceTree = "<group>"; };
+		18ACF8C91B243A4921E9F39A /* src/backend/Tms6747.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/Tms6747.cpp; sourceTree = "<group>"; };
+		7E32B3F7334D36B5EC061CFA /* src/backend/X86_64.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/X86_64.cpp; sourceTree = "<group>"; };
+		CFDED3177E548D6DEF4B1313 /* src/backend/X86_64Linux.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/X86_64Linux.cpp; sourceTree = "<group>"; };
+		B1AFCFD0C64BFF1EB58BE401 /* src/backend/X86_64Windows.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/backend/X86_64Windows.cpp; sourceTree = "<group>"; };
+		2600352227A308253C32D3E0 /* src/main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = src/main.cpp; sourceTree = "<group>"; };
+		3D6851E062635089428C493F /* runtime/Debug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runtime/Debug.h; sourceTree = "<group>"; };
+		85FA10D961E97269E86E4428 /* runtime/Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runtime/Internal.h; sourceTree = "<group>"; };
+		BDFBE0B3333BB3906194C30A /* runtime/Shortest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runtime/Shortest.h; sourceTree = "<group>"; };
+		386871FA1304A2D0C218AFB1 /* runtime/shmrt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runtime/shmrt.h; sourceTree = "<group>"; };
+		7EA0542E98571CB6CD11E366 /* src/Ast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Ast.h; sourceTree = "<group>"; };
+		75A673AB6AB4AB0CF74B6465 /* src/Builtin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Builtin.h; sourceTree = "<group>"; };
+		13F0893D814B67D40ED6C924 /* src/Check.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Check.h; sourceTree = "<group>"; };
+		15B4AD896B9C05FF0BA87B16 /* src/CodeGen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/CodeGen.h; sourceTree = "<group>"; };
+		AAD2F7CAA0B71CDEE53CE8BE /* src/Diag.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Diag.h; sourceTree = "<group>"; };
+		2280001DC1248F57B1541FE9 /* src/Driver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Driver.h; sourceTree = "<group>"; };
+		3160DBD7EE61B0F41603D76B /* src/Name.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Name.h; sourceTree = "<group>"; };
+		331ADA57717C9DEC731214D5 /* src/Parser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Parser.h; sourceTree = "<group>"; };
+		BF0C518B2C13AD59AF16AA29 /* src/Resolve.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Resolve.h; sourceTree = "<group>"; };
+		4DB86047D3C4B2368E95A6C5 /* src/Target.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Target.h; sourceTree = "<group>"; };
+		0B71C71F8A817B28200443F2 /* src/Token.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Token.h; sourceTree = "<group>"; };
+		E86F01A30D42CC8510B11DCD /* src/Type.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/Type.h; sourceTree = "<group>"; };
+		3EDCB2C7EC31DA2D6421BFCE /* src/backend/Arm64Darwin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/Arm64Darwin.h; sourceTree = "<group>"; };
+		16EFA56AB1789A15905325CC /* src/backend/Emitter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/Emitter.h; sourceTree = "<group>"; };
+		3467E2D0A8697EC188257DE5 /* src/backend/Ins.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/Ins.h; sourceTree = "<group>"; };
+		C3C8E283DEF130DE9AA1A060 /* src/backend/Optimize.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/Optimize.h; sourceTree = "<group>"; };
+		FD139D13B66F77CF25A29BCC /* src/backend/Spelling.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/Spelling.h; sourceTree = "<group>"; };
+		0F8A904D6EB0320051F6FF88 /* src/backend/Tms6747.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/Tms6747.h; sourceTree = "<group>"; };
+		56CB0E546198314CA3996062 /* src/backend/X86_64.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/X86_64.h; sourceTree = "<group>"; };
+		03DFEBBAE56C686B2916365B /* src/backend/X86_64Linux.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/X86_64Linux.h; sourceTree = "<group>"; };
+		6FC6CF63304FA4187CE297E1 /* src/backend/X86_64Windows.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/X86_64Windows.h; sourceTree = "<group>"; };
+		CC672FE3254F928D91AE2865 /* shalimar.exe */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = shalimar.exe; sourceTree = BUILT_PRODUCTS_DIR; };
+		5F957A5E5CC31B9A862D8527 /* cpp11.exe.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = cpp11.exe.xcodeproj; path = "../Compiler-Cppi/cxx1.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXContainerItemProxy section */
-		7ECB5021E1C9D7A03BC1C5F8 /* PBXContainerItemProxy */ = {
+		0A16C0004D3DB6B6CC5AC329 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 39639ADA9821E32E80B83258 /* cxx1i.exe.xcodeproj */;
+			containerPortal = 5F957A5E5CC31B9A862D8527 /* cpp11.exe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = B0DEE53FB510C2BF164ECD03;
-			remoteInfo = cxx1i.exe;
+			remoteGlobalIDString = 2DC24FDB4CCDA14233AB5364;
+			remoteInfo = cpp11.exe;
 		};
-		239CA0FD22F1CC99C26BC928 /* PBXContainerItemProxy */ = {
+		A89DCDEDB2F6146E6DA1B8DB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 39639ADA9821E32E80B83258 /* cxx1i.exe.xcodeproj */;
+			containerPortal = 5F957A5E5CC31B9A862D8527 /* cpp11.exe.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 9BDE0D6970DFE91E74C9FC29;
-			remoteInfo = cxx1i.exe;
+			remoteGlobalIDString = FC5035A3144E3FE75BF41BA5;
+			remoteInfo = cpp11.exe;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		876AF45313F36F5DA47CF5F4 /* Frameworks */ = {
+		D960DD805855EA23694821F2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -108,79 +109,80 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		C79EF7AB2888DFC3020D4C3C = {
+		DC139D45AB290E17728CE241 = {
 			isa = PBXGroup;
 			children = (
-				838969CE344FDAEB239F99BB /* Sources */,
-				39639ADA9821E32E80B83258 /* cxx1i.exe.xcodeproj */,
-				287B8F37C5D23BC16E0E80A2 /* Products */,
+				C830457CB0150BDDAC43CE58 /* Sources */,
+				5F957A5E5CC31B9A862D8527 /* cpp11.exe.xcodeproj */,
+				F055BEE628E49D0E2DB2AA13 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		838969CE344FDAEB239F99BB /* Sources */ = {
+		C830457CB0150BDDAC43CE58 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				B195FEA9B7E948B5DF3B7E21 /* runtime/Shortest.cpp */,
-				30307F574764066D5EE15CD8 /* src/Ast.cpp */,
-				97E3390E25970C5A0342472F /* src/Builtin.cpp */,
-				0901303781D33A1A3EAB8462 /* src/Check.cpp */,
-				E2A47605292B20D8C410A56E /* src/CodeGen.cpp */,
-				6FB71B9FE84080E54FD37D6D /* src/Diag.cpp */,
-				5EB5CA72B86B4E87A673EF84 /* src/Driver.cpp */,
-				9CF031406EE1DD9485C4BA3D /* src/Lexer.cpp */,
-				CFDD3A92A26BFD2888F07E53 /* src/Parser.cpp */,
-				DE54D8763C62836BEDB4858C /* src/Resolve.cpp */,
-				C14FB0270E32BCE6A029CC2C /* src/Target.cpp */,
-				0CF1F1632A53D18EADA1F08B /* src/Type.cpp */,
-				1D379CB68B7B096E7C1D1F03 /* src/backend/Arm64Darwin.cpp */,
-				FA842397EEE08645CBF0A4B6 /* src/backend/Emitter.cpp */,
-				96FFFBA283A475CAFAB98DB4 /* src/backend/Optimize.cpp */,
-				97F09AFC0AA38A8A04DE9345 /* src/backend/Spelling.cpp */,
-				7BBF83D8D6B8A7FC4D6DF50F /* src/backend/Tms6747.cpp */,
-				AE87171411E45DCD7C2A1A7C /* src/backend/X86_64.cpp */,
-				F08BD4D08CCA81D827656938 /* src/backend/X86_64Linux.cpp */,
-				4680FEDE33A9AE4FA966E075 /* src/backend/X86_64Windows.cpp */,
-				5ED8449B58A6C4DCC07A9E94 /* src/main.cpp */,
-				978B1B3B80F42BFC7B29E6CA /* runtime/Debug.h */,
-				AC618D3B0C6BB93586806709 /* runtime/Internal.h */,
-				3D541BCE774B87F24DEEBFB6 /* runtime/Shortest.h */,
-				E0008D7B6286A6D62113817B /* runtime/shmrt.h */,
-				31D92DEFE4B563F3C2B8F8E9 /* src/Ast.h */,
-				02431D9D517619355F74750B /* src/Builtin.h */,
-				DBE164A8F3706413BAB572C3 /* src/Check.h */,
-				4E2A5F48D4B7FC81C018216E /* src/CodeGen.h */,
-				C8051BBBF38CD975FAA89C4E /* src/Diag.h */,
-				D08F9BC6D7149867B26FBDEB /* src/Driver.h */,
-				334350E1CB772C075C7C92C7 /* src/Parser.h */,
-				538CAB31859745F8D146ED05 /* src/Resolve.h */,
-				8761BD51353C336B318D93E5 /* src/Target.h */,
-				434225D1DBB18017273F7248 /* src/Token.h */,
-				449316AEEC632DDF9F0755B1 /* src/Type.h */,
-				5D0A9371C09C368710D78D49 /* src/backend/Arm64Darwin.h */,
-				990A15B1715DDF27A8CEB533 /* src/backend/Emitter.h */,
-				F6E1B3F1413E9415A82E0E4D /* src/backend/Ins.h */,
-				153E42BC44876C6B87904BE2 /* src/backend/Optimize.h */,
-				7BB42B4202968E6326734CC6 /* src/backend/Spelling.h */,
-				2EA34AE75A9BDBDDB96DCFF1 /* src/backend/Tms6747.h */,
-				75BC19544D91766F79E7FF3B /* src/backend/X86_64.h */,
-				2E28904CB2FC6961A2D0F42E /* src/backend/X86_64Linux.h */,
-				A26C2E36CB65E5A3BDE3B768 /* src/backend/X86_64Windows.h */,
+				07961E601B2E7B18D4FFA2EB /* runtime/Shortest.cpp */,
+				4067FA032414C58CDFF09197 /* src/Ast.cpp */,
+				4457330CFE897A6333262BC8 /* src/Builtin.cpp */,
+				EA1C91C3A573568CAFFA2E51 /* src/Check.cpp */,
+				6F8333F305045625DA8F9AD2 /* src/CodeGen.cpp */,
+				F3BE9F99F531BED613BB75FA /* src/Diag.cpp */,
+				A26F1A3EB789D8B562D9E850 /* src/Driver.cpp */,
+				B52EED773B7DEC9BD423B577 /* src/Lexer.cpp */,
+				FA3555B7AF0374EAD0B9BEB5 /* src/Parser.cpp */,
+				0D05D5125621CE57CE82DC3E /* src/Resolve.cpp */,
+				424952BF3295504AE675C25B /* src/Target.cpp */,
+				235AA93B142CE8C8F5D85904 /* src/Type.cpp */,
+				121A6282D1700165E22B17B6 /* src/backend/Arm64Darwin.cpp */,
+				203F3D938FBEC0F74D9082B6 /* src/backend/Emitter.cpp */,
+				2A79CB0C228E7D447214D950 /* src/backend/Optimize.cpp */,
+				970F2537CE7DD71B0362F31A /* src/backend/Spelling.cpp */,
+				18ACF8C91B243A4921E9F39A /* src/backend/Tms6747.cpp */,
+				7E32B3F7334D36B5EC061CFA /* src/backend/X86_64.cpp */,
+				CFDED3177E548D6DEF4B1313 /* src/backend/X86_64Linux.cpp */,
+				B1AFCFD0C64BFF1EB58BE401 /* src/backend/X86_64Windows.cpp */,
+				2600352227A308253C32D3E0 /* src/main.cpp */,
+				3D6851E062635089428C493F /* runtime/Debug.h */,
+				85FA10D961E97269E86E4428 /* runtime/Internal.h */,
+				BDFBE0B3333BB3906194C30A /* runtime/Shortest.h */,
+				386871FA1304A2D0C218AFB1 /* runtime/shmrt.h */,
+				7EA0542E98571CB6CD11E366 /* src/Ast.h */,
+				75A673AB6AB4AB0CF74B6465 /* src/Builtin.h */,
+				13F0893D814B67D40ED6C924 /* src/Check.h */,
+				15B4AD896B9C05FF0BA87B16 /* src/CodeGen.h */,
+				AAD2F7CAA0B71CDEE53CE8BE /* src/Diag.h */,
+				2280001DC1248F57B1541FE9 /* src/Driver.h */,
+				3160DBD7EE61B0F41603D76B /* src/Name.h */,
+				331ADA57717C9DEC731214D5 /* src/Parser.h */,
+				BF0C518B2C13AD59AF16AA29 /* src/Resolve.h */,
+				4DB86047D3C4B2368E95A6C5 /* src/Target.h */,
+				0B71C71F8A817B28200443F2 /* src/Token.h */,
+				E86F01A30D42CC8510B11DCD /* src/Type.h */,
+				3EDCB2C7EC31DA2D6421BFCE /* src/backend/Arm64Darwin.h */,
+				16EFA56AB1789A15905325CC /* src/backend/Emitter.h */,
+				3467E2D0A8697EC188257DE5 /* src/backend/Ins.h */,
+				C3C8E283DEF130DE9AA1A060 /* src/backend/Optimize.h */,
+				FD139D13B66F77CF25A29BCC /* src/backend/Spelling.h */,
+				0F8A904D6EB0320051F6FF88 /* src/backend/Tms6747.h */,
+				56CB0E546198314CA3996062 /* src/backend/X86_64.h */,
+				03DFEBBAE56C686B2916365B /* src/backend/X86_64Linux.h */,
+				6FC6CF63304FA4187CE297E1 /* src/backend/X86_64Windows.h */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
 		};
-		287B8F37C5D23BC16E0E80A2 /* Products */ = {
+		F055BEE628E49D0E2DB2AA13 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				67AAF99CC753BFC75AAF3EAD /* shci.exe */,
+				CC672FE3254F928D91AE2865 /* shalimar.exe */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		DE1DE0B7B8F110077C3961EB /* Products */ = {
+		81146BB4D4927EF6F06114A6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				DD4AB28C5658160CCA7A4AEA /* cxx1i.exe */,
+				C35E51E2EB854B4AE8679923 /* cpp11.exe */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -188,77 +190,77 @@
 /* End PBXGroup section */
 
 /* Begin PBXReferenceProxy section */
-		DD4AB28C5658160CCA7A4AEA /* cxx1i.exe */ = {
+		C35E51E2EB854B4AE8679923 /* cpp11.exe */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
-			path = cxx1i.exe;
-			remoteRef = 7ECB5021E1C9D7A03BC1C5F8 /* PBXContainerItemProxy */;
+			path = cpp11.exe;
+			remoteRef = 0A16C0004D3DB6B6CC5AC329 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXNativeTarget section */
-		E2B705156EA9B32DAB3E58FD /* shci.exe */ = {
+		F6440263CC8FDF9D2B83AC61 /* shalimar.exe */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7250F947A3EFB9DD5D684849;
+			buildConfigurationList = 87D0DE5B5A8602FA433E1072;
 			buildPhases = (
-				3ABACC9FA9FBF57179ABE4F5 /* Sources */,
-				876AF45313F36F5DA47CF5F4 /* Frameworks */,
-				58D9D205F50D1B4B3A8583FC /* the Shalimar runtime, beside shci.exe */,
-				6691D8D0016767831EC71BFE /* put the finished program in RIDE's directory */,
+				C1FA00685839847297E1B514 /* Sources */,
+				D960DD805855EA23694821F2 /* Frameworks */,
+				9A8A8FDEC164C7011E6A66D9 /* the Shalimar runtime, beside shalimar.exe */,
+				74B2C86A7C8C35421E0E6280 /* put the finished program in RIDE's directory */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				44FA8D4C6D426AF50575250F /* PBXTargetDependency */,
+				0751F55E180DB91E8C5FF333 /* PBXTargetDependency */,
 			);
-			name = shci.exe;
-			productName = shci.exe;
-			productReference = 67AAF99CC753BFC75AAF3EAD /* shci.exe */;
+			name = shalimar.exe;
+			productName = shalimar.exe;
+			productReference = CC672FE3254F928D91AE2865 /* shalimar.exe */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXTargetDependency section */
-		44FA8D4C6D426AF50575250F /* PBXTargetDependency */ = {
+		0751F55E180DB91E8C5FF333 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			name = cxx1i.exe;
-			targetProxy = 239CA0FD22F1CC99C26BC928 /* PBXContainerItemProxy */;
+			name = cpp11.exe;
+			targetProxy = A89DCDEDB2F6146E6DA1B8DB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXProject section */
-		8ADA952F0B98A5BB95E9E34E /* Project object */ = {
+		1EB9FA9C539D73E017D600A4 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastUpgradeCheck = 1600;
 			};
-			buildConfigurationList = 8E32E86A56A83E47E2E26CB3;
+			buildConfigurationList = D7985EC3A1969C0543F0D985;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = C79EF7AB2888DFC3020D4C3C;
-			productRefGroup = 287B8F37C5D23BC16E0E80A2 /* Products */;
+			mainGroup = DC139D45AB290E17728CE241;
+			productRefGroup = F055BEE628E49D0E2DB2AA13 /* Products */;
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = DE1DE0B7B8F110077C3961EB /* Products */;
-					ProjectRef = 39639ADA9821E32E80B83258 /* cxx1i.exe.xcodeproj */;
+					ProductGroup = 81146BB4D4927EF6F06114A6 /* Products */;
+					ProjectRef = 5F957A5E5CC31B9A862D8527 /* cpp11.exe.xcodeproj */;
 				},
 			);
 			projectRoot = "";
 			targets = (
-				E2B705156EA9B32DAB3E58FD /* shci.exe */,
+				F6440263CC8FDF9D2B83AC61 /* shalimar.exe */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		58D9D205F50D1B4B3A8583FC /* the Shalimar runtime, beside shci.exe */ = {
+		9A8A8FDEC164C7011E6A66D9 /* the Shalimar runtime, beside shalimar.exe */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -275,9 +277,9 @@
 				"$(SRCROOT)/runtime/Internal.h",
 				"$(SRCROOT)/runtime/Shortest.h",
 				"$(SRCROOT)/runtime/Debug.h",
-				"$(BUILT_PRODUCTS_DIR)/cxx1i.exe",
+				"$(BUILT_PRODUCTS_DIR)/cpp11.exe",
 			);
-			name = "the Shalimar runtime, beside shci.exe";
+			name = "the Shalimar runtime, beside shalimar.exe";
 			outputPaths = (
 				"$(BUILT_PRODUCTS_DIR)/lib/shmrt-arm64-darwin.a",
 				"$(BUILT_PRODUCTS_DIR)/lib/shmrt-arm64-darwin-debug.a",
@@ -290,9 +292,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\ncxx=\"$(xcrun --find clang++)\"\nar=\"$(xcrun --find ar)\"\nflags=\"-std=c++14 -Wall -Wextra -Werror -pedantic -O2\"\nlib=\"$BUILT_PRODUCTS_DIR/lib\"\nmkdir -p \"$lib\"\nmkdir -p \"$DERIVED_FILE_DIR/runtime\"\n\"$cxx\" $flags -c \"$SRCROOT/runtime/Shortest.cpp\" -o \"$DERIVED_FILE_DIR/runtime/Shortest.o\"\n\"$cxx\" $flags -c \"$SRCROOT/runtime/Failure.cpp\" -o \"$DERIVED_FILE_DIR/runtime/Failure.o\"\n\"$cxx\" $flags -c \"$SRCROOT/runtime/Numbers.cpp\" -o \"$DERIVED_FILE_DIR/runtime/Numbers.o\"\n\"$cxx\" $flags -c \"$SRCROOT/runtime/Array.cpp\" -o \"$DERIVED_FILE_DIR/runtime/Array.o\"\n\"$cxx\" $flags -c \"$SRCROOT/runtime/Console.cpp\" -o \"$DERIVED_FILE_DIR/runtime/Console.o\"\n\"$cxx\" $flags -c \"$SRCROOT/runtime/Runtime.cpp\" -o \"$DERIVED_FILE_DIR/runtime/Runtime.o\"\nrm -f \"$lib/shmrt-arm64-darwin.a\"\n\"$ar\" rcs \"$lib/shmrt-arm64-darwin.a\" \"$DERIVED_FILE_DIR/runtime\"/*.o\nmkdir -p \"$DERIVED_FILE_DIR/runtime-debug\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Shortest.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Shortest.o\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Failure.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Failure.o\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Numbers.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Numbers.o\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Array.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Array.o\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Console.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Console.o\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Runtime.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Runtime.o\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Debug.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Debug.o\"\nrm -f \"$lib/shmrt-arm64-darwin-debug.a\"\n\"$ar\" rcs \"$lib/shmrt-arm64-darwin-debug.a\" \"$DERIVED_FILE_DIR/runtime-debug\"/*.o\ncxx1i=\"$BUILT_PRODUCTS_DIR/cxx1i.exe\"\ntest -x \"$cxx1i\" || { echo \"shc.xcodeproj: no cxx1i.exe beside the output - the C6000 runtime is its output\" >&2; exit 1; }\nrm -rf \"$lib/shmrt-tms6747\"\nmkdir -p \"$lib/shmrt-tms6747\"\n\"$cxx1i\" -S -arch tms6747 -nologo \"$SRCROOT/runtime/Shortest.cpp\" -o \"$lib/shmrt-tms6747/Shortest.s\"\n\"$cxx1i\" -S -arch tms6747 -nologo \"$SRCROOT/runtime/Failure.cpp\" -o \"$lib/shmrt-tms6747/Failure.s\"\n\"$cxx1i\" -S -arch tms6747 -nologo \"$SRCROOT/runtime/Numbers.cpp\" -o \"$lib/shmrt-tms6747/Numbers.s\"\n\"$cxx1i\" -S -arch tms6747 -nologo \"$SRCROOT/runtime/Array.cpp\" -o \"$lib/shmrt-tms6747/Array.s\"\n\"$cxx1i\" -S -arch tms6747 -nologo \"$SRCROOT/runtime/Console.cpp\" -o \"$lib/shmrt-tms6747/Console.s\"\n\"$cxx1i\" -S -arch tms6747 -nologo \"$SRCROOT/runtime/Runtime.cpp\" -o \"$lib/shmrt-tms6747/Runtime.s\"\n";
+			shellScript = "set -e\ncxx=\"$(xcrun --find clang++)\"\nar=\"$(xcrun --find ar)\"\nflags=\"-std=c++14 -Wall -Wextra -Werror -pedantic -O2\"\nlib=\"$BUILT_PRODUCTS_DIR/lib\"\nmkdir -p \"$lib\"\nmkdir -p \"$DERIVED_FILE_DIR/runtime\"\n\"$cxx\" $flags -c \"$SRCROOT/runtime/Shortest.cpp\" -o \"$DERIVED_FILE_DIR/runtime/Shortest.o\"\n\"$cxx\" $flags -c \"$SRCROOT/runtime/Failure.cpp\" -o \"$DERIVED_FILE_DIR/runtime/Failure.o\"\n\"$cxx\" $flags -c \"$SRCROOT/runtime/Numbers.cpp\" -o \"$DERIVED_FILE_DIR/runtime/Numbers.o\"\n\"$cxx\" $flags -c \"$SRCROOT/runtime/Array.cpp\" -o \"$DERIVED_FILE_DIR/runtime/Array.o\"\n\"$cxx\" $flags -c \"$SRCROOT/runtime/Console.cpp\" -o \"$DERIVED_FILE_DIR/runtime/Console.o\"\n\"$cxx\" $flags -c \"$SRCROOT/runtime/Runtime.cpp\" -o \"$DERIVED_FILE_DIR/runtime/Runtime.o\"\nrm -f \"$lib/shmrt-arm64-darwin.a\"\n\"$ar\" rcs \"$lib/shmrt-arm64-darwin.a\" \"$DERIVED_FILE_DIR/runtime\"/*.o\nmkdir -p \"$DERIVED_FILE_DIR/runtime-debug\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Shortest.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Shortest.o\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Failure.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Failure.o\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Numbers.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Numbers.o\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Array.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Array.o\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Console.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Console.o\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Runtime.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Runtime.o\"\n\"$cxx\" $flags -DSHM_DEBUG=1 -c \"$SRCROOT/runtime/Debug.cpp\" -o \"$DERIVED_FILE_DIR/runtime-debug/Debug.o\"\nrm -f \"$lib/shmrt-arm64-darwin-debug.a\"\n\"$ar\" rcs \"$lib/shmrt-arm64-darwin-debug.a\" \"$DERIVED_FILE_DIR/runtime-debug\"/*.o\ncpp11=\"$BUILT_PRODUCTS_DIR/cpp11.exe\"\ntest -x \"$cpp11\" || { echo \"shc.xcodeproj: no cpp11.exe beside the output - the C6000 runtime is its output\" >&2; exit 1; }\nrm -rf \"$lib/shmrt-tms6747\"\nmkdir -p \"$lib/shmrt-tms6747\"\n\"$cpp11\" -S -arch tms6747 -nologo \"$SRCROOT/runtime/Shortest.cpp\" -o \"$lib/shmrt-tms6747/Shortest.s\"\n\"$cpp11\" -S -arch tms6747 -nologo \"$SRCROOT/runtime/Failure.cpp\" -o \"$lib/shmrt-tms6747/Failure.s\"\n\"$cpp11\" -S -arch tms6747 -nologo \"$SRCROOT/runtime/Numbers.cpp\" -o \"$lib/shmrt-tms6747/Numbers.s\"\n\"$cpp11\" -S -arch tms6747 -nologo \"$SRCROOT/runtime/Array.cpp\" -o \"$lib/shmrt-tms6747/Array.s\"\n\"$cpp11\" -S -arch tms6747 -nologo \"$SRCROOT/runtime/Console.cpp\" -o \"$lib/shmrt-tms6747/Console.s\"\n\"$cpp11\" -S -arch tms6747 -nologo \"$SRCROOT/runtime/Runtime.cpp\" -o \"$lib/shmrt-tms6747/Runtime.s\"\n";
 		};
-		6691D8D0016767831EC71BFE /* put the finished program in RIDE's directory */ = {
+		74B2C86A7C8C35421E0E6280 /* put the finished program in RIDE's directory */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -310,38 +312,38 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		3ABACC9FA9FBF57179ABE4F5 /* Sources */ = {
+		C1FA00685839847297E1B514 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA2E3F44EA609A07BF8D1F82 /* runtime/Shortest.cpp in Sources */,
-				59C6E2AD256053BE27E81E40 /* src/Ast.cpp in Sources */,
-				D0B6555C5E35D377BA3E0DCB /* src/Builtin.cpp in Sources */,
-				EA5FF733A1D9A99AB659285E /* src/Check.cpp in Sources */,
-				EAC8447EE8FB3BE56B2B748E /* src/CodeGen.cpp in Sources */,
-				F3F509B5BEA2B63806E86A29 /* src/Diag.cpp in Sources */,
-				87E1438F5E0F21536D811CF1 /* src/Driver.cpp in Sources */,
-				B3B58E394327B534D007874E /* src/Lexer.cpp in Sources */,
-				5B30594E544C1E038663CA40 /* src/Parser.cpp in Sources */,
-				BEDB7A7B75C1291F94A9DA74 /* src/Resolve.cpp in Sources */,
-				4E63CFEB223F6063F629410E /* src/Target.cpp in Sources */,
-				90C4FBE5EC1A3DE5DAE697A1 /* src/Type.cpp in Sources */,
-				A45DC5B1C4209FF72F679396 /* src/backend/Arm64Darwin.cpp in Sources */,
-				3AB5913BD32D2FBD22B61831 /* src/backend/Emitter.cpp in Sources */,
-				3C3445BEFD11625065BD998A /* src/backend/Optimize.cpp in Sources */,
-				C85450FD793973D2CE9E3222 /* src/backend/Spelling.cpp in Sources */,
-				4AC536ECE1F6545D7D8F1067 /* src/backend/Tms6747.cpp in Sources */,
-				C6488B664BB11BF747289EF9 /* src/backend/X86_64.cpp in Sources */,
-				A669587D3E94EE6CB1249BB8 /* src/backend/X86_64Linux.cpp in Sources */,
-				025E27BE7A159BDA1B6FCF2B /* src/backend/X86_64Windows.cpp in Sources */,
-				E6D5CBF0B9AC9FD515D6E60F /* src/main.cpp in Sources */,
+				ADE91CF24B4D93281973FA66 /* runtime/Shortest.cpp in Sources */,
+				619BA2382D3C55C38DC332F5 /* src/Ast.cpp in Sources */,
+				BB9E2956B32EFABA3625329A /* src/Builtin.cpp in Sources */,
+				5AEF009B515799C3E09F577C /* src/Check.cpp in Sources */,
+				E2DF0F17651DBF73CBA77084 /* src/CodeGen.cpp in Sources */,
+				D8F14E620C131B4E66C3CC37 /* src/Diag.cpp in Sources */,
+				E8078FD1C114A929F3A89172 /* src/Driver.cpp in Sources */,
+				F0352AEA9474CC12BEA0AAF2 /* src/Lexer.cpp in Sources */,
+				FABC9AD25D09ADFFDCE241A9 /* src/Parser.cpp in Sources */,
+				F3AB0D874E5D7CBEAB47E2CE /* src/Resolve.cpp in Sources */,
+				E1DBE71064F979CFC6AD7494 /* src/Target.cpp in Sources */,
+				48518DEF6B9A035855D3EC8B /* src/Type.cpp in Sources */,
+				0686AC0897AA471726A714A0 /* src/backend/Arm64Darwin.cpp in Sources */,
+				C2EB00417335160D211704B0 /* src/backend/Emitter.cpp in Sources */,
+				0259CB1C28AC0BC2F7F87A3F /* src/backend/Optimize.cpp in Sources */,
+				375735E2F39E6EE8161B44BF /* src/backend/Spelling.cpp in Sources */,
+				9F779710F713B32FD3E90C1B /* src/backend/Tms6747.cpp in Sources */,
+				37FF9A130B73F12E238EC581 /* src/backend/X86_64.cpp in Sources */,
+				FCF93AD2019225D111FF146B /* src/backend/X86_64Linux.cpp in Sources */,
+				232F25F0ACD8306CF9A1DC67 /* src/backend/X86_64Windows.cpp in Sources */,
+				C2101F3FC6E45033CFAD914E /* src/main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		BAE25C7AA5868EB081D8126B /* Debug */ = {
+		C34513656614AF23C7679746 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -354,7 +356,7 @@
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_NAME = shci.exe;
+				PRODUCT_NAME = shalimar.exe;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/src $(SRCROOT)/runtime";
 				WARNING_CFLAGS = (
@@ -367,7 +369,7 @@
 			};
 			name = Debug;
 		};
-		8C7DFD9E3D8FB3C6176C2F11 /* Release */ = {
+		066E7FE6B6AEE5DBC00BA342 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -380,7 +382,7 @@
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_NAME = shci.exe;
+				PRODUCT_NAME = shalimar.exe;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/src $(SRCROOT)/runtime";
 				WARNING_CFLAGS = (
@@ -393,7 +395,7 @@
 			};
 			name = Release;
 		};
-		0558A993EF225C1E610066EE /* Debug */ = {
+		FCC0273FA1DDF975F31C59C6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -406,7 +408,7 @@
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_NAME = shci.exe;
+				PRODUCT_NAME = shalimar.exe;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/src $(SRCROOT)/runtime";
 				WARNING_CFLAGS = (
@@ -419,7 +421,7 @@
 			};
 			name = Debug;
 		};
-		C7B886D5C1CFE275724A0BB0 /* Release */ = {
+		A5C3EA59DF74F2E8E6A12039 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -432,7 +434,7 @@
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_NAME = shci.exe;
+				PRODUCT_NAME = shalimar.exe;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/src $(SRCROOT)/runtime";
 				WARNING_CFLAGS = (
@@ -448,25 +450,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		8E32E86A56A83E47E2E26CB3 /* project */ = {
+		D7985EC3A1969C0543F0D985 /* project */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				BAE25C7AA5868EB081D8126B /* Debug */,
-				8C7DFD9E3D8FB3C6176C2F11 /* Release */,
+				C34513656614AF23C7679746 /* Debug */,
+				066E7FE6B6AEE5DBC00BA342 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		7250F947A3EFB9DD5D684849 /* target */ = {
+		87D0DE5B5A8602FA433E1072 /* target */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				0558A993EF225C1E610066EE /* Debug */,
-				C7B886D5C1CFE275724A0BB0 /* Release */,
+				FCC0273FA1DDF975F31C59C6 /* Debug */,
+				A5C3EA59DF74F2E8E6A12039 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 8ADA952F0B98A5BB95E9E34E /* Project object */;
+	rootObject = 1EB9FA9C539D73E017D600A4 /* Project object */;
 }

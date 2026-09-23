@@ -1,7 +1,7 @@
 #!/bin/sh
 # tests/windows/ti-link.cmd on the box, from the Mac: every case compiled by the
 # driver for tms6747 all the way to a TI program - asm6x on the assembly, lnk6x
-# over the objects. The compiler, asm6x (and shci's runtime) are RIDE's, in its
+# over the objects. The compiler, asm6x (and shalimar's runtime) are RIDE's, in its
 # bin on the box, so the tree there is what RStudio's tools/to-windows.sh
 # relayed last: this ships it again and rebuilds RIDE's solution first, unless
 # told not to.

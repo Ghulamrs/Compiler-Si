@@ -59,10 +59,10 @@ ssh -n "$HOSTNAME_" "$REMOTE\\setup.bat" | grep -q RUNTIME_BUILT || {
 # by tests/run.sh. Only cases that produce a program travel.
 # Two parallel arrays rather than one associative one: the bash macOS ships
 # is 3.2, which has no 'declare -A'.
-# SHC_AS=<path on the box> sends every case through that assembler instead of
+# SHALIMAR_AS=<path on the box> sends every case through that assembler instead of
 # ml64 - the project's own, at C:\masm-tests\build\asm-win.exe once MASM's
 # tests/windows.sh has built it there - which is what RIDE does with it.
-ASM_THERE=${SHC_AS:-}
+ASM_THERE=${SHALIMAR_AS:-}
 [ -n "$ASM_THERE" ] && echo "assembling with $ASM_THERE"
 names=()
 sources=()

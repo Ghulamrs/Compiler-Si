@@ -33,8 +33,8 @@ public:
     }
 };
 
-// The fourth target: nothing here assembles it, so shci stops at the text
-// (-S) and the VM6747 emulator runs it with the runtime compiled by cxx1i.
+// The fourth target: nothing here assembles it, so shalimar stops at the text
+// (-S) and the VM6747 emulator runs it with the runtime compiled by cpp11.
 class Tms6747Target : public Target {
 public:
     std::string name() const override { return "tms6747"; }

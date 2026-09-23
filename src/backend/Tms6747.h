@@ -7,9 +7,9 @@
 namespace shalimar {
 
 // The TMS320C6747 (C6000) as the Shalimar compiler's fourth target: C6000
-// assembly text, serial, every delay slot a NOP - the conventions cc1i and
-// cxx1i emit for it, which is what lets one emulator run all three and the
-// runtime, compiled by cxx1i, sit beside a Shalimar program. See
+// assembly text, serial, every delay slot a NOP - the conventions c90 and
+// cpp11 emit for it, which is what lets one emulator run all three and the
+// runtime, compiled by cpp11, sit beside a Shalimar program. See
 // VM6747/TMS6747.md.
 //
 // The accumulator is A4, a real or a wide value the pair A5:A4. A15 is the

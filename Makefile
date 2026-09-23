@@ -86,7 +86,10 @@ BINDIR ?= .
 # example library; each falls back to a sibling checkout on its own.
 CC1 ?= ../Compiler-C/cc1.exe
 LIBDIR ?= ../Compiler-C/examples/shalimar-library
-SHC    ?= $(BINDIR)/shci.exe
+# The program's name, once - src/Name.h and the project files RIDE's
+# tools/make-projects.py writes spell it the same.
+PROGRAM = shalimar
+SHC    ?= $(BINDIR)/$(PROGRAM).exe
 
 # **The runtime goes wherever the compiler goes, and that is not a preference.**
 # shc finds its runtime relative to its own binary - lib/ beside it, then
@@ -101,12 +104,12 @@ DEBUG_RUNTIME := $(LIBDIR)/shmrt-$(TARGET)-debug.a
 all: $(SHC) $(RUNTIME) $(DEBUG_RUNTIME)
 
 # **The runtime for the C6000 is assembly, not an archive**: there is no
-# assembler for it on any machine here, so cxx1i compiles each runtime
+# assembler for it on any machine here, so cpp11 compiles each runtime
 # source to C6000 text and the VM6747 emulator takes the directory whole
 # beside a Shalimar program - `vm6747 prog.s lib/shmrt-tms6747`. Built by
-# `make tms6747`, since it needs cxx1i, which `make` alone must not: the
+# `make tms6747`, since it needs cpp11, which `make` alone must not: the
 # host runtime and the compiler build without the C++ clone being there.
-CXX1 ?= $(BINDIR)/cxx1i.exe
+CXX1 ?= $(BINDIR)/cpp11.exe
 TMS_RUNTIME_DIR := $(LIBDIR)/shmrt-tms6747
 TMS_RUNTIME := $(patsubst runtime/%.cpp,$(TMS_RUNTIME_DIR)/%.s,$(RUNTIME_SOURCES))
 
@@ -143,9 +146,9 @@ $(DEBUG_RUNTIME): $(DEBUG_RUNTIME_OBJECTS)
 
 test: all
 	SHC="$(abspath $(SHC))" ./tests/run.sh
-# The fourth target's corpus on the emulator, with the runtime cxx1i built.
+# The fourth target's corpus on the emulator, with the runtime cpp11 built.
 test-tms6747: tms6747
-	SHC="$(abspath $(SHC))" VM="$(abspath $(BINDIR))/vm6747.exe" CC1="$(abspath $(BINDIR))/cc1i.exe" \
+	SHC="$(abspath $(SHC))" VM="$(abspath $(BINDIR))/vm6747.exe" CC1="$(abspath $(BINDIR))/c90.exe" \
 	    RUNTIME="$(abspath $(TMS_RUNTIME_DIR))" ./tests/tms6747.sh
 # The examples too, because they were not built by anything and rotted: eight
 # of the twelve stopped compiling when `uses` landed and nothing said so. They

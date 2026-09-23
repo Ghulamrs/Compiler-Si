@@ -4,7 +4,7 @@ rem it. Driven by tests\remote-windows.sh, one case per invocation:
 rem
 rem   build.bat <name>        assembles work\<name>.asm and runs work\<name>.exe
 rem   build.bat <name> <asm>  the same through another assembler that takes ml64's
-rem                           command line - the project's own, as SHC_AS names it
+rem                           command line - the project's own, as SHALIMAR_AS names it
 rem
 rem The two commands are shc's own, from src\Driver.cpp - if they drift apart,
 rem this suite stops testing what shc does on this target:

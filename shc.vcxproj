@@ -12,8 +12,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
-    <ProjectGuid>{39F445EC-2E3B-CB68-9D8C-B98B85AC2258}</ProjectGuid>
-    <RootNamespace>shci</RootNamespace>
+    <ProjectGuid>{5BC0DB40-BD9A-72C2-1130-8E762F9DB1F7}</ProjectGuid>
+    <RootNamespace>shalimar</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -31,7 +31,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <PropertyGroup>
-    <TargetName>shci</TargetName>
+    <TargetName>shalimar</TargetName>
   </PropertyGroup>
   <!-- OutDir is left to the C++ default on purpose: this project's
        own x64\$(Configuration)\ when built alone, and the solution's
@@ -50,7 +50,7 @@
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Message>building the Shalimar runtime beside shci.exe</Message>
+      <Message>building the Shalimar runtime beside shalimar.exe</Message>
       <Command>if not exist "$(OutDir)lib" mkdir "$(OutDir)lib"
 if not exist "$(IntDir)rt" mkdir "$(IntDir)rt"
 if not exist "$(IntDir)rtd" mkdir "$(IntDir)rtd"
@@ -62,20 +62,20 @@ cl /nologo /std:c++14 /W4 /WX /EHsc /permissive- /O2 /D_CRT_SECURE_NO_WARNINGS /
 if errorlevel 1 exit /b 1
 lib /nologo /out:"$(OutDir)lib\shmrt-x86_64-windows-debug.lib" "$(IntDir)rtd\Shortest.obj" "$(IntDir)rtd\Failure.obj" "$(IntDir)rtd\Numbers.obj" "$(IntDir)rtd\Array.obj" "$(IntDir)rtd\Console.obj" "$(IntDir)rtd\Runtime.obj" "$(IntDir)rtd\Debug.obj"
 if errorlevel 1 exit /b 1
-if not exist "$(OutDir)cxx1i.exe" echo shc.vcxproj: no cxx1i.exe in $(OutDir) - the C6000 runtime is its output; build RIDE.sln, which builds it first
-if not exist "$(OutDir)cxx1i.exe" exit /b 1
+if not exist "$(OutDir)cpp11.exe" echo shc.vcxproj: no cpp11.exe in $(OutDir) - the C6000 runtime is its output; build RIDE.sln, which builds it first
+if not exist "$(OutDir)cpp11.exe" exit /b 1
 if not exist "$(OutDir)lib\shmrt-tms6747" mkdir "$(OutDir)lib\shmrt-tms6747"
-"$(OutDir)cxx1i.exe" -S -arch tms6747 -nologo "$(ProjectDir)runtime\Shortest.cpp" -o "$(OutDir)lib\shmrt-tms6747\Shortest.s"
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo "$(ProjectDir)runtime\Shortest.cpp" -o "$(OutDir)lib\shmrt-tms6747\Shortest.s"
 if errorlevel 1 exit /b 1
-"$(OutDir)cxx1i.exe" -S -arch tms6747 -nologo "$(ProjectDir)runtime\Failure.cpp" -o "$(OutDir)lib\shmrt-tms6747\Failure.s"
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo "$(ProjectDir)runtime\Failure.cpp" -o "$(OutDir)lib\shmrt-tms6747\Failure.s"
 if errorlevel 1 exit /b 1
-"$(OutDir)cxx1i.exe" -S -arch tms6747 -nologo "$(ProjectDir)runtime\Numbers.cpp" -o "$(OutDir)lib\shmrt-tms6747\Numbers.s"
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo "$(ProjectDir)runtime\Numbers.cpp" -o "$(OutDir)lib\shmrt-tms6747\Numbers.s"
 if errorlevel 1 exit /b 1
-"$(OutDir)cxx1i.exe" -S -arch tms6747 -nologo "$(ProjectDir)runtime\Array.cpp" -o "$(OutDir)lib\shmrt-tms6747\Array.s"
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo "$(ProjectDir)runtime\Array.cpp" -o "$(OutDir)lib\shmrt-tms6747\Array.s"
 if errorlevel 1 exit /b 1
-"$(OutDir)cxx1i.exe" -S -arch tms6747 -nologo "$(ProjectDir)runtime\Console.cpp" -o "$(OutDir)lib\shmrt-tms6747\Console.s"
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo "$(ProjectDir)runtime\Console.cpp" -o "$(OutDir)lib\shmrt-tms6747\Console.s"
 if errorlevel 1 exit /b 1
-"$(OutDir)cxx1i.exe" -S -arch tms6747 -nologo "$(ProjectDir)runtime\Runtime.cpp" -o "$(OutDir)lib\shmrt-tms6747\Runtime.s"
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo "$(ProjectDir)runtime\Runtime.cpp" -o "$(OutDir)lib\shmrt-tms6747\Runtime.s"
 if errorlevel 1 exit /b 1</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

@@ -1,3 +1,4 @@
+#include "../Name.h"
 #include "Spelling.h"
 
 #include "Ins.h"
@@ -64,8 +65,8 @@ const MasmName kMasmNames[] = {
 
 [[noreturn]] void giveUp(const char *mnemonic) {
     std::fprintf(stderr,
-                 "shc: masm: an instruction this spelling does not know\n"
-                 "  for: %s\n", mnemonic);
+                 "%s: masm: an instruction this spelling does not know\n"
+                 "  for: %s\n", program::kName, mnemonic);
     std::exit(1);
 }
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # The fourth target's suite: every case compiled for the TMS320C6747, run on
-# the VM6747 emulator beside the runtime cxx1i compiled for it, and compared
+# the VM6747 emulator beside the runtime cpp11 compiled for it, and compared
 # with the output recorded from the app's interpreter - the same claim
 # run.sh makes for the host, made for a target no machine here can execute.
 #
@@ -13,11 +13,11 @@
 #
 # Then one question the corpus cannot ask, since no runtime function takes
 # that many: a call with more arguments than the ten registers carry, into
-# a function another compiler wrote. cc1i lays a C function's stack
+# a function another compiler wrote. c90 lays a C function's stack
 # parameters out the way TI's cl6x was measured to - from the caller's
 # B15 + 4, a word each, a double 8-aligned - so a foreign call that
 # answers right says this compiler's callers do the same. Skipped, and
-# said so, where there is no cc1i to compile the C.
+# said so, where there is no c90 to compile the C.
 
 set -uo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
@@ -26,7 +26,7 @@ FILTER="${1:-}"
 OUT=tests/out-tms6747
 mkdir -p "$OUT"
 
-SHC="${SHC:-./shci.exe}"
+SHC="${SHC:-./shalimar.exe}"
 VM="${VM:-../Emulator/vm6747.exe}"
 RUNTIME="${RUNTIME:-lib/shmrt-tms6747}"
 [ -x "$SHC" ] || { echo "no $SHC - run make first, or set SHC=" >&2; exit 2; }
@@ -68,11 +68,11 @@ echo
 echo "tms6747: $pass passed, $fail failed"
 
 # ---- the foreign call past the registers ----------------------------------
-CC1="${CC1:-../Compiler-Ci/cc1i.exe}"
+CC1="${CC1:-../Compiler-Ci/c90.exe}"
 if [ -n "$FILTER" ]; then
     :
 elif [ ! -x "$CC1" ]; then
-    echo "tms6747: the foreign call past ten arguments was not checked - no cc1i at $CC1 (set CC1=)"
+    echo "tms6747: the foreign call past ten arguments was not checked - no c90 at $CC1 (set CC1=)"
 else
     # In a directory of its own: what stages out-tms6747 for TI's tools takes
     # every program there, and this pair is one program in two files.
@@ -97,13 +97,13 @@ fun <> = main() {
 S
     printf '650 \n1115.9687500 \n3071.0000000 \n' > "$F/foreign.expected"
     if ! "$CC1" -S -arch tms6747 "$F/foreign.c" -o "$F/foreign-c.s" > "$F/foreign.cc" 2>&1; then
-        echo "FAIL foreign: cc1i refused the C"; sed -n '1,3p' "$F/foreign.cc"; fail=$((fail+1))
+        echo "FAIL foreign: c90 refused the C"; sed -n '1,3p' "$F/foreign.cc"; fail=$((fail+1))
     elif ! "$SHC" --target=tms6747 -S "$F/foreign.shm" -o "$F/foreign.s" > "$F/foreign.compile" 2>&1; then
-        echo "FAIL foreign: shci refused the program"; sed -n '1,3p' "$F/foreign.compile"; fail=$((fail+1))
+        echo "FAIL foreign: shalimar refused the program"; sed -n '1,3p' "$F/foreign.compile"; fail=$((fail+1))
     else
         "$VM" "$F/foreign.s" "$F/foreign-c.s" "$RUNTIME" > "$F/foreign.actual" 2>&1 < /dev/null
         if diff -u "$F/foreign.expected" "$F/foreign.actual" > "$F/foreign.diff" 2>&1; then
-            echo "tms6747: the foreign call past ten arguments answers as cc1i's callee reads them"
+            echo "tms6747: the foreign call past ten arguments answers as c90's callee reads them"
         else
             echo "FAIL foreign: the arguments past the registers did not arrive"; sed -n '1,12p' "$F/foreign.diff"; fail=$((fail+1))
         fi

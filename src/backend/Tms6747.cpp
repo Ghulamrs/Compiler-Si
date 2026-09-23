@@ -90,7 +90,7 @@ void Tms6747Emitter::beginFunction(const std::string &name) {
     prologueMark_ = text_.size();
 }
 
-// The frame, the shape cc1i and cxx1i keep: A15 points at the caller's B15
+// The frame, the shape c90 and cpp11 keep: A15 points at the caller's B15
 // word and holds the caller's A15; below it, in the order TI's unwinder
 // pops them, B12, B10, B3, A12, A10 when the body loads the argument
 // registers and B3 alone otherwise, in 40 bytes whatever is saved; then
