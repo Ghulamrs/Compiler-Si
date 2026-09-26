@@ -14,10 +14,9 @@ namespace {
 // point of the table is the ones that are *not* the same word: the AT&T base
 // the emitter passes is not always Microsoft's name for it.
 
-// A mnemonic that is not here is refused by name rather than written out and
-// left for the assembler, because the failure then names the compiler that
-// wrote it and the instruction it meant. An optimizer added later will emit
-// mnemonics the emitter never did, and this is what will catch them.
+// A mnemonic that is not here is refused by name rather than written out and left for the
+// assembler, because the failure then names the compiler that wrote it and the instruction it
+// meant. An optimizer added later will emit mnemonics the emitter never did, and this is what will catch them.
 struct MasmName {
     const char *att;
     const char *masm;

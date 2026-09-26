@@ -40,10 +40,9 @@ public:
     virtual int intArgCapacity() const = 0;
     virtual int realArgCapacity() const = 0;
 
-    // The arguments past the registers, in the block of slots from `slot` on,
-    // one each in order, with their kinds: a target that hands over the
-    // block's address ignores the kinds, one that lays them out as its ABI
-    // does needs them.
+    // The arguments past the registers, in the block of slots from `slot` on, one each in order,
+    // with their kinds: a target that hands over the block's address ignores the kinds, one that
+    // lays them out as its ABI does needs them.
     virtual void setOverflowBlock(int slot, const std::vector<Slot> &kinds) = 0;
     virtual void spillOverflowArgument(Slot kind, int index, int slot) = 0;
 
@@ -79,9 +78,7 @@ public:
 
 protected:
 
-    // **Virtual, so a target that buffers can write its buffer out first.**
-    // Everything that is not a buffered instruction goes through one of
-    // these, so overriding them is enough to keep the order right.
+    // **Virtual, so a target that buffers can write its buffer out first.** Everything that is not a buffered instruction goes through one of these.
     virtual void instruction(const std::string &line) { text_ += "\t" + line + "\n"; }
 
     virtual void raw(const std::string &line) { text_ += line + "\n"; }

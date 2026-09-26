@@ -158,14 +158,9 @@ int32_t shm_fn_abs_int(int32_t x) { return shm::narrow(-static_cast<int64_t>(x) 
                                                        ? static_cast<int64_t>(x)
                                                        : -static_cast<int64_t>(x), "abs"); }
 
-// **These forward to nothing any more.** shc calls sin, sqrt, fabs and their
-// neighbours directly now - see ../src/Builtin.cpp and ../docs/FOREIGN.md - so
-// the seventeen one-line wrappers that used to stand here are gone and the
-// archive is smaller for it. Growing the borrowable set costs it nothing.
-//
-// What remains is here because it is NOT the C function of the same name:
-// abs_int traps where C's abs() is undefined, and max/min propagate NaN where
-// fmax/fmin swallow it. The C library has no integer max or min at all.
+// **These forward to nothing any more**: shc calls sin, sqrt, fabs and their neighbours directly (../src/Builtin.cpp,
+// ../docs/FOREIGN.md), so the seventeen wrappers that stood here are gone. What remains is NOT the C function of the
+// same name: abs_int traps where C's abs() is undefined, max/min propagate NaN where fmax/fmin swallow it, and C has no integer max or min at all.
 double  shm_fn_max_real(double a, double b) { return a > b ? a : b; }
 double  shm_fn_min_real(double a, double b) { return a < b ? a : b; }
 int32_t shm_fn_max_int(int32_t a, int32_t b) { return a > b ? a : b; }

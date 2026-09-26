@@ -5,9 +5,7 @@
 namespace shalimar {
 namespace {
 
-// **What each mnemonic this emitter writes does to its operands.** Anything
-// not named here is treated as reading and writing everything, which stops a
-// run rather than risking it.
+// **What each mnemonic this emitter writes does to its operands.** Anything not named here reads and writes everything, which stops a run rather than risking it.
 enum class Shape { Move, ReadWrite, ReadRead, Push, Pop, Unknown };
 
 Shape shapeOf(const char *m) {
@@ -68,10 +66,9 @@ bool instructionWrites(const Ins &i, Reg r) {
     return true;
 }
 
-// **Whether `r` is dead from `at` onwards**, proved rather than assumed: it
-// must be written again inside this run before anything reads it. A run ends
-// at a branch and the target may read the register, so running off the end
-// proves nothing and is not treated as death.
+// **Whether `r` is dead from `at` onwards**, proved rather than assumed: it must be written again
+// inside this run before anything reads it. A run ends at a branch and the target may read the
+// register, so running off the end proves nothing and is not treated as death.
 bool deadFrom(const std::vector<Ins> &run, std::size_t at, Reg r) {
     for (std::size_t k = at; k < run.size(); k++) {
         if (instructionReads(run[k], r)) return false;
@@ -100,10 +97,9 @@ void optimizeRun(std::vector<Ins> &run) {
             continue;
         }
 
-        // **A value made in one register and at once moved to another.** The
-        // first move may name the second's destination when what it wrote is
-        // dead after the copy - and the copy must be a plain register move of
-        // the same width, or the two are not the same value.
+        // **A value made in one register and at once moved to another.** The first move may name
+        // the second's destination when what it wrote is dead after the copy - and the copy must
+        // be a plain register move of the same width, or the two are not the same value.
         if (i + 1 < run.size() && shapeOf(x.mnemonic) == Shape::Move &&
             x.operands == 2 && x.b.kind == Operand::Register) {
             const Ins &c = run[i + 1];
