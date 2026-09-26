@@ -33,6 +33,8 @@ int Parser::lastLine() const {
 
 std::string Parser::unexpected() const {
     if (current().kind == Tok::EndOfInput) return "Program ends unfinished";
+    // Shalimar assigns and initialises with ':', and an '=' there is most often C's habit.
+    if (current().kind == Tok::Operator && current().text == "=") return "Unexpected '=' use ':'";
     return "Unexpected '" + spellingOf(current()) + "'";
 }
 
