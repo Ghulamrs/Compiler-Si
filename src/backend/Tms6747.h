@@ -6,19 +6,9 @@
 
 namespace shalimar {
 
-// The TMS320C6747 (C6000) as the Shalimar compiler's fourth target: C6000
-// assembly text, serial, every delay slot a NOP - the conventions c90 and
-// cpp11 emit for it, which is what lets one emulator run all three and the
-// runtime, compiled by cpp11, sit beside a Shalimar program. See
-// VM6747/TMS6747.md.
-//
-// The accumulator is A4, a real or a wide value the pair A5:A4. A15 is the
-// frame pointer, at the caller's B15 word; the slots are eight bytes each
-// below the saved registers, rising from A15 - base + 8*slot. Arguments are
-// positional, as the EABI has them - A4, B4, A6, B6, A8, B8, A10, B10,
-// A12, B12, one register (or pair) per argument whatever its kind - and
-// past ten on the stack from B15 + 4, as the EABI has them too. A3
-// addresses, A0/A1 predicate.
+// The TMS320C6747 (C6000) as the Shalimar compiler's fourth target: C6000 assembly text, serial,
+// every delay slot a NOP - the conventions c90 and cpp11 emit for it, which is what lets one
+// emulator run all three and the runtime sit beside a Shalimar program. The register conventions are in VM6747/TMS6747.md, "The shalimar backend's header".
 class Tms6747Emitter : public Emitter {
 public:
     // A borrowed C99 name as TI's runtime spells it; the emulator answers to both.
@@ -70,8 +60,7 @@ private:
     size_t prologueMark_ = 0;
     int returns_ = 0;
     int globalSlots_ = 0;
-    // The TI assembler wants an undefined name declared: what was called,
-    // less what this file defines, is `.ref`ed when the module ends.
+    // The TI assembler wants an undefined name declared: what was called, less what this file defines, is `.ref`ed when the module ends.
     std::set<std::string> called_, defined_;
     // A10, B10, A12 and B12 carry arguments seven to ten and are the
     // callee's to keep: a function that loads them saves them in its frame.

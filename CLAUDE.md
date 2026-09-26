@@ -151,3 +151,104 @@ needs nothing done to it by hand.
 `..\Compiler-C\msvc\cc1.vcxproj`. Build into that tree and no other: a second
 copy elsewhere ages apart from the one every other tool there reads, and then
 passes.
+
+## Comments cut to the cap, 2026-09-26: the long forms
+
+**No comment group in `src/` or `runtime/` runs longer than three lines, and
+one standing in front of a single line of code runs one line** - the house
+rule, with `C++Optimize/tools/comment-lines` as its oracle. The 47 groups over
+it were cut with whole sentences kept and the finding first; the library facts
+they carried - `fabs` and `OPTION NOKEYWORD`, `abs_int` and the NaN-propagating
+`max`/`min`, `-lm` named rather than relied upon - were already in
+`docs/FOREIGN.md` and are not repeated. What follows is the rest worth finding
+without `git log -p`.
+
+**1.2 is the first version this compiler has had a number for** (`Driver.cpp`,
+`shcVersion`). It had none until 2026-08-26 - built, relayed and run without
+one, which works until somebody has two copies and needs to say which is which.
+It is 1.2 rather than 1.0 because it is numbered alongside RStudio, which drives
+it: an editor at 1.2 driving a compiler at 1.0 invites the question of which
+pairs with which, and there is only ever one answer here. The releases they
+share are what the number tracks - 1.2 being `uses`, the borrowed library and
+the foreign declaration. `--version` and `--help` leave with 0 and a bad
+argument with 2; both used to be 2, which is why a script asking three compilers
+their versions stopped at the second one.
+
+**A foreign declaration with two outputs is refused, and it is not a limitation
+to be lifted** (`Check.cpp`, the walk over `program.foreign()`). shc returns two
+outputs through a scratch block whose address it passes in a register of its own
+choosing - a convention that is fine while both ends are code this compiler
+wrote, and is not written down anywhere for anybody else to implement. Such a
+declaration parses, emits and links, and would simply be wrong, which is the
+worst of the four outcomes. A C function returning two values does it through a
+pointer parameter, and Shalimar has no pointer type - so there is no spelling of
+this that would work, and refusing is the whole answer.
+
+**A program may have its own `pi` or `e`, but it has to say so**
+(`Check.cpp`). Declared - `real pi`, or a parameter - the name is the program's
+for that whole body and the constant is simply not in it. Created by assignment
+it is refused, because Shalimar makes a name on first write: `pi : 3` would
+leave `? pi` meaning 3.14159 above the line and 3 below it, one name with two
+meanings in one function. That is the hazard SHALIMAR_LANGUAGE.md named when it
+made these read-only, and it is the half worth keeping.
+
+**A borrowed name may not also be a variable, and the check carries on**
+(`Check.cpp`, `refuseBorrowed`; FOREIGN.md rule 3). `fmod` is an ordinary
+identifier in every file that does not borrow it; in one that does, `real fmod`
+beside `fmod(7.5, 2.0)` would be one name meaning two things in one file. It is
+stricter than a constant, which may be had by declaring it: there is no
+declaring your way out of a borrow, because the clause has already claimed the
+name for the file, so the message names both lines. Only this file's own borrows
+count - Resolve merges the borrows of any file it pulls a function from, so that
+the pulled function's calls resolve, and those must not take a name away from a
+variable here; `Program::Borrowed::own` is what tells them apart, and without it
+a `uses fmod` in a file you merely call into would refuse `fmod` as a variable
+here, where the app - one file, no merging - accepts it. Every caller reports
+and carries on rather than returning, so the name still enters scope: bailing
+produced "'fmod' is borrowed" followed by "Undefined variable 'fmod'" at a line
+that is not the mistake.
+
+**A redeclared name is declared anyway** (`Check.cpp`, `visit(Declaration)`).
+Returning after the report left the name undefined, so every later mention drew
+a second "Undefined variable" - one mistake, two messages, and the reader sent
+to the wrong line. The app's interpreter reports the redeclaration alone, and
+the differential suite caught the difference the moment a case used the name
+after declaring it twice.
+
+**`declaredLocals_` exists because `scope_` cannot answer for sibling blocks**
+(`Check.h`). A declaration may sit in a block now, but a declared local is still
+the whole call's - one name, one variable, one type - so two sibling blocks may
+not each declare `t`. The first block's level is popped long before the second
+is read, so a set kept for the whole function is what remembers it. Names made
+by a first assignment are not in it; those belong to their block and always
+have. The same rule is why a declaration inside an `if` may not shadow one
+outside it, and why `Checker::visit(Declaration)` asks `lookup` rather than
+`definedHere`.
+
+**Declarations go wherever a statement goes** (`Parser.cpp`). They were refused
+below the top of a function body once; the rule went so that a C program keeps
+its shape when it is converted rather than having every local hoisted to the
+top. What did not go is the lifetime - §6 of the specification.
+
+**`uses` is taken by the parser and judged by the checker** (`Parser.cpp`,
+`parseUses`). Whether a name is borrowable is a question about the table rather
+than about the grammar, and a parser that answered it would have to carry the
+table. The comma is required between names and forbidden after the last one,
+the parameter list's rule, so that `uses sin,` reads as a mistake rather than as
+a name that has not been typed yet.
+
+**`--with=` names a library on the command line rather than in the source**
+(`Driver.cpp`) for the reason C splits a header from `-l`: the program says what
+it calls, the build says where that lives, and the same source then serves a
+machine where the library sits somewhere else. A declaration with no library
+named is refused before the link, once, and only when linking: `-c` and `-S`
+produce an object somebody else will link, who is entitled to bring the library.
+
+**The C99 rows in the builtin table** (`Builtin.cpp`) were added 2026-08-26, and
+each is a row and nothing else: the symbol is libm's, so there is no wrapper to
+write and the archive does not grow. `log2`, `cbrt` and the hyperbolics postdate
+the standard Compiler-C targets, but this is a call into the platform's libm,
+not a C program, and all three of ours have them. The unborrowable list beside
+it is short on purpose: it turns the most likely mistakes into instructions
+naming the type Shalimar lacks, and anything not on it still gets a plain "not
+a library function this compiler knows", which is true and not misleading.

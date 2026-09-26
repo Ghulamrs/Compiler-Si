@@ -33,15 +33,7 @@
 
 namespace shalimar {
 
-// **1.2 is the first version this compiler has had a number for.** It had
-// none until 2026-08-26 - it was built, relayed and run without one, and that
-// works until somebody has two copies and needs to say which is which.
-//
-// It is 1.2 rather than 1.0 because it is numbered alongside RStudio, which
-// drives it: an editor at 1.2 driving a compiler at 1.0 invites the question
-// of which pairs with which, and there is only ever one answer here. The
-// releases they share are what the number tracks - 1.2 being `uses`, the
-// borrowed library and the foreign declaration.
+// **1.2 is the first version this compiler has had a number for**, numbered alongside the RStudio that drives it - see CLAUDE.md.
 const char *shcVersion() { return "1.2"; }
 
 // The line printed before each compile and by --version. `-nologo` omits it.
@@ -162,11 +154,9 @@ std::vector<std::string> Driver::assemblyFilesIn(const std::string &directory) {
 }
 
 #ifdef _WIN32
-// ml64 and link are on PATH only inside a Developer Command Prompt, and an
-// editor launched from Explorer is not one. Found once, then every command
-// runs through a batch file that sources vcvars first - a file rather than a
-// prefix because cmd's quote handling cannot be relied on with several
-// quoted paths and an '&&'.
+// ml64 and link are on PATH only inside a Developer Command Prompt, and an editor launched from
+// Explorer is not one. Found once, then every command runs through a batch file that sources
+// vcvars first - a file rather than a prefix because cmd's quote handling cannot be relied on with several quoted paths and an '&&'.
 static std::string findVcvars() {
     char folder[MAX_PATH];
     char temp[MAX_PATH];
@@ -325,14 +315,9 @@ bool Driver::parseArguments(const std::vector<std::string> &arguments) {
         } else if (a.compare(0, 10, "--runtime=") == 0) {
             runtimeObject_ = a.substr(10);
         } else if (a.compare(0, 7, "--with=") == 0) {
-            // A library holding what `uses <...> = f(...)` declared. Named on
-            // the command line rather than in the source, for the reason C
-            // splits a header from -l: the program says what it calls, the
-            // build says where that lives. The same source then serves a
-            // machine where the library sits somewhere else.
-            //
-            // Repeatable, and given to the linker in the order written, which
-            // is the order a linker cares about.
+            // A library holding what `uses <...> = f(...)` declared. Named on the command line
+            // rather than in the source, for the reason C splits a header from -l: the program says
+            // what it calls, the build says where that lives. Repeatable, and given to the linker in the order written.
             libraries_.push_back(a.substr(7));
         } else if (a == "--no-search") {
             search_ = false;
@@ -374,14 +359,10 @@ bool Driver::parseArguments(const std::vector<std::string> &arguments) {
 
 int Driver::run(const std::vector<std::string> &arguments) {
     program_ = arguments.empty() ? program::kName : arguments[0];
-    // **A question answered is not a failure.** --version and --help are
-    // requests this program can satisfy, so they leave with 0; a bad argument
-    // leaves with 2. Both used to be 2, which is why a script asking three
-    // compilers their versions stopped at the second one.
+    // **A question answered is not a failure.** --version and --help leave with 0 and a bad argument with 2; both used to be 2.
     if (!parseArguments(arguments)) return answered_ ? 0 : 2;
 
-    // **Before each compile, once the arguments are known good.** cc1 and
-    // cxx1 print their banner the same way; -nologo omits it.
+    // **Before each compile, once the arguments are known good.** cc1 and cxx1 print their banner the same way; -nologo omits it.
     if (!quiet_) std::cerr << bannerLine() << "\n";
 
     std::unique_ptr<Target> target = Target::forName(targetName_);
@@ -499,14 +480,9 @@ int Driver::run(const std::vector<std::string> &arguments) {
     }
     if (!sound) return 1;
 
-    // **A declaration without a library is a link failure this compiler can
-    // see coming.** `uses <real> = f(...)` says something else will provide
-    // f; if nothing was named with --with= and we are the ones linking, the
-    // linker will say "undefined symbol _f", which is true and names neither
-    // the declaration nor the cure. Said here instead, once, before the link.
-    //
-    // Only when linking: -c and -S produce an object or assembly that somebody
-    // else will link, and they are entitled to bring the library themselves.
+    // **A declaration without a library is a link failure this compiler can see coming.** With
+    // nothing named by --with= the linker would say "undefined symbol _f", which names neither the
+    // declaration nor the cure; said here instead, and only when linking, since -c and -S leave the link to somebody who may bring the library.
     if (!program->foreign().empty() && libraries_.empty() &&
         !objectOnly_ && !assemblyOnly_) {
         std::cerr << program::kName << ": '" << program->foreign()[0].name
@@ -596,14 +572,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
         command = "c++ -c -o " + shellQuote(named ? output_ : output_ + ".o") + " " +
                   shellQuote(assemblyPath);
     } else {
-        // **-lm, named rather than relied upon.** A borrowed `sin` is now a
-        // direct call to libm's own symbol, so the program needs libm whatever
-        // the runtime archive happens to reference. It is inside libSystem on
-        // a Mac and inside libc on glibc 2.34 and later, where the flag is a
-        // no-op; on anything older it is the difference between linking and
-        // "undefined reference to sin". Passing it always is one word and
-        // removes a fault that would pass here and on the build box and fail
-        // on somebody else's machine. See docs/FOREIGN.md.
+        // **-lm, named rather than relied upon:** a borrowed `sin` is a direct call to libm, which older glibc does not link without it - docs/FOREIGN.md.
         command = "c++ -o " + shellQuote(output_) + " " + shellQuote(assemblyPath);
         // Before the runtime, because a library may call into it and a linker
         // reads left to right.
@@ -653,13 +622,9 @@ static std::string environment(const char *name) {
     return value != nullptr ? std::string(value) : std::string();
 }
 
-// **The tms6747 target reaches an object on any host and a program where CCS
-// is.** asm6x, the project's own C6000 assembler, takes the assembly: SHALIMAR_AS
-// names it, else the one beside this program (as RIDE lays them out), else
-// asm6x on PATH. Without -c the object, the runtime directory's objects and
-// the libraries go to TI's lnk6x - SHALIMAR_TI names CCS's C6000 compiler
-// directory, SHALIMAR_TILIB one holding rts6740_elf_eh.lib, SHALIMAR_LD the linker -
-// into a .out.
+// **The tms6747 target reaches an object on any host and a program where CCS is.** asm6x takes the assembly -
+// SHALIMAR_AS names it, else the one beside this program, else PATH - and without -c the object, the runtime's objects
+// and the libraries go to TI's lnk6x into a .out: SHALIMAR_TI names CCS's compiler directory, SHALIMAR_TILIB one holding rts6740_elf_eh.lib, SHALIMAR_LD the linker.
 int Driver::finishTi(const std::string &assemblyPath, bool named) {
     std::string assembler = environment(program::env("AS").c_str());
     if (assembler.empty()) {

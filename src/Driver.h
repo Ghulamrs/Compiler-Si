@@ -20,8 +20,7 @@ private:
     std::string output_;
     std::string targetName_;
     std::string runtimeObject_;
-    // Libraries named with --with=, in the order given, holding what `uses
-    // <...> = f(...)` declared. See docs/FOREIGN.md.
+    // Libraries named with --with=, in the order given, holding what `uses <...> = f(...)` declared. See docs/FOREIGN.md.
     std::vector<std::string> libraries_;
 
     // Set when --version or --help was answered, so run() can leave with 0

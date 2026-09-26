@@ -7,10 +7,9 @@
 
 namespace shalimar {
 
-// **An instruction as a record rather than as text.** The emitter used to
-// hand the spelling finished strings, which is a shape nothing can optimize:
-// a pass that wants to know what a register holds cannot read it out of
-// "mov\trax, QWORD PTR [rsp+8]".
+// **An instruction as a record rather than as text.** The emitter used to hand the spelling
+// finished strings, which is a shape nothing can optimize: a pass that wants to know what a
+// register holds cannot read it out of "mov\trax, QWORD PTR [rsp+8]".
 
 // So an operand says what it *is* and the spelling renders it at the end,
 // which is where cc1 and cxx1 put the same seam - and is what an optimizer

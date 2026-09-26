@@ -40,10 +40,9 @@ void Tms6747Emitter::constant(const std::string &reg, int32_t value) {
     instruction("MVKH\t" + std::to_string(value) + ", " + reg);
 }
 
-// The slots rise from the bottom of the frame, so a block of them reads
-// as an array; how far below A15 that is - the save area and every slot -
-// is known only when the function ends, and is a symbol the assembler
-// resolves: slot k is at A15 - base + 8k.
+// The slots rise from the bottom of the frame, so a block of them reads as an array; how far
+// below A15 that is - the save area and every slot - is known only when the function ends, and
+// is a symbol the assembler resolves: slot k is at A15 - base + 8k.
 void Tms6747Emitter::slotAddress(int slot, const std::string &reg) {
     const std::string off = std::to_string(8 * slot) + " - " + slotBase_;
     instruction("MVKL\t" + off + ", " + reg);
@@ -90,12 +89,9 @@ void Tms6747Emitter::beginFunction(const std::string &name) {
     prologueMark_ = text_.size();
 }
 
-// The frame, the shape c90 and cpp11 keep: A15 points at the caller's B15
-// word and holds the caller's A15; below it, in the order TI's unwinder
-// pops them, B12, B10, B3, A12, A10 when the body loads the argument
-// registers and B3 alone otherwise, in 40 bytes whatever is saved; then
-// the slots, eight bytes each; then the outgoing arguments past the
-// registers, from B15 + 4 as the ABI has them, the word at B15 the callee's.
+// The frame, the shape c90 and cpp11 keep: A15 points at the caller's B15 word and holds the caller's A15; below it, in
+// the order TI's unwinder pops them, B12, B10, B3, A12, A10 when the body loads the argument registers and B3 alone
+// otherwise, in 40 bytes whatever is saved; then the slots, eight bytes each; then the outgoing arguments past the registers, from B15 + 4, the word at B15 the callee's.
 
 static std::vector<std::string> savedRegs(bool argRegs, bool pairRegs) {
     std::vector<std::string> r;
