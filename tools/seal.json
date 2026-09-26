@@ -1,0 +1,2 @@
+{"name": "shalimar", "version": "1.2", "banner": "©2026 G. R. Akhtar - Shalimar 1.2",
+ "dirs": ["src", "lib", "runtime", "examples"], "files": ["Makefile", "build.bat", "shc.vcxproj"]}
