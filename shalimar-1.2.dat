@@ -1,7 +1,7 @@
 ©2026 G. R. Akhtar - Shalimar 1.2
 Release seal, version 1.2, sealed 26-09-2026
 Written by tools/seal; check it with `tools/seal check`.
-CRC32  size  file - 76 files, seal 8297B4F3
+CRC32  size  file - 76 files, seal 4B8CDF60
 ------------------------------------------------------------------
 3227477C      7006  Makefile
 AE78FE04      5453  build.bat
@@ -32,29 +32,29 @@ B09C9F2A      3917  runtime/Console.cpp
 0584DDD8       850  runtime/Debug.h
 13D6CB14      1753  runtime/Failure.cpp
 53DE60BD      1775  runtime/Internal.h
-52A631F8      6441  runtime/Numbers.cpp
+6F2FEA22      6287  runtime/Numbers.cpp
 FB825833      1783  runtime/Runtime.cpp
 2D1CEF29      2661  runtime/Shortest.cpp
 156CC5DA       348  runtime/Shortest.h
 5D080891      5083  runtime/shmrt.h
 FF9488FA      6148  shc.vcxproj
 52181FC6      2539  src/Ast.cpp
-231AB79A     20605  src/Ast.h
-A3EC073C      5625  src/Builtin.cpp
+484ED9B6     19864  src/Ast.h
+DC0493C1      4870  src/Builtin.cpp
 CBF4BAFA       599  src/Builtin.h
-9B66223D     35355  src/Check.cpp
-3AD6CF22      3815  src/Check.h
-35208E7D     30444  src/CodeGen.cpp
+79F1607C     33018  src/Check.cpp
+97E06803      3448  src/Check.h
+0AE066F1     30437  src/CodeGen.cpp
 514009B9      3382  src/CodeGen.h
 A08423DE      1282  src/Diag.cpp
 8CA42429      1143  src/Diag.h
-44D44DAC     29672  src/Driver.cpp
-1C438FE5      2018  src/Driver.h
+C72343C1     28103  src/Driver.cpp
+A0F26402      2011  src/Driver.h
 2AD3C332     10400  src/Lexer.cpp
 F913D6B7       508  src/Name.h
-9CA6D4F0     27108  src/Parser.cpp
+1833C1E8     26619  src/Parser.cpp
 F07559E5      2406  src/Parser.h
-904C4DC7      7771  src/Resolve.cpp
+DDD1D35F      7344  src/Resolve.cpp
 0D04A205       733  src/Resolve.h
 ECBD003F      2162  src/Target.cpp
 45C5B2BA       551  src/Target.h
@@ -64,19 +64,19 @@ BB53E0D4       858  src/Token.h
 8C835AFC      7893  src/backend/Arm64Darwin.cpp
 F4D99348      2316  src/backend/Arm64Darwin.h
 388BACB3       195  src/backend/Emitter.cpp
-2A89C150      3028  src/backend/Emitter.h
-4CA74334      2775  src/backend/Ins.h
-ADE7D749      5073  src/backend/Optimize.cpp
-310A6568       796  src/backend/Optimize.h
-33517606      9917  src/backend/Spelling.cpp
+6A79E4D6      2953  src/backend/Emitter.h
+2DF5EDB8      2772  src/backend/Ins.h
+8F5EF1C6      5036  src/backend/Optimize.cpp
+713C727B       613  src/backend/Optimize.h
+A416F25E      9914  src/backend/Spelling.cpp
 40066693      4176  src/backend/Spelling.h
-695E8A9D     11946  src/backend/Tms6747.cpp
-43E8AEBE      4423  src/backend/Tms6747.h
+392784E5     11914  src/backend/Tms6747.cpp
+36AFE668      3976  src/backend/Tms6747.h
 9D58538D      8756  src/backend/X86_64.cpp
 E6221895      4647  src/backend/X86_64.h
 018A88ED      1262  src/backend/X86_64Linux.cpp
 26098183       925  src/backend/X86_64Linux.h
-DB645EE1      2753  src/backend/X86_64Windows.cpp
+3E136949      2210  src/backend/X86_64Windows.cpp
 2B288CFC      1017  src/backend/X86_64Windows.h
 715A203B       295  src/main.cpp
 ------------------------------------------------------------------
