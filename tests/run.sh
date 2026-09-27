@@ -28,46 +28,52 @@ mkdir -p "$OUT"
 SHC="${SHC:-./shc.exe}"
 [ -x "$SHC" ] || { echo "no $SHC - run make first, or set SHC=" >&2; exit 2; }
 
-pass=0
-fail=0
-failed=()
-
-for case in tests/cases/*.shm tests/load/*.shm; do
+# One case, its report and verdict beside its output, so that the cases run JOBS at a time.
+one() {
+    case=$1
     name=$(basename "$case" .shm)
-    [ -n "$FILTER" ] && [[ "$name" != *"$FILTER"* ]] && continue
-
     expected="${case%.shm}.expected"
     if [ ! -f "$expected" ]; then
         echo "SKIP $name (nothing recorded)"
-        continue
+        return
     fi
 
-    # The compiler's own output comes first and the program's after it, which
-    # is the order the app's interpreter produces them in: it reports what the
-    # checker found and then runs. A warning therefore belongs in the recorded
-    # file above the program's first line, and a case that does not compile is
-    # compared on the diagnostics alone.
     "$SHC" "$case" -o "$OUT/$name" > "$OUT/$name.compile" 2>/dev/null
     compiled=$?
     cp "$OUT/$name.compile" "$OUT/$name.actual"
     if [ $compiled -ne 0 ]; then
         if diff -u "$expected" "$OUT/$name.actual" > "$OUT/$name.diff" 2>&1; then
-            pass=$((pass+1)); continue
+            echo pass > "$OUT/$name.verdict"; return
         fi
         echo "FAIL $name (did not compile)"
         sed -n '1,12p' "$OUT/$name.diff"
-        failed+=("$name"); fail=$((fail+1)); continue
+        echo fail > "$OUT/$name.verdict"; return
     fi
 
-    "$OUT/$name" >> "$OUT/$name.actual" 2>&1
+    "$OUT/$name" >> "$OUT/$name.actual" 2>&1 < /dev/null
     if diff -u "$expected" "$OUT/$name.actual" > "$OUT/$name.diff" 2>&1; then
-        pass=$((pass+1))
+        echo pass > "$OUT/$name.verdict"
     else
         echo "FAIL $name"
         sed -n '1,12p' "$OUT/$name.diff"
-        failed+=("$name"); fail=$((fail+1))
+        echo fail > "$OUT/$name.verdict"
     fi
-done
+}
+if [ "$FILTER" = --one ]; then one "$2" > "$OUT/$(basename "$2" .shm).report" 2>&1; exit 0; fi
+
+cases() {
+    for case in tests/cases/*.shm tests/load/*.shm; do
+        name=$(basename "$case" .shm)
+        [ -n "$FILTER" ] && [[ "$name" != *"$FILTER"* ]] && continue
+        echo "$case"
+    done
+}
+rm -f "$OUT"/*.verdict "$OUT"/*.report
+JOBS=${JOBS:-$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 2)}
+cases | xargs -P "$JOBS" -n 1 bash tests/run.sh --one
+for case in $(cases); do cat "$OUT/$(basename "$case" .shm).report"; done
+pass=$(cat "$OUT"/*.verdict 2>/dev/null | grep -cx pass || true)
+fail=$(cat "$OUT"/*.verdict 2>/dev/null | grep -cx fail || true)
 
 echo
 echo "$pass passed, $fail failed"

@@ -33,36 +33,49 @@ RUNTIME="${RUNTIME:-lib/shmrt-tms6747}"
 [ -x "$VM" ] || { echo "no emulator at $VM - build VM6747/Emulator, or set VM=" >&2; exit 2; }
 [ -d "$RUNTIME" ] || { echo "no runtime at $RUNTIME - run 'make tms6747', or set RUNTIME=" >&2; exit 2; }
 
-pass=0
-fail=0
-
-for case in tests/cases/*.shm tests/load/*.shm; do
+# One case, its report and verdict beside its output, so that the cases run JOBS at a time.
+one() {
+    case=$1
     name=$(basename "$case" .shm)
-    [ -n "$FILTER" ] && [[ "$name" != *"$FILTER"* ]] && continue
     expected="${case%.shm}.expected"
-    [ -f "$expected" ] || { echo "SKIP $name (nothing recorded)"; continue; }
+    [ -f "$expected" ] || { echo "SKIP $name (nothing recorded)"; return; }
 
     "$SHC" --target=tms6747 -S "$case" -o "$OUT/$name.s" > "$OUT/$name.compile" 2>/dev/null
     compiled=$?
     cp "$OUT/$name.compile" "$OUT/$name.actual"
     if [ $compiled -ne 0 ]; then
         if diff -u "$expected" "$OUT/$name.actual" > "$OUT/$name.diff" 2>&1; then
-            pass=$((pass+1)); continue
+            echo pass > "$OUT/$name.verdict"; return
         fi
         echo "FAIL $name (did not compile)"
         sed -n '1,12p' "$OUT/$name.diff"
-        fail=$((fail+1)); continue
+        echo fail > "$OUT/$name.verdict"; return
     fi
 
     "$VM" "$OUT/$name.s" "$RUNTIME" >> "$OUT/$name.actual" 2>&1 < /dev/null
     if diff -u "$expected" "$OUT/$name.actual" > "$OUT/$name.diff" 2>&1; then
-        pass=$((pass+1))
+        echo pass > "$OUT/$name.verdict"
     else
         echo "FAIL $name"
         sed -n '1,12p' "$OUT/$name.diff"
-        fail=$((fail+1))
+        echo fail > "$OUT/$name.verdict"
     fi
-done
+}
+if [ "$FILTER" = --one ]; then one "$2" > "$OUT/$(basename "$2" .shm).report" 2>&1; exit 0; fi
+
+cases() {
+    for case in tests/cases/*.shm tests/load/*.shm; do
+        name=$(basename "$case" .shm)
+        [ -n "$FILTER" ] && [[ "$name" != *"$FILTER"* ]] && continue
+        echo "$case"
+    done
+}
+rm -f "$OUT"/*.verdict "$OUT"/*.report
+JOBS=${JOBS:-$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 2)}
+cases | SHC="$SHC" VM="$VM" RUNTIME="$RUNTIME" xargs -P "$JOBS" -n 1 bash tests/tms6747.sh --one
+for case in $(cases); do cat "$OUT/$(basename "$case" .shm).report"; done
+pass=$(cat "$OUT"/*.verdict 2>/dev/null | grep -cx pass || true)
+fail=$(cat "$OUT"/*.verdict 2>/dev/null | grep -cx fail || true)
 
 echo
 echo "tms6747: $pass passed, $fail failed"
