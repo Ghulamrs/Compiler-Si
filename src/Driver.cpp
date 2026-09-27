@@ -21,6 +21,7 @@
 #include <windows.h>
 #else
 #include <dirent.h>
+#include <glob.h>
 #include <limits.h>
 #include <unistd.h>
 #endif
@@ -301,6 +302,35 @@ std::string Driver::defaultRuntimeObject(const std::string &targetName) const {
     return beside;
 }
 
+// **A file name with `*` or `?` in it, expanded here**, as cl does: cmd hands the pattern through as
+// written, and a POSIX shell only when it was quoted. The matches come back sorted; a plain name is itself.
+static std::vector<std::string> expandPattern(const std::string &arg) {
+    std::vector<std::string> found;
+    if (arg.find_first_of("*?") == std::string::npos || std::ifstream(arg.c_str()).good()) {
+        found.push_back(arg);
+        return found;
+    }
+#ifdef _WIN32
+    const size_t slash = arg.find_last_of("/\\");
+    const std::string dir = slash == std::string::npos ? std::string() : arg.substr(0, slash + 1);
+    WIN32_FIND_DATAA entry;
+    HANDLE h = FindFirstFileA(arg.c_str(), &entry);
+    if (h != INVALID_HANDLE_VALUE) {
+        do {
+            if (!(entry.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) found.push_back(dir + entry.cFileName);
+        } while (FindNextFileA(h, &entry));
+        FindClose(h);
+    }
+    std::sort(found.begin(), found.end());
+#else
+    glob_t g;
+    if (glob(arg.c_str(), 0, nullptr, &g) == 0)
+        for (size_t k = 0; k < g.gl_pathc; k++) found.push_back(g.gl_pathv[k]);
+    globfree(&g);
+#endif
+    return found;
+}
+
 bool Driver::parseArguments(const std::vector<std::string> &arguments) {
     for (size_t i = 1; i < arguments.size(); ++i) {
         const std::string &a = arguments[i];
@@ -342,16 +372,41 @@ bool Driver::parseArguments(const std::vector<std::string> &arguments) {
         } else if (!a.empty() && a[0] == '-') {
             std::cerr << program::kName << ": unknown option " << a << "\n";
             return false;
-        } else if (input_.empty()) {
-            input_ = a;
         } else {
-
-            companions_.push_back(a);
+            // The program is the first file named, so a pattern standing for it must name one; the
+            // rest are companions, taken once each and never the program again.
+            std::vector<std::string> found = expandPattern(a);
+            if (found.empty()) {
+                std::cerr << program::kName << ": no file matches " << a << "\n";
+                return false;
+            }
+            if (input_.empty() && found.size() > 1) {
+                std::cerr << program::kName << ": " << a << " matches " << found.size()
+                          << " files, and the first file named is the program - name it, then the rest\n";
+                return false;
+            }
+            for (const std::string &f : found) {
+                if (input_.empty()) input_ = f;
+                else if (f != input_ && std::find(companions_.begin(), companions_.end(), f) == companions_.end())
+                    companions_.push_back(f);
+            }
         }
     }
     if (input_.empty()) {
         usage();
         return false;
+    }
+    // **A unit is named by its file's bare name**, so two files of one name would be one unit twice.
+    for (size_t i = 0; i < companions_.size(); ++i) {
+        const std::string &seen = leafOf(companions_[i]) == leafOf(input_) ? input_ : std::string();
+        std::string other = seen;
+        for (size_t k = 0; k < i && other.empty(); ++k)
+            if (leafOf(companions_[k]) == leafOf(companions_[i])) other = companions_[k];
+        if (!other.empty()) {
+            std::cerr << program::kName << ": " << other << " and " << companions_[i]
+                      << " would both be the unit " << leafOf(companions_[i]) << "\n";
+            return false;
+        }
     }
     if (targetName_.empty()) targetName_ = Target::hostName();
     return true;
