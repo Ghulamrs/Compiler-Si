@@ -9,6 +9,7 @@ rem  are RIDE's, in its bin, built from the trees RStudio's tools/to-windows.sh
 rem  relayed; the TI tools are CCS 7.4's.
 rem    ti-link.cmd <Compiler-Si tree on the box> <RIDE bin>
 setlocal enabledelayedexpansion
+if "%~1"==":shard" goto :shard
 if "%~2"=="" (echo ti-link.cmd: needs the tree root and RIDE's bin & exit /b 2)
 set ROOT=%~1
 set BIN=%~2
@@ -26,25 +27,40 @@ rem  The programs TI's runtime cannot link, each with its reason, are the
 rem  emulator's list - Emulator\tests\ti-nolink.txt, "shm/<name>" lines - and a
 rem  case on it that does link is a failure here too, until its line goes.
 set NOLINK=%ROOT%\..\Emulator\tests\ti-nolink.txt
-set linked=0
-set failed=0
-set refused=0
-set expected=0
-for %%f in (%ROOT%\tests\cases\*.shm %ROOT%\tests\load\*.shm) do (
-    set NAME=%%~nf
-    set KNOWN=
-    if exist %NOLINK% findstr /b /c:"shm/!NAME! " %NOLINK% >nul 2>&1 && set KNOWN=1
-    %BIN%\shalimar.exe --target=tms6747 -nologo -S %%f -o %OUT%\!NAME!.s > nul 2>&1
-    if errorlevel 1 (set /a refused+=1) else if defined KNOWN (
-        %BIN%\shalimar.exe --target=tms6747 -nologo %%f -o %OUT%\!NAME!.out > %OUT%\!NAME!.log 2>&1
-        if errorlevel 1 (set /a expected+=1 & echo TI-NOLINK-AS-RECORDED !NAME!) else (set /a failed+=1 & echo LINKED-BUT-RECORDED-AS-NOLINK !NAME!)
-    ) else (
-        %BIN%\shalimar.exe --target=tms6747 -nologo %%f -o %OUT%\!NAME!.out > %OUT%\!NAME!.log 2>&1
-        if errorlevel 1 (set /a failed+=1 & echo TI-FAILED !NAME! & type %OUT%\!NAME!.log) else (
-            if exist %OUT%\!NAME!.out (set /a linked+=1) else (set /a failed+=1 & echo TI-NO-OUT !NAME!)
-        )
-    )
-)
+rem  Six shards at once with par.cmd; each prints a marker line per case, and the counts are
+rem  read off the markers once all six are done.
+rem  Visual Studio's environment once, here: a compiler that finds it set runs its tools
+rem  directly, where without it every asm6x and lnk6x call went through vcvars64.bat again.
+call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat" >nul
+call "%~dp0par.cmd" 6 "%~f0" > %OUT%\shards.log
+findstr /v /b /c:"=" %OUT%\shards.log
+for /f %%n in ('findstr /b /c:"=LINKED " %OUT%\shards.log ^| find /c /v ""') do set linked=%%n
+for /f %%n in ('findstr /b /c:"=FAILED " %OUT%\shards.log ^| find /c /v ""') do set failed=%%n
+for /f %%n in ('findstr /b /c:"=EXPECTED " %OUT%\shards.log ^| find /c /v ""') do set expected=%%n
+for /f %%n in ('findstr /b /c:"=REFUSED " %OUT%\shards.log ^| find /c /v ""') do set refused=%%n
 echo ti-link.cmd: %linked% programs linked by lnk6x, %failed% failed, %expected% do not link as ti-nolink.txt records, %refused% the compiler refuses
 if not %failed%==0 exit /b 1
 endlocal
+exit /b 0
+
+:shard
+set /a I=0
+for %%f in (%ROOT%\tests\cases\*.shm %ROOT%\tests\load\*.shm) do (
+    set /a I+=1, M=I %% %~3 + 1
+    if !M!==%~2 call :one %%~nf %%f
+)
+exit /b 0
+
+:one
+%BIN%\shalimar.exe --target=tms6747 -nologo -S %2 -o %OUT%\%1.s > nul 2>&1
+if errorlevel 1 (echo =REFUSED %1& exit /b 0)
+set KNOWN=
+if exist %NOLINK% findstr /b /c:"shm/%1 " %NOLINK% >nul 2>&1 && set KNOWN=1
+%BIN%\shalimar.exe --target=tms6747 -nologo %2 -o %OUT%\%1.out > %OUT%\%1.log 2>&1
+if defined KNOWN (
+    if errorlevel 1 (echo =EXPECTED %1& echo TI-NOLINK-AS-RECORDED %1) else (echo =FAILED %1& echo LINKED-BUT-RECORDED-AS-NOLINK %1)
+    exit /b 0
+)
+if errorlevel 1 (echo =FAILED %1& echo TI-FAILED %1& type %OUT%\%1.log& exit /b 0)
+if exist %OUT%\%1.out (echo =LINKED %1) else (echo =FAILED %1& echo TI-NO-OUT %1)
+exit /b 0
