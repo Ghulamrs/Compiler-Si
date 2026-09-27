@@ -1,7 +1,7 @@
 ©2026 G. R. Akhtar - Shalimar 1.2
 Release seal, version 1.2, sealed 27-09-2026
 Written by tools/seal; check it with `tools/seal check`.
-CRC32  size  file - 76 files, seal B6D687DD
+CRC32  size  file - 76 files, seal B4DE502F
 ------------------------------------------------------------------
 3227477C      7006  Makefile
 AE78FE04      5453  build.bat
@@ -48,7 +48,7 @@ CBF4BAFA       599  src/Builtin.h
 514009B9      3382  src/CodeGen.h
 A08423DE      1282  src/Diag.cpp
 8CA42429      1143  src/Diag.h
-B85753A5     30853  src/Driver.cpp
+EF5C5483     31031  src/Driver.cpp
 A0F26402      2011  src/Driver.h
 2AD3C332     10400  src/Lexer.cpp
 F913D6B7       508  src/Name.h
