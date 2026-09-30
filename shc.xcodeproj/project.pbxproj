@@ -78,7 +78,7 @@
 		03DFEBBAE56C686B2916365B /* src/backend/X86_64Linux.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/X86_64Linux.h; sourceTree = "<group>"; };
 		6FC6CF63304FA4187CE297E1 /* src/backend/X86_64Windows.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = src/backend/X86_64Windows.h; sourceTree = "<group>"; };
 		CC672FE3254F928D91AE2865 /* shalimar.exe */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = shalimar.exe; sourceTree = BUILT_PRODUCTS_DIR; };
-		5F957A5E5CC31B9A862D8527 /* cpp11.exe.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = cpp11.exe.xcodeproj; path = "../Compiler-Cppi/cxx1.xcodeproj"; sourceTree = "<group>"; };
+		5F957A5E5CC31B9A862D8527 /* cpp11.exe.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = cpp11.exe.xcodeproj; path = "../Compiler-Cppi/ide/cxx1.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXContainerItemProxy section */
@@ -307,7 +307,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\ndest=\"$SRCROOT/../../RIDE\"\nmkdir -p \"$dest\"\ncp -f \"$BUILT_PRODUCTS_DIR/$PRODUCT_NAME\" \"$dest/.$PRODUCT_NAME.new\"\nmv -f \"$dest/.$PRODUCT_NAME.new\" \"$dest/$PRODUCT_NAME\"\ncodesign --force --sign - \"$dest/$PRODUCT_NAME\"\nmkdir -p \"$dest/lib\"\ncp -f \"$BUILT_PRODUCTS_DIR\"/lib/*.a \"$dest/lib/\"\nrm -rf \"$dest/lib/shmrt-tms6747\"\ncp -R \"$BUILT_PRODUCTS_DIR/lib/shmrt-tms6747\" \"$dest/lib/\"\n";
+			shellScript = "set -e\ndest=\"$SRCROOT/../../RIDE-4.5\"\nmkdir -p \"$dest\"\ncp -f \"$BUILT_PRODUCTS_DIR/$PRODUCT_NAME\" \"$dest/.$PRODUCT_NAME.new\"\nmv -f \"$dest/.$PRODUCT_NAME.new\" \"$dest/$PRODUCT_NAME\"\ncodesign --force --sign - \"$dest/$PRODUCT_NAME\"\nmkdir -p \"$dest/lib\"\ncp -f \"$BUILT_PRODUCTS_DIR\"/lib/*.a \"$dest/lib/\"\nrm -rf \"$dest/lib/shmrt-tms6747\"\ncp -R \"$BUILT_PRODUCTS_DIR/lib/shmrt-tms6747\" \"$dest/lib/\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
