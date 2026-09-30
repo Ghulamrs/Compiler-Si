@@ -17,3 +17,8 @@ tests/out-foreign/
 # The library examples' built programs.
 examples/*/prog
 examples/*/prog.exe
+
+# What ide/shc.sln and ide/shc.vcxproj write: the solution's output and the objects.
+ide/x64/
+ide/build/
+*.vcxproj.user

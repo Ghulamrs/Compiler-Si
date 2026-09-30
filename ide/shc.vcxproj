@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64"><Configuration>Debug</Configuration><Platform>x64</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64"><Configuration>Release</Configuration><Platform>x64</Platform></ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <ProjectGuid>{5BC0DB40-BD9A-72C2-1130-8E762F9DB1F7}</ProjectGuid>
+    <RootNamespace>shc</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <!-- **The output is the solution's**, its own ide\shc.sln or RIDE's: the post-build step
+       wants cpp11.exe beside shalimar.exe, and both solutions build cpp11 into the same place. Built
+       alone, with no solution, it goes to build\<config>\. The objects stay here. -->
+  <PropertyGroup>
+    <OutDir Condition="'$(SolutionDir)'=='' Or '$(SolutionDir)'=='*Undefined*'">$(ProjectDir)build\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(SolutionDir)'!='' And '$(SolutionDir)'!='*Undefined*'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)build\$(Configuration)\obj\</IntDir>
+    <TargetName>shalimar</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <ConformanceMode>true</ConformanceMode>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\runtime;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link><SubSystem>Console</SubSystem></Link>
+    <PostBuildEvent>
+      <Message>building the Shalimar runtime beside shalimar.exe</Message>
+      <Command>if not exist "$(OutDir)lib" mkdir "$(OutDir)lib"
+if not exist "$(IntDir)rt" mkdir "$(IntDir)rt"
+if not exist "$(IntDir)rtd" mkdir "$(IntDir)rtd"
+cl /nologo /std:c++14 /W4 /WX /EHsc /permissive- /O2 /D_CRT_SECURE_NO_WARNINGS /Fo"$(IntDir)rt\\" /c "$(ProjectDir)..\runtime\Shortest.cpp" "$(ProjectDir)..\runtime\Failure.cpp" "$(ProjectDir)..\runtime\Numbers.cpp" "$(ProjectDir)..\runtime\Array.cpp" "$(ProjectDir)..\runtime\Console.cpp" "$(ProjectDir)..\runtime\Runtime.cpp"
+if errorlevel 1 exit /b 1
+lib /nologo /out:"$(OutDir)lib\shmrt-x86_64-windows.lib" "$(IntDir)rt\Shortest.obj" "$(IntDir)rt\Failure.obj" "$(IntDir)rt\Numbers.obj" "$(IntDir)rt\Array.obj" "$(IntDir)rt\Console.obj" "$(IntDir)rt\Runtime.obj"
+if errorlevel 1 exit /b 1
+cl /nologo /std:c++14 /W4 /WX /EHsc /permissive- /O2 /D_CRT_SECURE_NO_WARNINGS /DSHM_DEBUG=1 /Fo"$(IntDir)rtd\\" /c "$(ProjectDir)..\runtime\Shortest.cpp" "$(ProjectDir)..\runtime\Failure.cpp" "$(ProjectDir)..\runtime\Numbers.cpp" "$(ProjectDir)..\runtime\Array.cpp" "$(ProjectDir)..\runtime\Console.cpp" "$(ProjectDir)..\runtime\Runtime.cpp" "$(ProjectDir)..\runtime\Debug.cpp"
+if errorlevel 1 exit /b 1
+lib /nologo /out:"$(OutDir)lib\shmrt-x86_64-windows-debug.lib" "$(IntDir)rtd\Shortest.obj" "$(IntDir)rtd\Failure.obj" "$(IntDir)rtd\Numbers.obj" "$(IntDir)rtd\Array.obj" "$(IntDir)rtd\Console.obj" "$(IntDir)rtd\Runtime.obj" "$(IntDir)rtd\Debug.obj"
+if errorlevel 1 exit /b 1
+if not exist "$(OutDir)cpp11.exe" echo shc.vcxproj: no cpp11.exe in $(OutDir) - the C6000 runtime is its output
+if not exist "$(OutDir)cpp11.exe" exit /b 1
+if not exist "$(OutDir)lib\shmrt-tms6747" mkdir "$(OutDir)lib\shmrt-tms6747"
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo "$(ProjectDir)..\runtime\Shortest.cpp" -o "$(OutDir)lib\shmrt-tms6747\Shortest.s"
+if errorlevel 1 exit /b 1
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo "$(ProjectDir)..\runtime\Failure.cpp" -o "$(OutDir)lib\shmrt-tms6747\Failure.s"
+if errorlevel 1 exit /b 1
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo "$(ProjectDir)..\runtime\Numbers.cpp" -o "$(OutDir)lib\shmrt-tms6747\Numbers.s"
+if errorlevel 1 exit /b 1
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo "$(ProjectDir)..\runtime\Array.cpp" -o "$(OutDir)lib\shmrt-tms6747\Array.s"
+if errorlevel 1 exit /b 1
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo "$(ProjectDir)..\runtime\Console.cpp" -o "$(OutDir)lib\shmrt-tms6747\Console.s"
+if errorlevel 1 exit /b 1
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo "$(ProjectDir)..\runtime\Runtime.cpp" -o "$(OutDir)lib\shmrt-tms6747\Runtime.s"
+if errorlevel 1 exit /b 1</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link><GenerateDebugInformation>true</GenerateDebugInformation></Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link><GenerateDebugInformation>true</GenerateDebugInformation></Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\Driver.cpp" />
+    <ClCompile Include="..\src\Diag.cpp" />
+    <ClCompile Include="..\src\Lexer.cpp" />
+    <ClCompile Include="..\src\Type.cpp" />
+    <ClCompile Include="..\src\Ast.cpp" />
+    <ClCompile Include="..\src\Parser.cpp" />
+    <ClCompile Include="..\src\Check.cpp" />
+    <ClCompile Include="..\src\Resolve.cpp" />
+    <ClCompile Include="..\src\Builtin.cpp" />
+    <ClCompile Include="..\runtime\Shortest.cpp" />
+    <ClCompile Include="..\src\CodeGen.cpp" />
+    <ClCompile Include="..\src\Target.cpp" />
+    <ClCompile Include="..\src\backend\Emitter.cpp" />
+    <ClCompile Include="..\src\backend\Spelling.cpp" />
+    <ClCompile Include="..\src\backend\Optimize.cpp" />
+    <ClCompile Include="..\src\backend\Arm64Darwin.cpp" />
+    <ClCompile Include="..\src\backend\X86_64.cpp" />
+    <ClCompile Include="..\src\backend\X86_64Linux.cpp" />
+    <ClCompile Include="..\src\backend\X86_64Windows.cpp" />
+    <ClCompile Include="..\src\backend\Tms6747.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\Ast.h" />
+    <ClInclude Include="..\src\Builtin.h" />
+    <ClInclude Include="..\src\Check.h" />
+    <ClInclude Include="..\src\CodeGen.h" />
+    <ClInclude Include="..\src\Diag.h" />
+    <ClInclude Include="..\src\Driver.h" />
+    <ClInclude Include="..\src\Name.h" />
+    <ClInclude Include="..\src\Parser.h" />
+    <ClInclude Include="..\src\Resolve.h" />
+    <ClInclude Include="..\src\Target.h" />
+    <ClInclude Include="..\src\Token.h" />
+    <ClInclude Include="..\src\Type.h" />
+    <ClInclude Include="..\src\backend\Arm64Darwin.h" />
+    <ClInclude Include="..\src\backend\Emitter.h" />
+    <ClInclude Include="..\src\backend\Ins.h" />
+    <ClInclude Include="..\src\backend\Optimize.h" />
+    <ClInclude Include="..\src\backend\Spelling.h" />
+    <ClInclude Include="..\src\backend\Tms6747.h" />
+    <ClInclude Include="..\src\backend\X86_64.h" />
+    <ClInclude Include="..\src\backend\X86_64Linux.h" />
+    <ClInclude Include="..\src\backend\X86_64Windows.h" />
+    <ClInclude Include="..\runtime\Debug.h" />
+    <ClInclude Include="..\runtime\Internal.h" />
+    <ClInclude Include="..\runtime\Shortest.h" />
+    <ClInclude Include="..\runtime\shmrt.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>
