@@ -1,31 +1,10 @@
 ©2026 G. R. Akhtar - Shalimar 1.2
-Release seal, version 1.2, sealed 30-09-2026
+Release seal, version 1.2, sealed 02-10-2026
 Written by tools/seal; check it with `tools/seal check`.
-CRC32  size  file - 85 files, seal 875D8B33
+CRC32  size  file - 64 files, seal 06C62676
 ------------------------------------------------------------------
 3227477C      7006  Makefile
 AE78FE04      5453  build.bat
-D3D09BCB       432  examples/factorial.shm
-79D7F080       217  examples/fibonacci.shm
-2E514DCC      1006  examples/gaussseidel.shm
-133857D6       176  examples/gcd.shm
-570FE9BB      1517  examples/invert.shm
-3E85B5B2       989  examples/library-integers/README.md
-B859C6BB       678  examples/library-integers/build.sh
-E68C1978      1069  examples/library-integers/prog.shm
-F8531827      2595  examples/library-text/README.md
-B859C6BB       678  examples/library-text/build.sh
-C9AF3BDD      2874  examples/library-text/prog.shm
-AFBFE567      1305  examples/prime.shm
-70AE2B88       263  examples/quadratic.shm
-E012C67B      1351  examples/rotations.shm
-B112A0AA      2471  examples/rotmat.shm
-E3BF65CE       621  examples/sqroot.shm
-7067977F       957  examples/strsplit.shm
-C2E8BC89       228  examples/table.shm
-ADCD89A8      2336  examples/using-a-library/README.md
-C6196AB8       681  examples/using-a-library/build.sh
-857999D4      1481  examples/using-a-library/prog.shm
 B961933A      2325  ide/README.md
 4013EF26      1027  ide/build-vs.cmd
 7AB3BF78      1085  ide/check-vs.cmd
@@ -89,4 +68,4 @@ E6221895      4647  src/backend/X86_64.h
 2B288CFC      1017  src/backend/X86_64Windows.h
 715A203B       295  src/main.cpp
 ------------------------------------------------------------------
-Sealed on 30-09-2026
+Sealed on 02-10-2026
