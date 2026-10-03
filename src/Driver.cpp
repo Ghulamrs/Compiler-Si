@@ -420,6 +420,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
     if (!parseArguments(arguments)) return answered_ ? 0 : 2;
 
     // **Before each compile, once the arguments are known good.** cc1 and cxx1 print their banner the same way; -nologo omits it.
+    saysDone_ = !quiet_;
     if (!quiet_) std::cerr << bannerLine() << "\n";
 
     std::unique_ptr<Target> target = Target::forName(targetName_);
@@ -571,7 +572,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
         std::cerr << program::kName << ": cannot write " << assemblyPath << "\n";
         return 2;
     }
-    if (assemblyOnly_) return 0;
+    if (assemblyOnly_) { produced_.push_back(assemblyPath); return 0; }
 
     if (ti) return finishTi(assemblyPath, named);
 
@@ -603,7 +604,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
         return 2;
     }
     std::remove(assemblyPath.c_str());
-    if (objectOnly_) return 0;
+    if (objectOnly_) { produced_.push_back(objectPath); return 0; }
 
     // And the linker the same way: SHALIMAR_LD names one that takes link.exe's
     // command line - the project's own does - else Microsoft's.
@@ -622,6 +623,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
         noteWindowsToolchain();
         return 2;
     }
+    produced_.push_back(output_);
     return 0;
 #else
     std::string command;
@@ -640,6 +642,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
 
     const int status = shell(command);
     std::remove(assemblyPath.c_str());
+    if (status == 0) produced_.push_back(objectOnly_ && !named ? output_ + ".o" : output_);
     return status == 0 ? 0 : 2;
 #endif
 }
@@ -701,7 +704,7 @@ int Driver::finishTi(const std::string &assemblyPath, bool named) {
                   << "     asm6x is the project's C6000 assembler; SHALIMAR_AS names it\n";
         return 2;
     }
-    if (objectOnly_) return 0;
+    if (objectOnly_) { produced_.push_back(objectPath); return 0; }
 
     // the runtime: every .s of the directory, assembled beside the program's object
     std::vector<std::string> made;
@@ -761,6 +764,7 @@ int Driver::finishTi(const std::string &assemblyPath, bool named) {
                      "     rts6740_elf_eh.lib, SHALIMAR_LD the linker itself\n";
         return 2;
     }
+    produced_.push_back(output_);
     return 0;
 }
 

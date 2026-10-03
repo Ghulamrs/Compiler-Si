@@ -11,6 +11,10 @@ public:
     int run(const std::vector<std::string> &arguments);
 
     static const char *bannerLine();
+    // After run() returned 0: whether to say so - a compile was begun and -nologo was not given.
+    bool saysDone() const { return saysDone_; }
+    // What this run made, for the line above the one that says it finished: the program, the objects or the assembly.
+    std::vector<std::string> produced() const { return produced_; }
 
 private:
     std::string input_;
@@ -27,6 +31,8 @@ private:
     // rather than reporting a usage error the caller did not make.
     bool answered_ = false;
     bool quiet_ = false;   // -nologo: leave out the start-of-compile banner
+    bool saysDone_ = false;  // a compile was begun, and the line saying it finished is wanted
+    std::vector<std::string> produced_;  // what a run that succeeded made
     std::string program_;
     bool assemblyOnly_ = false;
     bool objectOnly_ = false;
