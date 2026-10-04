@@ -1,20 +1,8 @@
 ©2026 G. R. Akhtar - Shalimar 1.2
-Release seal, version 1.2, sealed 03-10-2026
+Release seal, version 1.2, sealed 05-10-2026
 Written by tools/seal; check it with `tools/seal check`.
-CRC32  size  file - 64 files, seal C5A9C456
+CRC32  size  file - 52 files, seal 5B9B1954
 ------------------------------------------------------------------
-3227477C      7006  Makefile
-AE78FE04      5453  build.bat
-B961933A      2325  ide/README.md
-4013EF26      1027  ide/build-vs.cmd
-7AB3BF78      1085  ide/check-vs.cmd
-15F6723D     26718  ide/generate.py
-05ED6BCF      1442  ide/shc.sln
-5FC1FFD5      8694  ide/shc.vcxproj
-0C939E76      5684  ide/shc.vcxproj.filters
-9186EC19     26088  ide/shc.xcodeproj/project.pbxproj
-3E31421F      1564  ide/shc.xcodeproj/xcshareddata/xcschemes/shc.xcscheme
-B6FF4B51       217  ide/shc.xcworkspace/contents.xcworkspacedata
 359E0AC8      7012  runtime/Array.cpp
 B09C9F2A      3917  runtime/Console.cpp
 69D7A9E9      4483  runtime/Debug.cpp
@@ -68,4 +56,4 @@ E6221895      4647  src/backend/X86_64.h
 2B288CFC      1017  src/backend/X86_64Windows.h
 80F3F61D      1334  src/main.cpp
 ------------------------------------------------------------------
-Sealed on 03-10-2026
+Sealed on 05-10-2026

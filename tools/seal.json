@@ -1,2 +1,5 @@
-{"name": "shalimar", "version": "1.2", "banner": "©2026 G. R. Akhtar - Shalimar 1.2",
- "dirs": ["src", "lib", "runtime", "ide"], "files": ["Makefile", "build.bat"]}
+{"name": "shalimar",
+ "version": "1.2",
+ "banner": "©2026 G. R. Akhtar - Shalimar 1.2",
+ "dirs": ["src", "lib", "runtime"],
+ "files": []}
