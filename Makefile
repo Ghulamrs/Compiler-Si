@@ -109,15 +109,23 @@ all: $(SHC) $(RUNTIME) $(DEBUG_RUNTIME)
 # beside a Shalimar program - `vm6747 prog.s lib/shmrt-tms6747`. Built by
 # `make tms6747`, since it needs cpp11, which `make` alone must not: the
 # host runtime and the compiler build without the C++ clone being there.
+# Two of them, as on the hosts: shmrt-tms6747 at -O2 for a Release build, shmrt-tms6747-debug at -O0
+# with SHM_DEBUG and Debug.cpp for a Debug one - beside RTS6x's rts6x.lib and rts6xd.lib under them.
 CXX1 ?= $(BINDIR)/cpp11.exe
 TMS_RUNTIME_DIR := $(LIBDIR)/shmrt-tms6747
 TMS_RUNTIME := $(patsubst runtime/%.cpp,$(TMS_RUNTIME_DIR)/%.s,$(RUNTIME_SOURCES))
+TMS_DEBUG_RUNTIME_DIR := $(LIBDIR)/shmrt-tms6747-debug
+TMS_DEBUG_RUNTIME := $(patsubst runtime/%.cpp,$(TMS_DEBUG_RUNTIME_DIR)/%.s,$(DEBUG_RUNTIME_SOURCES))
 
-tms6747: $(SHC) $(TMS_RUNTIME)
+tms6747: $(SHC) $(TMS_RUNTIME) $(TMS_DEBUG_RUNTIME)
 
 $(TMS_RUNTIME_DIR)/%.s: runtime/%.cpp $(CXX1)
 	@mkdir -p $(TMS_RUNTIME_DIR)
-	$(CXX1) -S -arch tms6747 -nologo $< -o $@
+	$(CXX1) -S -arch tms6747 -nologo -O2 $< -o $@
+
+$(TMS_DEBUG_RUNTIME_DIR)/%.s: runtime/%.cpp $(CXX1)
+	@mkdir -p $(TMS_DEBUG_RUNTIME_DIR)
+	$(CXX1) -S -arch tms6747 -nologo -O0 -DSHM_DEBUG=1 $< -o $@
 
 # shc.exe on every machine, not only Windows. The three programs in this family
 # - RStudio, cc1 and shc - carry one name each wherever they are, and a suffix
@@ -150,6 +158,8 @@ test: all
 test-tms6747: tms6747
 	SHC="$(abspath $(SHC))" VM="$(abspath $(BINDIR))/vm6747.exe" CC1="$(abspath $(BINDIR))/c90.exe" \
 	    RUNTIME="$(abspath $(TMS_RUNTIME_DIR))" ./tests/tms6747.sh
+	SHC="$(abspath $(SHC))" VM="$(abspath $(BINDIR))/vm6747.exe" CC1="$(abspath $(BINDIR))/c90.exe" \
+	    RUNTIME="$(abspath $(TMS_DEBUG_RUNTIME_DIR))" ./tests/tms6747.sh
 # The examples too, because they were not built by anything and rotted: eight
 # of the twelve stopped compiling when `uses` landed and nothing said so. They
 # are documentation people are pointed at, so a broken one is worse than a

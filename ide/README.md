@@ -14,7 +14,8 @@ step. Nothing in the build depends on them - `make` and the suites are unchanged
 no `lib/` beside it compiles, writes correct assembly and then dies at the link,
 so both projects build the runtime after the compiler - the two host archives
 from `runtime/`, as the Makefile's RUNTIME_SOURCES and DEBUG_RUNTIME_SOURCES
-name them, and the C6000 runtime, `lib/shmrt-tms6747/*.s`, which is **cpp11's
+name them, and the C6000 runtime, `lib/shmrt-tms6747/*.s` at -O2 and
+`lib/shmrt-tms6747-debug/*.s` at -O0 with `SHM_DEBUG`, which is **cpp11's
 output**. So each depends on cpp11: the Xcode project on
 `../../Compiler-Cppi/ide/cxx1.xcodeproj`, which the workspace opens beside it,
 and `shc.sln` holds `../../Compiler-Cppi/ide/cxx1.vcxproj` and builds it first.

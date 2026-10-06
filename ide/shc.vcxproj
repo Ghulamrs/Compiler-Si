@@ -60,17 +60,32 @@ if errorlevel 1 exit /b 1
 if not exist "$(OutDir)cpp11.exe" echo shc.vcxproj: no cpp11.exe in $(OutDir) - the C6000 runtime is its output
 if not exist "$(OutDir)cpp11.exe" exit /b 1
 if not exist "$(OutDir)lib\shmrt-tms6747" mkdir "$(OutDir)lib\shmrt-tms6747"
-"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo "$(ProjectDir)..\runtime\Shortest.cpp" -o "$(OutDir)lib\shmrt-tms6747\Shortest.s"
+if not exist "$(OutDir)lib\shmrt-tms6747-debug" mkdir "$(OutDir)lib\shmrt-tms6747-debug"
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo -O2 "$(ProjectDir)..\runtime\Shortest.cpp" -o "$(OutDir)lib\shmrt-tms6747\Shortest.s"
 if errorlevel 1 exit /b 1
-"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo "$(ProjectDir)..\runtime\Failure.cpp" -o "$(OutDir)lib\shmrt-tms6747\Failure.s"
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo -O2 "$(ProjectDir)..\runtime\Failure.cpp" -o "$(OutDir)lib\shmrt-tms6747\Failure.s"
 if errorlevel 1 exit /b 1
-"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo "$(ProjectDir)..\runtime\Numbers.cpp" -o "$(OutDir)lib\shmrt-tms6747\Numbers.s"
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo -O2 "$(ProjectDir)..\runtime\Numbers.cpp" -o "$(OutDir)lib\shmrt-tms6747\Numbers.s"
 if errorlevel 1 exit /b 1
-"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo "$(ProjectDir)..\runtime\Array.cpp" -o "$(OutDir)lib\shmrt-tms6747\Array.s"
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo -O2 "$(ProjectDir)..\runtime\Array.cpp" -o "$(OutDir)lib\shmrt-tms6747\Array.s"
 if errorlevel 1 exit /b 1
-"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo "$(ProjectDir)..\runtime\Console.cpp" -o "$(OutDir)lib\shmrt-tms6747\Console.s"
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo -O2 "$(ProjectDir)..\runtime\Console.cpp" -o "$(OutDir)lib\shmrt-tms6747\Console.s"
 if errorlevel 1 exit /b 1
-"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo "$(ProjectDir)..\runtime\Runtime.cpp" -o "$(OutDir)lib\shmrt-tms6747\Runtime.s"
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo -O2 "$(ProjectDir)..\runtime\Runtime.cpp" -o "$(OutDir)lib\shmrt-tms6747\Runtime.s"
+if errorlevel 1 exit /b 1
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo -O0 -DSHM_DEBUG=1 "$(ProjectDir)..\runtime\Shortest.cpp" -o "$(OutDir)lib\shmrt-tms6747-debug\Shortest.s"
+if errorlevel 1 exit /b 1
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo -O0 -DSHM_DEBUG=1 "$(ProjectDir)..\runtime\Failure.cpp" -o "$(OutDir)lib\shmrt-tms6747-debug\Failure.s"
+if errorlevel 1 exit /b 1
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo -O0 -DSHM_DEBUG=1 "$(ProjectDir)..\runtime\Numbers.cpp" -o "$(OutDir)lib\shmrt-tms6747-debug\Numbers.s"
+if errorlevel 1 exit /b 1
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo -O0 -DSHM_DEBUG=1 "$(ProjectDir)..\runtime\Array.cpp" -o "$(OutDir)lib\shmrt-tms6747-debug\Array.s"
+if errorlevel 1 exit /b 1
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo -O0 -DSHM_DEBUG=1 "$(ProjectDir)..\runtime\Console.cpp" -o "$(OutDir)lib\shmrt-tms6747-debug\Console.s"
+if errorlevel 1 exit /b 1
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo -O0 -DSHM_DEBUG=1 "$(ProjectDir)..\runtime\Runtime.cpp" -o "$(OutDir)lib\shmrt-tms6747-debug\Runtime.s"
+if errorlevel 1 exit /b 1
+"$(OutDir)cpp11.exe" -S -arch tms6747 -nologo -O0 -DSHM_DEBUG=1 "$(ProjectDir)..\runtime\Debug.cpp" -o "$(OutDir)lib\shmrt-tms6747-debug\Debug.s"
 if errorlevel 1 exit /b 1</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

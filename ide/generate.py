@@ -112,9 +112,12 @@ def runtime_shell(release, debug):
     c6000 = ('cpp11="$BUILT_PRODUCTS_DIR/%s"\n' % DEP_EXE +
              'test -x "$cpp11" || { echo "shc.xcodeproj: no cpp11.exe beside the output - '
              'the C6000 runtime is its output" >&2; exit 1; }\n'
-             'rm -rf "$lib/shmrt-tms6747"\nmkdir -p "$lib/shmrt-tms6747"\n' +
-             "".join('"$cpp11" -S -arch tms6747 -nologo "$SRCROOT/%s/runtime/%s.cpp" '
-                     '-o "$lib/shmrt-tms6747/%s.s"\n' % (UP, n, n) for n in release))
+             'rm -rf "$lib/shmrt-tms6747" "$lib/shmrt-tms6747-debug"\n'
+             'mkdir -p "$lib/shmrt-tms6747" "$lib/shmrt-tms6747-debug"\n' +
+             "".join('"$cpp11" -S -arch tms6747 -nologo -O2 "$SRCROOT/%s/runtime/%s.cpp" '
+                     '-o "$lib/shmrt-tms6747/%s.s"\n' % (UP, n, n) for n in release) +
+             "".join('"$cpp11" -S -arch tms6747 -nologo -O0 -DSHM_DEBUG=1 "$SRCROOT/%s/runtime/%s.cpp" '
+                     '-o "$lib/shmrt-tms6747-debug/%s.s"\n' % (UP, n, n) for n in debug))
     return ('set -e\ncxx="$(xcrun --find clang++)"\nar="$(xcrun --find ar)"\n'
             'flags="%s"\nlib="$BUILT_PRODUCTS_DIR/lib"\nmkdir -p "$lib"\n' % RUNTIME_FLAGS +
             archive(release, "$DERIVED_FILE_DIR/runtime", "", "shmrt-%s.a" % RUNTIME_TARGET) +
@@ -154,7 +157,8 @@ def write_xcode(srcs, hdrs, check):
               ["$(BUILT_PRODUCTS_DIR)/%s" % DEP_EXE])
     outputs = (["$(BUILT_PRODUCTS_DIR)/lib/shmrt-%s.a" % RUNTIME_TARGET,
                 "$(BUILT_PRODUCTS_DIR)/lib/shmrt-%s-debug.a" % RUNTIME_TARGET] +
-               ["$(BUILT_PRODUCTS_DIR)/lib/shmrt-tms6747/%s.s" % n for n in release])
+               ["$(BUILT_PRODUCTS_DIR)/lib/shmrt-tms6747/%s.s" % n for n in release] +
+               ["$(BUILT_PRODUCTS_DIR)/lib/shmrt-tms6747-debug/%s.s" % n for n in debug])
     listed = lambda xs: "".join('\t\t\t\t"%s",\n' % x for x in xs)
 
     common = ('\t\t\t\tALWAYS_SEARCH_USER_PATHS = NO;\n'
@@ -447,9 +451,13 @@ def write_vs(srcs, hdrs, check):
     flags = "/nologo /std:c++14 /W4 /WX /EHsc /permissive- /O2 /D_CRT_SECURE_NO_WARNINGS"
     rsrc = lambda ns: " ".join('"$(ProjectDir)..\\runtime\\%s.cpp"' % n for n in ns)
     robj = lambda ns, d: " ".join('"$(IntDir)%s\\%s.obj"' % (d, n) for n in ns)
-    c6000 = "".join('"$(OutDir)%s" -S -arch tms6747 -nologo "$(ProjectDir)..\\runtime\\%s.cpp" '
+    # The C6000 runtime twice, as the hosts' archives: -O2 for Release, -O0 with SHM_DEBUG for Debug.
+    c6000 = "".join('"$(OutDir)%s" -S -arch tms6747 -nologo -O2 "$(ProjectDir)..\\runtime\\%s.cpp" '
                     '-o "$(OutDir)lib\\shmrt-tms6747\\%s.s"\nif errorlevel 1 exit /b 1\n'
-                    % (DEP_EXE, n, n) for n in release)
+                    % (DEP_EXE, n, n) for n in release) + "".join(
+                    '"$(OutDir)%s" -S -arch tms6747 -nologo -O0 -DSHM_DEBUG=1 "$(ProjectDir)..\\runtime\\%s.cpp" '
+                    '-o "$(OutDir)lib\\shmrt-tms6747-debug\\%s.s"\nif errorlevel 1 exit /b 1\n'
+                    % (DEP_EXE, n, n) for n in debug)
     step = ('if not exist "$(OutDir)lib" mkdir "$(OutDir)lib"\n'
             'if not exist "$(IntDir)rt" mkdir "$(IntDir)rt"\n'
             'if not exist "$(IntDir)rtd" mkdir "$(IntDir)rtd"\n'
@@ -459,7 +467,8 @@ def write_vs(srcs, hdrs, check):
             'lib /nologo /out:"$(OutDir)lib\\shmrt-x86_64-windows-debug.lib" %s\nif errorlevel 1 exit /b 1\n'
             'if not exist "$(OutDir)%s" echo shc.vcxproj: no cpp11.exe in $(OutDir) - the C6000 runtime is its output\n'
             'if not exist "$(OutDir)%s" exit /b 1\n'
-            'if not exist "$(OutDir)lib\\shmrt-tms6747" mkdir "$(OutDir)lib\\shmrt-tms6747"\n%s'
+            'if not exist "$(OutDir)lib\\shmrt-tms6747" mkdir "$(OutDir)lib\\shmrt-tms6747"\n'
+            'if not exist "$(OutDir)lib\\shmrt-tms6747-debug" mkdir "$(OutDir)lib\\shmrt-tms6747-debug"\n%s'
             % (flags, rsrc(release), robj(release, "rt"), flags, rsrc(debug), robj(debug, "rtd"),
                DEP_EXE, DEP_EXE, c6000)).rstrip("\n")
     step = step.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")

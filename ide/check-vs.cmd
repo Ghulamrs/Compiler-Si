@@ -9,6 +9,7 @@ set CASE=%HERE%..\examples\gcd.shm
 if not exist "%SHC%" ( echo check-vs.cmd: build it first & exit /b 1 )
 if not exist "%HERE%x64\Release\lib\shmrt-x86_64-windows.lib" ( echo check-vs.cmd: no runtime beside shalimar.exe & exit /b 1 )
 if not exist "%HERE%x64\Release\lib\shmrt-tms6747\Runtime.s" ( echo check-vs.cmd: no C6000 runtime beside shalimar.exe & exit /b 1 )
+if not exist "%HERE%x64\Release\lib\shmrt-tms6747-debug\Debug.s" ( echo check-vs.cmd: no C6000 Debug runtime beside shalimar.exe & exit /b 1 )
 
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat" >nul
 "%SHC%" "%CASE%" -o "%HERE%x64\Release\case.exe"
