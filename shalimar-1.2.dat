@@ -1,5 +1,5 @@
 ©2026 G. R. Akhtar - Shalimar 1.2
-Release seal, version 1.2, sealed 05-10-2026
+Release seal, version 1.2, sealed 13-10-2026
 Written by tools/seal; check it with `tools/seal check`.
 CRC32  size  file - 52 files, seal 5B9B1954
 ------------------------------------------------------------------
@@ -56,4 +56,4 @@ E6221895      4647  src/backend/X86_64.h
 2B288CFC      1017  src/backend/X86_64Windows.h
 80F3F61D      1334  src/main.cpp
 ------------------------------------------------------------------
-Sealed on 05-10-2026
+Sealed on 13-10-2026
