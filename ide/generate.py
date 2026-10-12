@@ -12,8 +12,8 @@ assembly, and dies at the link, so both projects build the runtime archives
 from runtime/ after the compiler - RUNTIME_SOURCES and DEBUG_RUNTIME_SOURCES,
 as the Makefile names them - and the C6000 runtime, lib/shmrt-tms6747/*.s,
 which is cpp11's output. **So each depends on cpp11**: the Xcode project on
-../../Compiler-Cppi/ide/cxx1.xcodeproj's target, and ide/shc.sln holds
-../../Compiler-Cppi/ide/cxx1.vcxproj and builds it first. Built from here, both
+../../C++Optimize/ide/cxx1.xcodeproj's target, and ide/shc.sln holds
+../../C++Optimize/ide/cxx1.vcxproj and builds it first. Built from here, both
 land in this solution's output; built from RIDE's, beside RIDE's others.
 """
 import hashlib
@@ -33,8 +33,8 @@ RUNTIME_FLAGS = "-std=c++14 -Wall -Wextra -Werror -pedantic -O2"   # its CXXFLAG
 
 # cpp11, which writes the C6000 runtime: its projects, from here, and its product.
 DEP_EXE = "cpp11.exe"
-DEP_XCODE = "../../Compiler-Cppi/ide/cxx1.xcodeproj"
-DEP_VS = "..\\..\\Compiler-Cppi\\ide\\cxx1.vcxproj"
+DEP_XCODE = "../../C++Optimize/ide/cxx1.xcodeproj"
+DEP_VS = "..\\..\\C++Optimize\\ide\\cxx1.vcxproj"
 
 
 def rid(exe, *parts):

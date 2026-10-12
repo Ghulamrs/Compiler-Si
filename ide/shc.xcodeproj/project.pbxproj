@@ -94,7 +94,7 @@
 		CF23DC9AED39AAE2F65F48F1 /* Shortest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Shortest.h; path = "../runtime/Shortest.h"; sourceTree = "<group>"; };
 		D3AFCF7C7466ADF3BC873DB2 /* shmrt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = shmrt.h; path = "../runtime/shmrt.h"; sourceTree = "<group>"; };
 		CC672FE3254F928D91AE2865 /* shalimar.exe */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = shalimar.exe; sourceTree = BUILT_PRODUCTS_DIR; };
-		BA4A26EB7DF17458A300299B /* cxx1.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = cxx1.xcodeproj; path = "../../Compiler-Cppi/ide/cxx1.xcodeproj"; sourceTree = "<group>"; };
+		BA4A26EB7DF17458A300299B /* cxx1.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = cxx1.xcodeproj; path = "../../C++Optimize/ide/cxx1.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
