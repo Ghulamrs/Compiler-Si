@@ -9,7 +9,7 @@
 #
 # What this adds is shc.exe existing there at all, which is what a person or an
 # editor on that machine needs in order to compile Shalimar without a Mac in
-# the room. ../RStudio skipped every Shalimar case on that box for want of it.
+# the room. ../../RStudio skipped every Shalimar case on that box for want of it.
 #
 # It also builds with cl, which is the third of the three toolchains this
 # project claims to be ISO C++14 under, and the only one nothing was checking.
@@ -23,7 +23,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 HOSTNAME_="${SHM_WINDOWS_HOST:-windows}"
 # `source/Compiler-S`, not `Compiler-S`. The box keeps the four projects as
 # SIBLINGS under ~/source - RStudio, Compiler-C, Compiler-S, Converter-C2S -
-# because RStudio.sln names ..\Compiler-C\msvc\cc1.vcxproj and friends. A
+# because RStudio.sln names ..\..\Compiler-C\msvc\cc1.vcxproj and friends. A
 # default of plain "Compiler-S" put a SECOND tree in the home directory, which
 # then aged apart from the one every other tool on that box reads: a build that
 # passes against a tree nobody else uses is the stale-artefact hazard CLAUDE.md
@@ -61,7 +61,7 @@ done
 
 # The build scripts and the sources both, every time. A stale build.bat on that
 # box has silently reported an old, smaller suite for this family of project
-# before now - see ../RStudio's own relay, which learned it the hard way.
+# before now - see ../../RStudio's own relay, which learned it the hard way.
 scp -q src/*.cpp src/*.h "$HOSTNAME_:$REMOTE/src/" || exit 2
 scp -q src/backend/*.cpp src/backend/*.h "$HOSTNAME_:$REMOTE/src/backend/" || exit 2
 scp -q runtime/*.cpp runtime/*.h "$HOSTNAME_:$REMOTE/runtime/" || exit 2

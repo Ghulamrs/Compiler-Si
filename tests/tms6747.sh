@@ -27,7 +27,7 @@ OUT=tests/out-tms6747
 mkdir -p "$OUT"
 
 SHC="${SHC:-./shalimar.exe}"
-VM="${VM:-../VM6747/vm6747.exe}"
+VM="${VM:-../../TI/VM6747/vm6747.exe}"
 RUNTIME="${RUNTIME:-lib/shmrt-tms6747}"
 [ -x "$SHC" ] || { echo "no $SHC - run make first, or set SHC=" >&2; exit 2; }
 [ -x "$VM" ] || { echo "no emulator at $VM - build VM6747/, or set VM=" >&2; exit 2; }

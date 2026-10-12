@@ -77,7 +77,7 @@ double c_total(const ShmArray *a)
 }
 C
 
-CC1="${CC1:-$ROOT/../Compiler-C/cc1.exe}"
+CC1="${CC1:-$ROOT/../../Compiler-C/cc1.exe}"
 if [ -x "$CC1" ]; then
     compiler="cc1"
     "$CC1" -c -I "$RT" "$OUT/mine.c" -o "$OUT/mine.o" > "$OUT/compile" 2>&1

@@ -42,7 +42,7 @@ double c_total(const ShmArray *a)
 }
 C
 
-CC1="${CC1:-$ROOT/../Compiler-C/cc1.exe}"
+CC1="${CC1:-$ROOT/../../Compiler-C/cc1.exe}"
 if [ -x "$CC1" ]; then "$CC1" -c -I "$RT" "$OUT/mine.c" -o "$OUT/mine.o" > "$OUT/cc" 2>&1
 else                   cc     -c -I "$RT" "$OUT/mine.c" -o "$OUT/mine.o" > "$OUT/cc" 2>&1; fi
 [ -f "$OUT/mine.o" ] || { bad "could not compile the library's C"; sed -n '1,3p' "$OUT/cc"; echo; echo "foreign  $fail failed"; exit 1; }

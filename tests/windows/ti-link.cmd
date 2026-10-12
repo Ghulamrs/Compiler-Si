@@ -26,7 +26,7 @@ mkdir %OUT%
 rem  The programs TI's runtime cannot link, each with its reason, are the
 rem  emulator's list - VM6747\tests\ti-nolink.txt, "shm/<name>" lines - and a
 rem  case on it that does link is a failure here too, until its line goes.
-set NOLINK=%ROOT%\..\VM6747\tests\ti-nolink.txt
+set NOLINK=%ROOT%\..\..\TI\VM6747\tests\ti-nolink.txt
 rem  Six shards at once with par.cmd; each prints a marker line per case, and the counts are
 rem  read off the markers once all six are done.
 rem  Visual Studio's environment once, here: a compiler that finds it set runs its tools

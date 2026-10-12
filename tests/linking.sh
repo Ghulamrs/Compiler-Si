@@ -2,7 +2,7 @@
 #
 # What a Shalimar object is, and why it is not a piece of something larger.
 #
-# The editor in ../RStudio grew a compiler per group so that a project can hold
+# The editor in ../../RStudio grew a compiler per group so that a project can hold
 # C and C++ together, and the obvious next question was whether Shalimar could
 # be a third group. It cannot, and the reason is not the editor's and not a
 # missing feature - it is what shc's output *is*. This suite is that answer,

@@ -84,8 +84,8 @@ BINDIR ?= .
 
 # Named by workspace.mk so the examples and ABI suites can find cc1 and the
 # example library; each falls back to a sibling checkout on its own.
-CC1 ?= ../Compiler-C/cc1.exe
-LIBDIR ?= ../Compiler-C/examples/shalimar-library
+CC1 ?= ../../Compiler-C/cc1.exe
+LIBDIR ?= ../../Compiler-C/examples/shalimar-library
 # The program's name, once - src/Name.h and the project files RIDE's
 # tools/make-projects.py writes spell it the same.
 PROGRAM = shalimar

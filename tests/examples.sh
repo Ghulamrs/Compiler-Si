@@ -103,12 +103,12 @@ linked=0
 # and then skipped the whole block **without saying so**. A check that quietly
 # did not run is the shape of green this project does not accept, so an absent
 # library directory is now a sentence rather than a silence.
-LIBDIR="${LIBDIR:-$ROOT/../Compiler-C/examples/shalimar-library}"
+LIBDIR="${LIBDIR:-$ROOT/../../Compiler-C/examples/shalimar-library}"
 if [ ! -f "$LIBDIR/build.sh" ]; then
     echo "  (no $LIBDIR - the library examples are not checked here;"
     echo "   name it with \$LIBDIR if Compiler-C is somewhere else)"
 elif true; then
-    if ( cd "$LIBDIR" && CC1="${CC1:-$ROOT/../Compiler-C/cc1.exe}" \
+    if ( cd "$LIBDIR" && CC1="${CC1:-$ROOT/../../Compiler-C/cc1.exe}" \
                          RT="$ROOT/runtime" ./build.sh >"$OUT/lib.log" 2>&1 ) ||
        ( cd "$LIBDIR" && CC=cc RT="$ROOT/runtime" ./build.sh >>"$OUT/lib.log" 2>&1 ); then
         for dir in "$ROOT"/examples/*/; do
