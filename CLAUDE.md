@@ -83,10 +83,32 @@ so the C entry point stays the runtime's.
 
 ## Decisions that are settled
 
-**No debugger support.** No `-g`, no DWARF, no CodeView, and none planned -
-asked and answered on 2026-08-22. What stands in for it is `shm_line`, which
-lets a runtime error name its line and its function, and `-S`. Extend those
-if a program is hard to see into; do not start a line table.
+**Debug information for the debuggers RIDE drives - reversed 2026-10-12.**
+The decision of 2026-08-22 was "no `-g`, no DWARF, no CodeView, and none
+planned". It is reversed: a Shalimar program in RIDE is to be debugged with
+lldb, gdb and cdb as a c90 or cpp11 one is - breakpoints, steps, frames,
+variables and watches. The reasoning and the plan are in
+`docs/REVIEW-SHALIMAR-DEBUG-2026-10-12.md` in the cpp11 repository
+(Ghulamrs/Compiler-Cpp-Optimize), and they come down to four rules:
+
+- **The writers are cpp11's, not Shalimar-Codex's.** `Dwarf.cpp`,
+  `CodeView.cpp` and `CodeViewTypes.cpp` are brought across and fed through
+  an adapter from `Function::symbols_` and the four types; nothing of Codex's
+  IR, `IRSelector` or `CoffWriter` comes in.
+- **Codex's `DEBUGGER_RELEASE_REQUIREMENTS.md` is the acceptance contract**,
+  verbatim: names, types and values right, array count and data shown
+  honestly, scopes and shadowing honoured, nothing unavailable fabricated.
+- **The rungs run D1 to D5**: lines on arm64-darwin and x86_64-linux, then
+  variables and globals, then lexical blocks, then x86_64-windows through a
+  GNU/COFF spelling and CodeView, then the C6747 once the house has a
+  debugger there. Each green on all three boxes before the next, measured
+  against clang or cl in the debugger as cpp11's M10 was.
+- **`-g` adds sections and changes no code**, and `shm_line` and the session
+  stay as they are: they are still what reports a runtime error's line and
+  the only way to stop a program on the C6747.
+
+Until D1 lands, nothing here emits debug information; RIDE's help and
+`toolchain.cpp` say so, and come down rung by rung, not ahead of them.
 
 ## How this is built
 
