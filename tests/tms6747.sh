@@ -42,7 +42,8 @@ one() {
 
     "$SHC" --target=tms6747 -S "$case" -o "$OUT/$name.s" > "$OUT/$name.compile" 2>/dev/null
     compiled=$?
-    cp "$OUT/$name.compile" "$OUT/$name.actual"
+    # A Windows build writes its messages with CR LF, and the recorded output has LF.
+    tr -d '\r' < "$OUT/$name.compile" > "$OUT/$name.actual"
     if [ $compiled -ne 0 ]; then
         if diff -u "$expected" "$OUT/$name.actual" > "$OUT/$name.diff" 2>&1; then
             echo pass > "$OUT/$name.verdict"; return
