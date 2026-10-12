@@ -36,7 +36,8 @@ cl /nologo /std:c++14 /W4 /WX /EHsc /permissive- /O2 /D_CRT_SECURE_NO_WARNINGS ^
    src\Ast.cpp src\Parser.cpp src\Check.cpp src\Resolve.cpp src\Builtin.cpp ^
    runtime\Shortest.cpp src\CodeGen.cpp src\Target.cpp ^
    src\backend\Emitter.cpp src\backend\Spelling.cpp src\backend\Arm64Darwin.cpp ^
-   src\backend\X86_64.cpp src\backend\X86_64Linux.cpp src\backend\X86_64Windows.cpp
+   src\backend\X86_64.cpp src\backend\X86_64Linux.cpp src\backend\X86_64Windows.cpp ^
+   src\backend\Optimize.cpp src\backend\Tms6747.cpp
 if errorlevel 1 goto :fail
 
 rem The runtime, twice from the same sources. The release archive has no
