@@ -27,10 +27,10 @@ OUT=tests/out-tms6747
 mkdir -p "$OUT"
 
 SHC="${SHC:-./shalimar.exe}"
-VM="${VM:-../Emulator/vm6747.exe}"
+VM="${VM:-../VM6747/vm6747.exe}"
 RUNTIME="${RUNTIME:-lib/shmrt-tms6747}"
 [ -x "$SHC" ] || { echo "no $SHC - run make first, or set SHC=" >&2; exit 2; }
-[ -x "$VM" ] || { echo "no emulator at $VM - build VM6747/Emulator, or set VM=" >&2; exit 2; }
+[ -x "$VM" ] || { echo "no emulator at $VM - build VM6747/, or set VM=" >&2; exit 2; }
 [ -d "$RUNTIME" ] || { echo "no runtime at $RUNTIME - run 'make tms6747', or set RUNTIME=" >&2; exit 2; }
 
 # One case, its report and verdict beside its output, so that the cases run JOBS at a time.

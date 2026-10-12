@@ -1,6 +1,6 @@
 # IDE projects for shc
 
-The same layout as Compiler-Ci's and Compiler-Cppi's `ide/`, file for file: two
+The same layout as Compiler-Ci's and C++Optimize's `ide/`, file for file: two
 projects that build the whole compiler, every path in them `..` and one more
 step. Nothing in the build depends on them - `make` and the suites are unchanged.
 
@@ -17,8 +17,8 @@ from `runtime/`, as the Makefile's RUNTIME_SOURCES and DEBUG_RUNTIME_SOURCES
 name them, and the C6000 runtime, `lib/shmrt-tms6747/*.s` at -O2 and
 `lib/shmrt-tms6747-debug/*.s` at -O0 with `SHM_DEBUG`, which is **cpp11's
 output**. So each depends on cpp11: the Xcode project on
-`../../Compiler-Cppi/ide/cxx1.xcodeproj`, which the workspace opens beside it,
-and `shc.sln` holds `../../Compiler-Cppi/ide/cxx1.vcxproj` and builds it first.
+`../../C++Optimize/ide/cxx1.xcodeproj`, which the workspace opens beside it,
+and `shc.sln` holds `../../C++Optimize/ide/cxx1.vcxproj` and builds it first.
 The output is the solution's, `ide\x64\<config>\`, because the runtime step wants
 cpp11.exe beside shalimar.exe.
 

@@ -19,14 +19,14 @@ if not exist %BIN%\shalimar.exe (echo ti-link.cmd: no shalimar.exe in %BIN% & ex
 if not exist %BIN%\asm6x.exe (echo ti-link.cmd: no asm6x.exe beside it & exit /b 1)
 if not exist %BIN%\lib\shmrt-tms6747\Runtime.s (echo ti-link.cmd: no C6000 runtime in %BIN%\lib & exit /b 1)
 if not exist %SHALIMAR_TI%\bin\lnk6x.exe (echo ti-link.cmd: no lnk6x under %SHALIMAR_TI% & exit /b 1)
-if not exist %SHALIMAR_TILIB%\rts6740_elf_eh.lib (echo ti-link.cmd: no rts6740_elf_eh.lib - see Emulator/tests/ti.sh & exit /b 1)
+if not exist %SHALIMAR_TILIB%\rts6740_elf_eh.lib (echo ti-link.cmd: no rts6740_elf_eh.lib - see VM6747/tests/ti.sh & exit /b 1)
 set OUT=%ROOT%\tests\out-ti-link
 if exist %OUT% rmdir /s /q %OUT%
 mkdir %OUT%
 rem  The programs TI's runtime cannot link, each with its reason, are the
-rem  emulator's list - Emulator\tests\ti-nolink.txt, "shm/<name>" lines - and a
+rem  emulator's list - VM6747\tests\ti-nolink.txt, "shm/<name>" lines - and a
 rem  case on it that does link is a failure here too, until its line goes.
-set NOLINK=%ROOT%\..\Emulator\tests\ti-nolink.txt
+set NOLINK=%ROOT%\..\VM6747\tests\ti-nolink.txt
 rem  Six shards at once with par.cmd; each prints a marker line per case, and the counts are
 rem  read off the markers once all six are done.
 rem  Visual Studio's environment once, here: a compiler that finds it set runs its tools
