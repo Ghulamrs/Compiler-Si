@@ -17,7 +17,13 @@ public:
     void endFunction(int slots) override;
     void label(int id) override;
 
+    void sourceLine(int unit, int line) override;
+    void describeFunction(const DebugFunction &function) override;
+    void describeGlobals(const std::vector<DebugGlobal> &globals) override { debugGlobals_ = globals; }
+
 private:
+    bool writesCfi() const override { return describing(); }
+    std::string localLabel(const std::string &name) const override { return ".L" + name; }
 
     std::string labelName(int id) const override { return ".Lshm" + std::to_string(id); }
     std::string bytesLabel(int id) const override { return ".Lshmb" + std::to_string(id); }

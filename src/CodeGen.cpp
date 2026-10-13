@@ -21,6 +21,17 @@ void CodeGen::run(Program &program, const std::string &sourceName,
     emitter_.beginModule(sourceName);
     emitter_.defineGlobals(program.globalSlots());
     units_ = units;
+    if (emitter_.debugInfo()) {
+        std::vector<DebugGlobal> globals;
+        for (const Symbol *symbol : program.globalSymbols()) {
+            DebugGlobal g;
+            g.name = symbol->name();
+            g.type = symbol->type();
+            g.slot = symbol->slot();
+            globals.push_back(g);
+        }
+        emitter_.describeGlobals(globals);
+    }
 
     std::set<int> named;
     for (std::unique_ptr<Function> &f : program.functions()) {
@@ -94,6 +105,7 @@ void CodeGen::generate(Function &function) {
     exitLabel_ = newLabel();
 
     emitter_.beginFunction(mangle(proto.name));
+    if (emitter_.debugInfo()) describe(function);
 
     const std::vector<Place> places = planArguments(proto);
     for (int pass = 0; pass < 2; ++pass) {
@@ -177,8 +189,39 @@ std::vector<CodeGen::Place> CodeGen::planArguments(const Prototype &proto) const
     return places;
 }
 
+// **-g: the function as a debugger sees it** - its name and line, its result, and every named slot:
+// the parameters first, in order, a by-reference one marked as holding an address, then what the
+// body declared or made by a first assignment. The hidden slots have no name and are not here.
+void CodeGen::describe(const Function &function) {
+    const Prototype &proto = function.proto();
+    DebugFunction d;
+    d.name = proto.name.empty() ? mangle(proto.name) : proto.name;
+    d.symbol = mangle(proto.name);
+    d.unit = proto.unit;
+    d.line = proto.line;
+    d.returns = proto.outputs.size() == 1 ? proto.outputs[0] : nullptr;
+    const std::vector<std::unique_ptr<Symbol>> &symbols = function.symbols();
+    for (size_t i = 0; i < symbols.size(); ++i) {
+        DebugLocal l;
+        l.name = symbols[i]->name();
+        l.type = symbols[i]->type();
+        l.slot = symbols[i]->slot();
+        l.isParam = i < proto.inputs.size();
+        l.indirect = symbols[i]->isReference();
+        l.scope = symbols[i]->scope();
+        d.locals.push_back(l);
+    }
+    for (int parent : function.scopeParents()) {
+        DebugBlock b;
+        b.parent = parent;
+        d.blocks.push_back(b);
+    }
+    emitter_.describeFunction(d);
+}
+
 void CodeGen::generate(Stmt &statement) {
 
+    emitter_.sourceLine(statement.unit(), statement.line());
     emitter_.setLine(statement.unit(), statement.line());
     statement.accept(*this);
 }
@@ -812,11 +855,17 @@ void CodeGen::visit(If &node) {
         const int next = newLabel();
         evaluateCondition(*branch.condition);
         emitter_.jumpIfZero(next);
+        emitter_.beginBlock(branch.scope);
         generate(branch.body);
+        emitter_.endBlock(branch.scope);
         emitter_.jump(done);
         emitter_.label(next);
     }
-    if (node.hasElse()) generate(node.elseBody());
+    if (node.hasElse()) {
+        emitter_.beginBlock(node.elseScope());
+        generate(node.elseBody());
+        emitter_.endBlock(node.elseScope());
+    }
     emitter_.label(done);
 }
 
@@ -828,7 +877,9 @@ void CodeGen::visit(While &node) {
     emitter_.jumpIfZero(done);
 
     loops_.push_back(LoopLabels{done, top});
+    emitter_.beginBlock(node.scope());
     generate(node.body());
+    emitter_.endBlock(node.scope());
     loops_.pop_back();
 
     emitter_.jump(top);
@@ -836,8 +887,10 @@ void CodeGen::visit(While &node) {
 }
 
 void CodeGen::visit(For &node) {
+    emitter_.beginBlock(node.counterScope());
     if (isReal(node.start()->type())) generateRealLoop(node);
     else generateIntLoop(node);
+    emitter_.endBlock(node.counterScope());
 }
 
 void CodeGen::generateIntLoop(For &node) {
@@ -873,7 +926,9 @@ void CodeGen::generateIntLoop(For &node) {
     emitter_.storeSlot(Slot::Int, node.counter()->slot());
 
     loops_.push_back(LoopLabels{done, step});
+    emitter_.beginBlock(node.bodyScope());
     generate(node.body());
+    emitter_.endBlock(node.bodyScope());
     loops_.pop_back();
 
     emitter_.label(step);
@@ -926,7 +981,9 @@ void CodeGen::generateRealLoop(For &node) {
     emitter_.jumpIfZero(done);
 
     loops_.push_back(LoopLabels{done, step});
+    emitter_.beginBlock(node.bodyScope());
     generate(node.body());
+    emitter_.endBlock(node.bodyScope());
     loops_.pop_back();
 
     emitter_.label(step);

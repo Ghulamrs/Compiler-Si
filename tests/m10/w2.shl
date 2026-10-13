@@ -1,0 +1,30 @@
+int counter : 3
+real scale : 2.5
+
+fun <> = bump(&n: int) {
+  n : n + 1
+}
+
+fun <real> = total(v[]: real, k: int) {
+  real s : 0.
+
+  for i : 0 to k - 1 {
+    s : s + v[i]
+  }
+  return s
+}
+
+fun <> = main() {
+  real v[3]
+  v[0] : 1.5
+  v[1] : 2.5
+  v[2] : 4.
+  char t[8] : "hi"
+  real m[2][2]
+  m[1][1] : 9.
+  int c : 65
+  real r : total(v, 3)
+  bump(counter)
+  ? r counter scale
+  ? char(c) t
+}

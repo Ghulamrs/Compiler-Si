@@ -58,10 +58,23 @@ public:
 
 }
 
+int Checker::openScope() {
+    const int id = function_->openScope(currentScope());
+    scopes_.push_back(id);
+    scope_.push();
+    return id;
+}
+
+void Checker::closeScope() {
+    scope_.pop();
+    scopes_.pop_back();
+}
+
 Symbol *Checker::declareName(const std::string &name, const Type *type) {
-    if (!inGlobalScope_) return function_->declare(name, type);
+    if (!inGlobalScope_) return function_->declare(name, type, currentScope());
     Symbol *symbol = new Symbol(name, type, program_->addGlobalSlot(), Symbol::Storage::Global);
     globals_[name] = symbol;
+    program_->addGlobalSymbol(symbol);
     laterGlobals_.erase(name);
     return symbol;
 }
@@ -180,6 +193,7 @@ void Checker::check(Function &function) {
     unit_ = function.proto().unit;
     scope_.clear();
     scope_.push();
+    scopes_.clear();
     declaredLocals_.clear();
 
     for (const Param &parameter : function.proto().inputs) {
@@ -775,23 +789,26 @@ void Checker::checkCondition(ExprPtr &expr) {
     }
 }
 
-void Checker::checkBlock(Block &body) {
-    scope_.push();
+// A nested block: its own scope, numbered for the generator, which puts the labels round the same
+// statements so that a debugger reads a name made in it as the block's and not an outer one's.
+int Checker::checkBlock(Block &body) {
+    const int scope = openScope();
     for (StmtPtr &s : body) check(*s);
-    scope_.pop();
+    closeScope();
+    return scope;
 }
 
 void Checker::visit(If &node) {
     for (If::Branch &branch : node.branches()) {
         checkCondition(branch.condition);
-        checkBlock(branch.body);
+        branch.scope = checkBlock(branch.body);
     }
-    if (node.hasElse()) checkBlock(node.elseBody());
+    if (node.hasElse()) node.setElseScope(checkBlock(node.elseBody()));
 }
 
 void Checker::visit(While &node) {
     checkCondition(node.condition());
-    checkBlock(node.body());
+    node.setScope(checkBlock(node.body()));
 }
 
 void Checker::visit(For &node) {
@@ -814,12 +831,12 @@ void Checker::visit(For &node) {
     for (int i = 1; i < For::HiddenSlotCount; ++i) function_->addHiddenSlot();
     node.setHiddenBase(base);
 
-    scope_.push();
-    Symbol *counter = function_->declare(node.variable(), counterType);
+    const int outer = openScope();
+    Symbol *counter = function_->declare(node.variable(), counterType, outer);
     scope_.define(node.variable(), counter);
     node.resolve(counter);
-    checkBlock(node.body());
-    scope_.pop();
+    node.setScopes(outer, checkBlock(node.body()));
+    closeScope();
 }
 
 void Checker::visit(Break &) {}

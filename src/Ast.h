@@ -92,12 +92,17 @@ public:
     bool isReference() const { return reference_; }
     void makeReference() { reference_ = true; }
 
+    // The block the name belongs to - 0 the function's own, else one Function::openScope numbered - for -g's lexical blocks.
+    int scope() const { return scope_; }
+    void setScope(int scope) { scope_ = scope; }
+
 private:
     std::string name_;
     const Type *type_;
     int slot_;
     Storage storage_;
     bool reference_ = false;
+    int scope_ = 0;
 };
 
 class Expr : public Node {
@@ -466,6 +471,7 @@ public:
     struct Branch {
         ExprPtr condition;
         Block body;
+        int scope = 0;      // the body's block, as the checker numbered it
     };
 
     explicit If(int line) : Stmt(line) {}
@@ -480,6 +486,8 @@ public:
     std::vector<Branch> &branches() { return branches_; }
     Block &elseBody() { return elseBody_; }
     bool hasElse() const { return hasElse_; }
+    int elseScope() const { return elseScope_; }
+    void setElseScope(int scope) { elseScope_ = scope; }
 
     void accept(NodeVisitor &v) override { v.visit(*this); }
 
@@ -487,6 +495,7 @@ private:
     std::vector<Branch> branches_;
     Block elseBody_;
     bool hasElse_ = false;
+    int elseScope_ = 0;
 };
 
 class While : public Stmt {
@@ -496,11 +505,14 @@ public:
 
     ExprPtr &condition() { return condition_; }
     Block &body() { return body_; }
+    int scope() const { return scope_; }
+    void setScope(int scope) { scope_ = scope; }
     void accept(NodeVisitor &v) override { v.visit(*this); }
 
 private:
     ExprPtr condition_;
     Block body_;
+    int scope_ = 0;
 };
 
 class For : public Stmt {
@@ -522,6 +534,11 @@ public:
     int hidden(HiddenSlot which) const { return hiddenBase_ + which; }
     void setHiddenBase(int base) { hiddenBase_ = base; }
 
+    // Two blocks: the counter's, round the whole loop, and the body's inside it.
+    int counterScope() const { return counterScope_; }
+    int bodyScope() const { return bodyScope_; }
+    void setScopes(int counter, int body) { counterScope_ = counter; bodyScope_ = body; }
+
     void accept(NodeVisitor &v) override { v.visit(*this); }
 
 private:
@@ -532,6 +549,8 @@ private:
     Block body_;
     const Symbol *counter_ = nullptr;
     int hiddenBase_ = 0;
+    int counterScope_ = 0;
+    int bodyScope_ = 0;
 };
 
 class Break : public Stmt {
@@ -602,13 +621,22 @@ public:
     Frame &frame() { return frame_; }
     const Frame &frame() const { return frame_; }
 
-    Symbol *declare(const std::string &name, const Type *type) {
+    Symbol *declare(const std::string &name, const Type *type, int scope = 0) {
         symbols_.push_back(std::unique_ptr<Symbol>(
             new Symbol(name, type, frame_.addVariable())));
+        symbols_.back()->setScope(scope);
         return symbols_.back().get();
     }
 
+    // The blocks the checker opened, each by its parent: 0 is the function's own scope, and a name
+    // made inside a block belongs to it - which is what lets a debugger tell two `t`s apart.
+    int openScope(int parent) { scopeParents_.push_back(parent); return static_cast<int>(scopeParents_.size()) - 1; }
+    const std::vector<int> &scopeParents() const { return scopeParents_; }
+
     int addHiddenSlot() { return frame_.addVariable(); }
+
+    // Every named slot - the parameters first, in order, then what the body declared or made - which is what -g describes to a debugger.
+    const std::vector<std::unique_ptr<Symbol>> &symbols() const { return symbols_; }
 
     int outPointerBase() const { return outPointerBase_; }
     void setOutPointerBase(int base) { outPointerBase_ = base; }
@@ -621,6 +649,7 @@ private:
     Block body_;
     Frame frame_;
     std::vector<std::unique_ptr<Symbol>> symbols_;
+    std::vector<int> scopeParents_{-1};
     bool called_ = false;
     bool rejected_ = false;
     int outPointerBase_ = 0;
@@ -689,6 +718,10 @@ public:
     int addGlobalSlot() { return globalSlots_++; }
     int globalSlots() const { return globalSlots_; }
 
+    // The globals by name, type and slot, in the order made - for -g, which names each one at shm_globals + 8*slot.
+    void addGlobalSymbol(const Symbol *symbol) { globalSymbols_.push_back(symbol); }
+    const std::vector<const Symbol *> &globalSymbols() const { return globalSymbols_; }
+
     Function &initializer() { return initializer_; }
 
 private:
@@ -698,6 +731,7 @@ private:
     std::vector<Borrowed> borrowed_;
     std::vector<Prototype> foreign_;
     int globalSlots_ = 0;
+    std::vector<const Symbol *> globalSymbols_;
     Function initializer_{Prototype(), Block()};
 };
 

@@ -18,7 +18,8 @@
 set -uo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-[ -x ./shc.exe ] || { echo "no ./shc.exe - run make first" >&2; exit 2; }
+SHC="${SHC:-./shalimar.exe}"
+[ -x "$SHC" ] || { echo "no $SHC - run make first, or set SHC=" >&2; exit 2; }
 
 WORK="${TMPDIR:-/tmp}/shm-debug"
 rm -rf "$WORK"; mkdir -p "$WORK"
@@ -70,8 +71,8 @@ cp tests/debug/steps.shl "$WORK/steps.shl"
 
 # ---- the boundary ---------------------------------------------------------
 
-./shc.exe "$WORK/steps.shl" -S -o "$WORK/release.s" >/dev/null 2>&1
-./shc.exe "$WORK/steps.shl" --debug -S -o "$WORK/debug.s" >/dev/null 2>&1
+"$SHC" "$WORK/steps.shl" -S -o "$WORK/release.s" >/dev/null 2>&1
+"$SHC" "$WORK/steps.shl" --debug -S -o "$WORK/debug.s" >/dev/null 2>&1
 if diff -q "$WORK/release.s" "$WORK/debug.s" >/dev/null; then
     pass=$((pass+1))
 else
@@ -79,8 +80,8 @@ else
     fail=$((fail+1))
 fi
 
-./shc.exe "$WORK/steps.shl" -o "$WORK/release" >/dev/null 2>&1
-./shc.exe "$WORK/steps.shl" --debug -o "$WORK/debug" >/dev/null 2>&1
+"$SHC" "$WORK/steps.shl" -o "$WORK/release" >/dev/null 2>&1
+"$SHC" "$WORK/steps.shl" --debug -o "$WORK/debug" >/dev/null 2>&1
 
 # A release build has no code for any of this, so arming it does nothing.
 check "a release build ignores being armed" \
@@ -155,7 +156,7 @@ fun <> = main() {
   ? 1 / 0
 }
 SHM
-./shc.exe "$WORK/bad.shl" --debug -o "$WORK/bad" >/dev/null 2>&1
+"$SHC" "$WORK/bad.shl" --debug -o "$WORK/bad" >/dev/null 2>&1
 contains "a program that fails says so on the channel" \
          "$(session "$WORK/bad" 'c\n')" "#exit 1"
 
@@ -175,7 +176,7 @@ fun <> = main() {
 SHM
 # Named rather than searched for, so the numbering is this line's and not the
 # directory listing's - which is exactly what the editor does.
-./shc.exe "$WORK/uses.shl" "$WORK/helper.shl" --debug -o "$WORK/uses" >/dev/null 2>&1
+"$SHC" "$WORK/uses.shl" "$WORK/helper.shl" --debug -o "$WORK/uses" >/dev/null 2>&1
 check "the second file is named as unit 1" \
       "$(printf 'c\n' | SHM_DEBUG=1 "$WORK/uses" 2>&1 >/dev/null | sed -n '2p')" \
       "#file 1 helper.shl"

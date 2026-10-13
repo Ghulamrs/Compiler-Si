@@ -125,6 +125,15 @@ protected:
     void emitEpilogue(int slots);
     int frameBytesFor(int slots) const;
 
+    // -g on a target whose assembler takes .cfi_*: the frame's unwind data, which is what lets a
+    // debugger walk the stack and which the MASM spelling has no words for.
+    virtual bool writesCfi() const { return false; }
+    // What a target writes between the prologue's instructions: ELF's .cfi_*, COFF's .seh_*.
+    virtual std::string afterPush() const { return writesCfi() ? "\t.cfi_def_cfa_offset\t16\n\t.cfi_offset\t%rbp, -16\n" : ""; }
+    virtual std::string afterSetFrame() const { return writesCfi() ? "\t.cfi_def_cfa_register\t%rbp\n" : ""; }
+    virtual std::string afterAlloc(int) const { return ""; }
+    virtual std::string endPrologue() const { return ""; }
+
     size_t prologueMark_ = 0;
 
     void noteExternal(const std::string &name) override;

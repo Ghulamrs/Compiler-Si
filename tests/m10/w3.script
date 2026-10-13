@@ -1,0 +1,22 @@
+# D3: lexical blocks - a name made in a block is the block's, and a name outside it with the same
+# spelling is another variable; the loop counter hides the `i` declared before it. No `vars`
+# inside the loop: the outer `t` is in scope there and not yet set, in Shalimar and in C alike.
+break @:5
+break @:10
+break @:12
+run
+print i
+print t
+continue
+continue
+print i
+print t
+continue
+vars
+print t
+print u
+continue
+vars
+print i
+print t
+continue

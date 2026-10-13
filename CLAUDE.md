@@ -42,6 +42,8 @@ make                      build shc and the host runtime
 ./tests/record.sh         re-record expected output from the app's interpreter
 ./tests/cross.sh          finding the rest of the program in the other files
 ./tests/debug.sh          stopping a program from inside itself
+./tests/m10.sh            the host's debugger on a -g build, beside the C compiler's (D1-D3)
+./tests/m10-tms6747.sh    vm6747 --debug and sim6747 --run --debug, beside cpp11's (D5)
 ./tests/linking.sh        what an object holds, and why it is a whole program
 ./tests/build-windows.sh  build shc itself on the Windows box, with cl
 ```
@@ -107,8 +109,282 @@ variables and watches. The reasoning and the plan are in
   stay as they are: they are still what reports a runtime error's line and
   the only way to stop a program on the C6747.
 
-Until D1 lands, nothing here emits debug information; RIDE's help and
-`toolchain.cpp` say so, and come down rung by rung, not ahead of them.
+D1 landed 2026-10-13 (below); RIDE's help and `toolchain.cpp` come down rung by
+rung, not ahead of them.
+
+## Rung D1: `-g`, lines and frames on arm64-darwin and x86_64-linux, 2026-10-13
+
+**`shalimar -g` writes DWARF for the two GNU targets, and lldb and gdb stop a
+Shalimar program on a line, step it and walk its stack.** Measured the way
+cpp11's M10 was: `tests/m10/m10.py` puts the program under the host's debugger
+beside clang's or gcc's build of the same program written in C line for line
+(`tests/m10/w1.shl`, `w1.c`, one script `w1.script`), and compares where each
+stopped, what the stack held and what the variables read. On the Mac, lldb: **17
+agree, 0 differ**; on the Linux box, gdb 16.3: **15 agree, 0 differ** - a
+breakpoint on line 9, `bt`, a step over, a step into `twice` and its stack
+(`twice` at 2 over `main` at 10), a step out, `up` and the caller's variables.
+`tests/m10.sh` is the suite, and it needs the host's C compiler and debugger.
+
+**What was written, and where** - the plan of the review (section 5) held:
+
+- `src/backend/DebugInfo.h` is the adapter: `DebugFunction` (name, symbol,
+  unit and line, result type, `DebugLocal`s by slot, blocks), `DebugGlobal`
+  by slot. `CodeGen::describe` fills one per function from
+  `Function::symbols()` - the parameters first, a by-reference one marked
+  `indirect` - and `Program::globalSymbols()`, which the checker now keeps.
+- `src/backend/Dwarf.cpp` is cpp11's writer brought across and fed from the
+  adapter: the abbreviations, the compile unit (DW_LANG_C99, so the C
+  expression reader serves `p a->count`), a subprogram per function with
+  DW_AT_frame_base the frame register, a parameter or variable per slot at
+  `DW_OP_fbreg slotBias + 8*slot` (`DW_OP_deref` for a by-reference one), a
+  variable per global at `shm_globals + 8*slot`, and the types - the four of
+  them, an array being a pointer to a structure `{int32 count; int32
+  element; data}` whose `data` points at the elements, which is exactly what
+  the runtime's `Array` is. The line program is the assembler's, from `.file`
+  and `.loc`.
+- Each `Emitter` has four hooks that do nothing until `setDebugInfo`:
+  `sourceLine` before a statement's first instruction - before the `shm_line`
+  call, so the stop is where the statement begins - `describeFunction`,
+  `describeGlobals`, and `beginBlock`/`endBlock` for D3. The two GNU emitters
+  write `.file` per unit, `.loc unit+1 line`, `Lfunc.begin`/`Lfunc.end`
+  labels, and `.cfi_startproc` / `.cfi_def_cfa` / `.cfi_offset` /
+  `.cfi_endproc` round the prologue - the unwind data a stack walk needs,
+  which neither target had. Slot k is at `rbp + shadow + 8k - frame` on
+  x86-64 and `x29 + 8k - frame` on arm64; the emitter alone knows the frame,
+  so it fills `slotBias` at `endFunction`.
+- `-g` goes on the `c++` link line too: on a Mac that is what makes clang run
+  `dsymutil`, so the DWARF outlives the object the driver assembled and threw
+  away.
+
+**`-g` adds sections and changes no code.** The emit golden - every program in
+`tests/cases`, `tests/load`, `tests/debug` and `examples/` for all four
+targets, 248 emissions, recorded before the first line of this was written -
+reads **0 of 248 changed** without `-g`, at `-O0` and at `-O2`. The `.loc`
+before a statement is a `raw` line, which flushes the x86 optimizer's run; it
+cannot change what the peephole folds, because every statement already begins
+with `shm_line`'s `call`, which ends a run, and no fold spans a statement.
+`make test` 94/0, `tests/debug.sh` 19/0, `tests/tms6747.sh` 94/0 before and
+after; the Linux box builds with g++ 11 and passes the same.
+
+**Two things found by running it.** The `.cfi_*` lines went into *every*
+prologue the moment `-g` was on, `shm_name_files` included, where no
+`.cfi_startproc` had opened one, and clang refused the file: a function is
+described only between `describeFunction` and the end of the function it
+opened (`Emitter::describing()`). And `describing_` was cleared before the
+prologue text was composed, so `twice`'s frame carried no CFA rule and lldb's
+`bt` from inside it showed `twice` twice; the flag now outlives the insertion.
+
+**The function is named as the program names it** - `main`, not
+`shm_user_main` - so a stack reads `twice` over `main` over the runtime's
+`main`, which has no source and ends the walk. `tests/debug.sh` and
+`docs/DEBUGGING.md`'s session are untouched: `shm_line` is still emitted in
+every build and is still what names a runtime error's line.
+
+**What D1 does not claim**: variables and globals are D2, whose measurement is
+the next section; the names are in the DWARF already because the adapter was
+written whole, and `w1`'s `vars` lines agreeing with clang's is their first
+sighting, not their proof. x86_64-windows and tms6747 are D4 and D5 - `-g` on
+those targets writes nothing yet and says nothing, which D4 will mend.
+
+## Rung D2: parameters, locals, globals and arrays, 2026-10-13
+
+**A debugger shows a Shalimar program's names, types and values, writes one,
+and reads an array through the structure it is.** `tests/m10/w2.shl` beside
+`w2.c` - two globals, a by-reference parameter, a function over a `real[]`
+with an `int`, and a `main` holding a `real[3]`, a `char[8]`, a `real[2][2]`,
+an `int` and a `real` - under one script: a breakpoint inside the loop and two
+in `main`, `vars` in each frame, the caller's variables from `up`, `print` of
+`v->count`, `v->data[1]`, `m->count`, `m->data[1]->data[1]`, `t->data[1]`,
+`t->count`, the two globals, the by-reference `n` inside `bump`, and `set
+counter = 10` read back. **Mac, lldb: 37 agree, 0 differ. Linux box, gdb: 35
+agree, 0 differ.** The C program's arrays are written as the runtime's
+structure - `{int count; int element; double *data;}` and a pointer to it -
+because that is what the Shalimar one *is*; a C array would have made the
+debugger show an extent the Shalimar side has no business guessing. Codex's
+contract rows - parameters, globals and locals by their Shalimar names with
+correct types and values; array count and elements, the capacity (`count` 8
+for `char t[8] : "hi"`) kept distinct from the text (`data` "hi"); nothing
+unavailable fabricated - are met as far as a debugger can measure them.
+
+**One line of DWARF changed, and dsymutil chose it.** A global's location was
+`DW_OP_addr shm_globals + 8*slot`, and clang's assembler took it, gdb read it,
+and `dsymutil` dropped every global but the first - `counter` was in the
+dSYM and `scale`, at `_shm_globals + 8`, was not, so lldb called it undeclared.
+It is `DW_OP_addr shm_globals` and then `DW_OP_plus_uconst 8*slot`: the
+relocation names the symbol alone, which is what dsymutil keeps, and the
+offset is an operation, which both debuggers evaluate. Measured on both
+boxes; nothing else moved, and the emit golden still reads 0 of 248 without `-g`.
+
+**Two things the measurement taught about Shalimar rather than about DWARF.**
+A by-reference argument is copy-in, copy-out: `bump(counter)` evaluates the
+global into a scratch slot, passes *that* address, and copies the result back
+when the call returns - so at a `finish` out of `bump` the debugger reads
+`counter` as 3, and 4 only once the statement has completed. That is the
+language's semantics shown honestly, and the script stops at the next line to
+read it. And stepping past a function's last statement leaves the function -
+there is no line entry for the closing brace, as cpp11's M10 W5 records for
+C++ - so a step that in C stops on `}` here returns to the caller.
+
+**The harness learned two things from gdb.** It prints a pointer to a known
+object as `0x404030 <vs>`, which normalises to `<pointer>` like lldb's bare
+hex; and `info locals` lists the innermost block's variables first where
+lldb's `frame variable` lists the outermost's, so one listing's `var` lines
+are compared in name order. `print OURS | THEIRS` lets the two programs spell
+one value differently - `n` in Shalimar, `*n` in C - under one label.
+
+## Rung D3: lexical blocks, 2026-10-13
+
+**A name made inside a block is the block's, and a debugger inside the block
+reads that one.** `tests/m10/w3.shl` beside `w3.c`: `int i : 100`, a `for i`
+whose counter hides it, a `t` made by first assignment inside the loop and
+another `t` made after it, and a `u` inside an `if`. At line 5 `print i` is
+0 and `print t` the loop's; at 12 they are 100 and 7; at 10 `vars` is `i`,
+`t`, `u`. **Mac, lldb: 19 agree, 0 differ (the `vars` lists hold the hidden
+names too, as C's do). Linux box, gdb: 19 agree, 0 differ.** No `vars` is
+asked inside the loop, because the outer `t` is in scope there and not yet
+set, in Shalimar and in C alike - the one value the two cannot agree on.
+
+**The checker numbers the blocks and the generator puts the labels round
+the same statements.** `Checker::openScope` asks `Function::openScope(parent)`
+for a number each time `scope_` is pushed - a branch's body, an else, a
+while's body, and for a `for` two: the counter's, round the whole loop, and the
+body's inside it - and the `Symbol` a declaration or a first assignment
+makes carries the number (`Symbol::scope`); a parameter is 0. The number goes
+on the node (`If::Branch::scope`, `elseScope`, `While::scope`,
+`For::counterScope`/`bodyScope`), so `CodeGen` can call `beginBlock` and
+`endBlock` round exactly the statements the checker scoped, with no second
+numbering to drift from the first. `Emitter::blockLabel` writes one label each
+- `Lblock.<symbol>.<n>.b` and `.e`, `.L` on ELF - into the
+`DebugFunction`'s block table, and `Dwarf.cpp` writes a `DW_TAG_lexical_block`
+for every block that declares something, nested as the parents say; one that
+declares nothing is flattened into its parent, as cpp11 does.
+
+**Where a block's labels fall is why `-g` still changes no code at `-O2`.**
+A branch body begins after its `jumpIfZero` and ends before the `jump` past
+the else; a loop body sits between labels and jumps; the counter's block
+begins after the statement's own `shm_line` call. Every one of those is
+already where the x86 optimizer's run ends, so the `raw` label flushes a run
+that was about to be flushed. The emit golden reads **0 of 248 changed**
+without `-g` at `-O0` and at `-O2`.
+
+**What Shalimar's rule makes of shadowing.** A declared name may not be
+redeclared in an inner block, and a first assignment to a name that already
+exists outside the block assigns the outer one - so a block-local name hides
+an outer one only when the outer one is made *later* in the function, which is
+what `w3` does with `t`, and a `for` counter always hides an `i` declared
+before it. Those are the two shapes, and both resolve as the contract asks.
+
+## Rung D4: x86_64-windows - the GNU spelling, clang's assembler, CodeView, cdb, 2026-10-13
+
+**`shalimar -g` on x86_64-windows writes the GNU spelling for clang's COFF
+assembler, with CodeView after the code, and cdb stops a Shalimar program on
+a line, steps it, walks its stack and reads its variables** - the road cpp11
+took on 2026-09-10 and in M10. Measured on the Windows box with `shc` built
+there by `cl` (`build.bat`), each program built by `shc -g` and its C
+counterpart by `cl /Zi /Od`, both under cdb through `tests/m10/m10.py`
+(`tests/windows/m10.cmd w1 w2 w3`): **w1 15 agree, 0 differ; w2 37 agree, 0
+differ; w3 19 agree, 0 differ.** The suites are unchanged - `make test` 94,
+`tests/debug.sh` 19, `tests/tms6747.sh` 94, `tests/m10.sh` 3/3 under lldb -
+and the emit golden reads 0 of 248 without `-g` at `-O0` and `-O2`: a Release
+build on Windows is the MASM it always was, byte for byte.
+
+**What was written.** `src/backend/X86_64Coff.cpp` is a third x86-64 emitter:
+the same instruction stream and the same Microsoft ABI as the MASM one,
+rendered by `GnuSpelling`, with COFF round it - `.text`, `.section
+.rdata,"dr"`, `.bss` with `.zero`, `.Lshm` labels - and, per described
+function, `.seh_proc`, `.seh_pushreg %rbp`, `.seh_setframe %rbp, 0`,
+`.seh_stackalloc`, `.seh_endprologue` and `.seh_endproc`, from which the
+assembler builds the `.pdata` and `.xdata` a stack walk needs; `.cv_file`
+per unit with an absolute path, `.cv_func_id` per function and `.cv_loc` per
+statement, once per run of a line. `X86_64Emitter::prologue` grew four hooks
+- `afterPush`, `afterSetFrame`, `afterAlloc`, `endPrologue` - which Linux
+fills with its `.cfi_*` and this with its `.seh_*`. `CodeView.cpp` and
+`CodeViewTypes.cpp` are cpp11's writers over `DebugInfo.h`: S_OBJNAME,
+S_COMPILE3 (C), per function S_GPROC32, S_FRAMEPROC and an S_REGREL32 off
+RBP per slot at `shadow + 8k - frame` (negative - RBP is taken before the
+allocation here), S_BLOCK32 per block, `.cv_linetable`; S_GDATA32 per global
+at `shm_globals + 8*slot`; the types with cl's own numbers - T_INT4,
+T_REAL64, T_UCHAR - and an array an LF_POINTER to an LF_STRUCTURE
+`{count, element, data}` named by the Shalimar type, a by-reference parameter
+an LF_POINTER in reference mode. `Target::newDebugEmitter` chooses the
+emitter under `-g`; the driver then assembles with clang (`SHALIMAR_CLANG`,
+Visual Studio's own, LLVM's, or the PATH - cpp11's search) and links with
+`link /debug /incremental:no`. `build.bat` lists the four new sources.
+
+**Three things cdb taught, each a line in the harness or the driver.**
+*`/incremental:no`.* `link /debug` links incrementally by default, and every
+call then goes through an ILT thunk - `w1!ILT+14790(shm_line)` - so a step
+into a Shalimar call landed in a thunk with no source; cl's counterpart is
+linked the same way in `m10.cmd`, for the same reason. *A step is not one
+`t`.* cdb's `t` enters any call, lines or none, and a Shalimar statement
+begins with `shm_line`; lldb and gdb step past a function they have no lines
+for. So the harness drives cdb a command at a time over its stdin (`??` takes
+the rest of a line, so a `-c` string cannot carry one), sets `.step_filter
+"*!shm_*;*!shm::*"` and `Sources.SkipCrtCode`, and repeats a step while it
+leaves the program on the same line further on - RIDE's own rule - and steps
+once more into a function it entered, since cdb stops on the callee's own
+line before its parameters are stored where lldb stops on its first
+statement; cpp11's M10 W5 made RIDE's F6 do the same. *A reference is shown
+as the pointer it holds.* `?? n` on the by-reference parameter prints `int *
+0x...`; `?? *n` prints the value, and the script's third spelling says so.
+
+**One difference the measurement keeps, and it is cdb's.** `?? i` and `?? t`
+inside `w3`'s loop answer `Ambiguous symbol error` for the Shalimar program
+and for cl's alike - two `i`s in nested scopes are more than cdb's expression
+reader resolves - while `dv /t` lists both with their values and the S_BLOCK32
+is what cl writes too. Recorded as agreement, since it is, and not claimed as
+a value shown.
+
+## Rung D5: the C6747 - `.dwpsn`, vm6747 --debug and sim6747 --run --debug, 2026-10-13
+
+**`shalimar -g --target=tms6747` writes cl6x's `.dwpsn` before each statement,
+as cpp11 1.8 does, and a Shalimar program stops on a line, steps and walks
+its stack under `vm6747 --debug` on the assembly and under `sim6747 --run
+--debug` on the linked image.** The oracle is the only one the C6747 has:
+cpp11 -g's build of the same program written in C++ (`w1.c` with `printf`
+given C linkage - cpp11 compiles no C), under the same two debuggers.
+`tests/m10-tms6747.sh`, on the Mac: **vm6747 8 agree, 0 differ; sim6747 8
+agree, 0 differ** - a breakpoint on line 9, `bt`, a step over, a step into
+`twice` landing on its first statement, the two frames, `finish` back to
+line 10, and the end. The image is linked by asm6x 1.3 and lnk6x 1.2, which
+turn the `.dwpsn` into a `.debug_line` and carry it (their work of the same
+day), against TI's `rts6740_elf_eh.lib`; shc's own driver links it, given
+`SHALIMAR_AS`, `SHALIMAR_LD` and `SHALIMAR_TILIB`, so the `.out` is what a
+Shalimar build on this target makes.
+
+**What was written is small, as the review said it would be.**
+`Tms6747Emitter::sourceLine` writes `.dwpsn file "f",line N,column 0,is_stmt,
+isa 0` before the statement, and `describeFunction` the function's own line
+before the prologue, where cl6x and cpp11 put the entry's position - vm6747
+steps over it into the first statement, and with it *after* the prologue a
+step into `twice` stopped on line 1 instead of 2. No types, no locations and
+no frames are described, because the C6747 path carries none: `info locals`
+answers "No symbol table info available" for a Shalimar program and for
+cpp11's alike, and nothing is fabricated.
+
+**One spelling, under `-g` only.** vm6747's debug shell takes any label as a
+function unless it begins `$`, `.`, `L$` or `L.`, and this emitter's `Lshm<n>`
+and `Lshmr<n>` read as functions - the stack was `Lshmr9` over `Lshmr8` over
+`Lshmr7`, and a `next` thought it had entered one. Under `-g` the labels are
+`L$shm<n>`, `L$shmb<n>` and `L$shmr<n>`, which is how c90 and cpp11 spell
+theirs; without `-g` nothing moves and the emit golden reads 0 of 248 at `-O0`
+and `-O2`. Making the `L$` spelling unconditional is the tidier design and a
+one-line change that moves 62 golden files; left for the parent to decide.
+
+**The suites, on the three boxes, at the close.** Mac: `make test` 94/0,
+`tests/debug.sh` 19/0, `tests/tms6747.sh` 94/0, `tests/m10.sh` 3/0 (lldb),
+`tests/m10-tms6747.sh` 2/0. Linux box (g++ 11): 94/0, 19/0, gdb 13/0, 35/0,
+19/0. Windows box (cl): `build.bat` builds, cdb 15/0, 37/0, 19/0, and the
+MASM case suite `tests/remote-windows.sh` 58/0 with 36 diagnostic-only cases
+not sent - the Release path untouched. Nothing in VM6747, SIM6747, ASM6x or
+LNK6x was changed for this rung and nothing needed to be.
+
+**The suites a debugger rung runs**, beside the four above:
+`tests/m10.sh` (the host's debugger against clang's or gcc's C),
+`tests/windows/m10.cmd` (cdb against cl's, on the box, after `build.bat`),
+`tests/m10-tms6747.sh` (vm6747 and sim6747 against cpp11's), and the emit
+golden - every program for every target without `-g`, recorded before a rung
+and diffed after it, which is the claim "-g changes no code" made checkable.
 
 ## How this is built
 

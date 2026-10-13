@@ -62,6 +62,8 @@ void Driver::usage() const {
         "                     repeatable, linked in the order given\n"
         "  --no-search        do not look in the other files beside this one\n"
         "  --version          say which shc this is, and stop\n"
+        "  -g                 write debug information, so lldb, gdb or cdb can stop on\n"
+        "                     a line and show the variables; nothing else changes\n"
         "  --debug            link the runtime a debugger can stop, which\n"
         "                     changes nothing about what is compiled\n"
         "\n"
@@ -361,6 +363,8 @@ bool Driver::parseArguments(const std::vector<std::string> &arguments) {
             optimize_ = 2;
         } else if (a == "--debug") {
             debug_ = true;
+        } else if (a == "-g") {
+            debugInfo_ = true;
         } else if (a == "--version") {
             std::cout << bannerLine() << "\n";
             answered_ = true;
@@ -550,8 +554,9 @@ int Driver::run(const std::vector<std::string> &arguments) {
         return 1;
     }
 
-    std::unique_ptr<Emitter> emitter = target->newEmitter();
+    std::unique_ptr<Emitter> emitter = debugInfo_ ? target->newDebugEmitter() : target->newEmitter();
     emitter->setOptimize(optimize_);
+    if (debugInfo_) emitter->setDebugInfo(files, workingDirectory());
     CodeGen generator(*emitter);
     generator.run(*program, input_, names);
 
@@ -567,7 +572,8 @@ int Driver::run(const std::vector<std::string> &arguments) {
     }
 
     const std::string assemblyPath =
-        assemblyOnly_ ? output_ : output_ + target->assemblyExtension();
+        assemblyOnly_ ? output_ : output_ + (debugInfo_ ? target->debugAssemblyExtension()
+                                                        : target->assemblyExtension());
     if (!writeFile(assemblyPath, emitter->text())) {
         std::cerr << program::kName << ": cannot write " << assemblyPath << "\n";
         return 2;
@@ -596,6 +602,21 @@ int Driver::run(const std::vector<std::string> &arguments) {
     const std::string assembler = (as != nullptr && as[0] != '\0') ? shellQuote(as) : "ml64";
     std::string command = assembler + " /nologo /c /Fo" + shellQuote(objectPath) + " " +
                           shellQuote(assemblyPath);
+    // **-g is the GNU spelling, and clang assembles it** - the road cpp11 took: MASM has no words
+    // for a line table, and clang's COFF assembler writes the CodeView that link.exe /DEBUG makes a PDB of.
+    if (debugInfo_) {
+        const std::string clang = windowsClang();
+        if (clang.empty()) {
+            std::cerr << program::kName << ": -g on this target needs clang to assemble the debug information,\n"
+                         "     and none was found - Visual Studio's 'C++ Clang tools' component, LLVM under\n"
+                         "     Program Files, or clang.exe on the PATH; " << program::env("CLANG")
+                      << " names one\n";
+            std::remove(assemblyPath.c_str());
+            return 2;
+        }
+        command = shellQuote(clang) + " -target x86_64-pc-windows-msvc -c -x assembler -o " +
+                  shellQuote(objectPath) + " " + shellQuote(assemblyPath);
+    }
     int status = shell(command);
     if (status != 0) {
         std::cerr << program::kName << ": the assembler failed - the command was:\n  " << command << "\n";
@@ -610,8 +631,10 @@ int Driver::run(const std::vector<std::string> &arguments) {
     // command line - the project's own does - else Microsoft's.
     const char *ld = std::getenv(program::env("LD").c_str());
     const std::string linker = (ld != nullptr && ld[0] != '\0') ? shellQuote(ld) : "link";
-    command = linker + " /nologo /subsystem:console /out:" + shellQuote(output_) + " " +
-              shellQuote(objectPath);
+    // /debug makes the PDB cdb reads; /incremental:no with it, or every call goes through an
+    // ILT thunk the linker adds and a debugger stepping into a runtime call lands in the thunk.
+    command = linker + " /nologo /subsystem:console" + (debugInfo_ ? " /debug /incremental:no" : "") +
+              " /out:" + shellQuote(output_) + " " + shellQuote(objectPath);
     for (std::size_t i = 0; i < libraries_.size(); ++i)
         command += " " + shellQuote(libraries_[i]);
     command += " " + shellQuote(runtimeObject_);
@@ -627,12 +650,15 @@ int Driver::run(const std::vector<std::string> &arguments) {
     return 0;
 #else
     std::string command;
+    // -g on the link line too: on a Mac that is what makes clang run dsymutil, so the debug
+    // information outlives the object the driver assembled and discarded.
+    const std::string gnuDebug = debugInfo_ ? " -g" : "";
     if (objectOnly_) {
-        command = "c++ -c -o " + shellQuote(named ? output_ : output_ + ".o") + " " +
+        command = "c++" + gnuDebug + " -c -o " + shellQuote(named ? output_ : output_ + ".o") + " " +
                   shellQuote(assemblyPath);
     } else {
         // **-lm, named rather than relied upon:** a borrowed `sin` is a direct call to libm, which older glibc does not link without it - docs/FOREIGN.md.
-        command = "c++ -o " + shellQuote(output_) + " " + shellQuote(assemblyPath);
+        command = "c++" + gnuDebug + " -o " + shellQuote(output_) + " " + shellQuote(assemblyPath);
         // Before the runtime, because a library may call into it and a linker
         // reads left to right.
         for (std::size_t i = 0; i < libraries_.size(); ++i)
@@ -644,6 +670,45 @@ int Driver::run(const std::vector<std::string> &arguments) {
     std::remove(assemblyPath.c_str());
     if (status == 0) produced_.push_back(objectOnly_ && !named ? output_ + ".o" : output_);
     return status == 0 ? 0 : 2;
+#endif
+}
+
+// **Wherever a clang is, on the Windows box**: SHALIMAR_CLANG, Visual Studio's own (the "C++ Clang
+// tools" component, in any edition), a standalone LLVM, then the PATH - cpp11's search, measured there.
+std::string Driver::windowsClang() {
+#ifdef _WIN32
+    const char *env = std::getenv(program::env("CLANG").c_str());
+    if (env != nullptr && env[0] != '\0') return env;
+    std::vector<std::string> tries;
+    const std::string llvm = "\\VC\\Tools\\Llvm\\x64\\bin\\clang.exe";
+    const char *vc = std::getenv("VCINSTALLDIR");
+    if (vc != nullptr && vc[0] != '\0') tries.push_back(std::string(vc) + "Tools\\Llvm\\x64\\bin\\clang.exe");
+    const char *pf = std::getenv("ProgramFiles");
+    if (pf != nullptr && pf[0] != '\0') {
+        static const char *const editions[] = {"Community", "Professional", "Enterprise", "BuildTools"};
+        for (const char *e : editions)
+            tries.push_back(std::string(pf) + "\\Microsoft Visual Studio\\2022\\" + e + llvm);
+        tries.push_back(std::string(pf) + "\\LLVM\\bin\\clang.exe");
+    }
+    char onPath[MAX_PATH];
+    if (SearchPathA(nullptr, "clang.exe", nullptr, MAX_PATH, onPath, nullptr) > 0) tries.push_back(onPath);
+    for (std::size_t i = 0; i < tries.size(); i++)
+        if (exists(tries[i])) return tries[i];
+    return std::string();
+#else
+    return "clang";
+#endif
+}
+
+// The directory a debugger resolves the source names against - DW_AT_comp_dir.
+std::string Driver::workingDirectory() {
+#ifdef _WIN32
+    char buffer[MAX_PATH];
+    const DWORD n = GetCurrentDirectoryA(sizeof buffer, buffer);
+    return n > 0 && n < sizeof buffer ? std::string(buffer) : std::string();
+#else
+    char buffer[PATH_MAX];
+    return getcwd(buffer, sizeof buffer) != nullptr ? std::string(buffer) : std::string();
 #endif
 }
 

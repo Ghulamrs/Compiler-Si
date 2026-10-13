@@ -47,6 +47,10 @@ public:
     void jump(int id) override;
     void jumpIfZero(int id) override;
 
+    void sourceLine(int unit, int line) override;
+    void describeFunction(const DebugFunction &function) override;
+    void describeGlobals(const std::vector<DebugGlobal> &globals) override { debugGlobals_ = globals; }
+
 private:
 
     static const int frameRecordBytes = 16;

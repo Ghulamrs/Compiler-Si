@@ -57,12 +57,16 @@ std::string X86_64Emitter::prologue(int slots) {
     // frame size is not known until the body has been walked; it is built
     // from the same records all the same.
     out += "\t" + spelling_.render(ins1("push", 8, regOp(Reg::Bp, 8))) + "\n";
+    out += afterPush();
     out += "\t" + spelling_.render(ins2("mov", 8, regOp(Reg::Sp, 8),
                                          regOp(Reg::Bp, 8))) + "\n";
+    out += afterSetFrame();
     if (bytes > 0) {
         out += "\t" + spelling_.render(ins2("sub", 8, immOp(bytes),
                                              regOp(Reg::Sp, 8))) + "\n";
+        out += afterAlloc(bytes);
     }
+    out += endPrologue();
     return out;
 }
 

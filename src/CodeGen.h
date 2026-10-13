@@ -57,6 +57,7 @@ private:
     void release();
 
     void generate(Function &function);
+    void describe(const Function &function);
 
     void generateFileNames(const std::set<int> &units);
     void generate(Stmt &statement);
