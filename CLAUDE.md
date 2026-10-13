@@ -184,6 +184,52 @@ written whole, and `w1`'s `vars` lines agreeing with clang's is their first
 sighting, not their proof. x86_64-windows and tms6747 are D4 and D5 - `-g` on
 those targets writes nothing yet and says nothing, which D4 will mend.
 
+## Rung D2: parameters, locals, globals and arrays, 2026-10-13
+
+**A debugger shows a Shalimar program's names, types and values, writes one,
+and reads an array through the structure it is.** `tests/m10/w2.shl` beside
+`w2.c` - two globals, a by-reference parameter, a function over a `real[]`
+with an `int`, and a `main` holding a `real[3]`, a `char[8]`, a `real[2][2]`,
+an `int` and a `real` - under one script: a breakpoint inside the loop and two
+in `main`, `vars` in each frame, the caller's variables from `up`, `print` of
+`v->count`, `v->data[1]`, `m->count`, `m->data[1]->data[1]`, `t->data[1]`,
+`t->count`, the two globals, the by-reference `n` inside `bump`, and `set
+counter = 10` read back. **Mac, lldb: 37 agree, 0 differ. Linux box, gdb: 35
+agree, 0 differ.** The C program's arrays are written as the runtime's
+structure - `{int count; int element; double *data;}` and a pointer to it -
+because that is what the Shalimar one *is*; a C array would have made the
+debugger show an extent the Shalimar side has no business guessing. Codex's
+contract rows - parameters, globals and locals by their Shalimar names with
+correct types and values; array count and elements, the capacity (`count` 8
+for `char t[8] : "hi"`) kept distinct from the text (`data` "hi"); nothing
+unavailable fabricated - are met as far as a debugger can measure them.
+
+**One line of DWARF changed, and dsymutil chose it.** A global's location was
+`DW_OP_addr shm_globals + 8*slot`, and clang's assembler took it, gdb read it,
+and `dsymutil` dropped every global but the first - `counter` was in the
+dSYM and `scale`, at `_shm_globals + 8`, was not, so lldb called it undeclared.
+It is `DW_OP_addr shm_globals` and then `DW_OP_plus_uconst 8*slot`: the
+relocation names the symbol alone, which is what dsymutil keeps, and the
+offset is an operation, which both debuggers evaluate. Measured on both
+boxes; nothing else moved, and the emit golden still reads 0 of 248 without `-g`.
+
+**Two things the measurement taught about Shalimar rather than about DWARF.**
+A by-reference argument is copy-in, copy-out: `bump(counter)` evaluates the
+global into a scratch slot, passes *that* address, and copies the result back
+when the call returns - so at a `finish` out of `bump` the debugger reads
+`counter` as 3, and 4 only once the statement has completed. That is the
+language's semantics shown honestly, and the script stops at the next line to
+read it. And stepping past a function's last statement leaves the function -
+there is no line entry for the closing brace, as cpp11's M10 W5 records for
+C++ - so a step that in C stops on `}` here returns to the caller.
+
+**The harness learned two things from gdb.** It prints a pointer to a known
+object as `0x404030 <vs>`, which normalises to `<pointer>` like lldb's bare
+hex; and `info locals` lists the innermost block's variables first where
+lldb's `frame variable` lists the outermost's, so one listing's `var` lines
+are compared in name order. `print OURS | THEIRS` lets the two programs spell
+one value differently - `n` in Shalimar, `*n` in C - under one label.
+
 ## How this is built
 
 **One language feature at a time, green on all three targets before the

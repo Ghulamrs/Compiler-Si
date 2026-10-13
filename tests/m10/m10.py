@@ -40,8 +40,9 @@ def number(text):
     m = re.match(r"^(-?\d+)\s+'(.*)'$", text)      # gdb's `65 'A'`
     if m:
         return "'" + m.group(2) + "'"
-    if re.match(r"^0x[0-9a-fA-F]+$", text):
-        return "<pointer>" if text != "0x0" and text != "0x0000000000000000" else "<null>"
+    m = re.match(r"^0x([0-9a-fA-F]+)(?: <\S+>)?$", text)      # gdb's `0x404030 <vs>`
+    if m:
+        return "<pointer>" if int(m.group(1), 16) != 0 else "<null>"
     return text
 
 
@@ -142,8 +143,25 @@ def cdb_commands(script):
     return out
 
 
-def run_session(debugger, program, source, script):
-    script = [line.replace("@", os.path.basename(source)) for line in script]
+# `print OURS | THEIRS`: the two programs spell one value differently - a by-reference parameter
+# is `n` in Shalimar and `*n` in C - and the line reads as the first spelling for both.
+def side(line, which):
+    if "|" in line and line.split()[0] in ("print", "set"):
+        word, rest = line.split(None, 1)
+        ours, theirs = [p.strip() for p in rest.split("|", 1)]
+        return word + " " + (ours if which == 0 else theirs), ours
+    return line, None
+
+
+def run_session(debugger, program, source, script, which=0):
+    labels = {}
+    chosen = []
+    for line in script:
+        line, label = side(line, which)
+        if label is not None:
+            labels[line.split(None, 1)[1].strip()] = label
+        chosen.append(line)
+    script = [line.replace("@", os.path.basename(source)) for line in chosen]
     marker = "@@m10@@"
     if debugger == "lldb":
         cmds = lldb_commands(script)
@@ -180,7 +198,7 @@ def run_session(debugger, program, source, script):
             blocks.append(current)
         elif current is not None:
             current[1].append(line)
-    return raw, blocks
+    return raw, blocks, labels
 
 
 # ---- normalising what each debugger said ---------------------------------------------------
@@ -191,7 +209,13 @@ FRAME_CDB = re.compile(r"^([0-9a-f]+) [0-9a-f`]+ [0-9a-f`]+ (?:\S+!)?(\S+?)(?:\+
 FRAME_CDB_ONE = re.compile(r"^([0-9a-f]+) [0-9a-f`]+ [0-9a-f`]+ (?:\S+!)?(\S+?)(?:\+0x[0-9a-f]+)? \[(.*?) @ (\d+)\]")
 
 
-def normalise(debugger, blocks):
+def sortedVars(out, start):
+    """The variables listed since `start`, in name order: gdb lists the innermost block's first and lldb the outermost's."""
+    out[start:] = sorted(out[start:])
+
+
+def normalise(debugger, blocks, labels=None):
+    labels = labels or {}
     out = []
     for command, lines in blocks:
         text = "\n".join(lines)
@@ -218,16 +242,18 @@ def normalise(debugger, blocks):
                     out.append("frame %d %s %s:%s" % (n, m.group(2), stem(m.group(3)), m.group(4)))
                     n += 1
             elif command == "frame variable":
+                start = len(out)
                 for line in lines:
                     m = re.match(r"^\((.*?)\) (\S+) = (.*)$", line)
                     if m:
                         out.append("var %s = %s" % (m.group(2), number(m.group(3))))
+                sortedVars(out, start)
             elif command.startswith("expression"):
                 expr = command[len("expression --"):].strip()
                 m = re.search(r"\$\d+ = (.*)$", text)
                 if "=" in expr and not re.search(r"[=!<>]=", expr):
                     continue
-                out.append("print %s = %s" % (expr, number(m.group(1)) if m else "<error>"))
+                out.append("print %s = %s" % (labels.get(expr, expr), number(m.group(1)) if m else "<error>"))
             elif "exited with status" in text:
                 out.append("exited")
         elif debugger == "gdb":
@@ -250,14 +276,21 @@ def normalise(debugger, blocks):
                     out.append("frame %d %s %s:%s" % (n, m.group(2), stem(m.group(3)), m.group(4)))
                     n += 1
             elif command in ("info args", "info locals"):
+                start = len(out)
                 for line in lines:
                     m = re.match(r"^(\S+) = (.*)$", line)
                     if m:
                         out.append("var %s = %s" % (m.group(1), number(m.group(2))))
+                # args then locals are two listings; sorted together once the locals are in
+                if command == "info locals":
+                    back = start
+                    while back > 0 and out[back - 1].startswith("var "):
+                        back -= 1
+                    sortedVars(out, back)
             elif word == "print":
                 expr = command[len("print"):].strip()
                 m = re.search(r"\$\d+ = (.*)$", text)
-                out.append("print %s = %s" % (expr, number(m.group(1)) if m else "<error>"))
+                out.append("print %s = %s" % (labels.get(expr, expr), number(m.group(1)) if m else "<error>"))
             elif word in ("run", "continue", "next", "step", "finish") and "exited" in text:
                 out.append("exited")
         elif debugger == "cdb":
@@ -280,10 +313,12 @@ def normalise(debugger, blocks):
                     out.append("frame %d %s %s:%s" % (n, m.group(2), stem(m.group(3)), m.group(4)))
                     n += 1
             elif command == "dv /t":
+                start = len(out)
                 for line in lines:
                     m = re.match(r"^\s*(?:struct |class )?\S+\s*\*?\s+(\S+) = (.*)$", line.strip())
                     if m:
                         out.append("var %s = %s" % (m.group(1), number(m.group(2))))
+                sortedVars(out, start)
             elif command.startswith("??"):
                 expr = command[2:].strip()
                 if "=" in expr and not re.search(r"[=!<>]=", expr):
@@ -291,7 +326,7 @@ def normalise(debugger, blocks):
                 m = re.search(r"(?:^|\n)(?:\S+ )?(\S+)\s*$", text.strip())
                 value = text.strip().split("\n")[-1] if text.strip() else "<error>"
                 value = re.sub(r"^(int|double|unsigned char|char)\s+", "", value)
-                out.append("print %s = %s" % (expr, number(value)))
+                out.append("print %s = %s" % (labels.get(expr, expr), number(value)))
     return out
 
 
@@ -308,17 +343,20 @@ def main(argv):
         program, source, script = args[0], args[1], args[2]
         with open(script) as f:
             lines = [l.rstrip("\n") for l in f if l.strip() and not l.startswith("#")]
-        raw, blocks = run_session(debugger, program, source, lines)
+        raw, blocks, labels = run_session(debugger, program, source, lines,
+                                          1 if os.environ.get("M10_THEIRS") else 0)
         if os.environ.get("M10_RAW"):
             print(raw)
-        for line in normalise(debugger, blocks):
+        for line in normalise(debugger, blocks, labels):
             print(line)
         return 0
     ours, oursrc, theirs, theirsrc, script = args[0], args[1], args[2], args[3], args[4]
     with open(script) as f:
         lines = [l.rstrip("\n") for l in f if l.strip() and not l.startswith("#")]
-    a = normalise(debugger, run_session(debugger, ours, oursrc, lines)[1])
-    b = normalise(debugger, run_session(debugger, theirs, theirsrc, lines)[1])
+    ra = run_session(debugger, ours, oursrc, lines, 0)
+    rb = run_session(debugger, theirs, theirsrc, lines, 1)
+    a = normalise(debugger, ra[1], ra[2])
+    b = normalise(debugger, rb[1], rb[2])
     same = 0
     differ = 0
     for i in range(max(len(a), len(b))):

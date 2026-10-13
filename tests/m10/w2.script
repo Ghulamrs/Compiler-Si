@@ -1,0 +1,32 @@
+# D2: parameters, locals and globals by name, type and value; an array's count and elements
+# through the structure it is; a by-reference parameter; a variable written from the debugger.
+break @:12
+break @:27
+break @:28
+run
+vars
+bt
+up
+print c
+print v->data[2]
+down
+continue
+continue
+vars
+continue
+vars
+print v->count
+print v->data[1]
+print m->count
+print m->data[1]->data[1]
+print t->data[1]
+print t->count
+print counter
+print scale
+step
+print n | *n
+continue
+print counter
+set counter = 10 | counter = 10
+print counter
+continue

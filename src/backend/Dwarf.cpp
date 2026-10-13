@@ -43,7 +43,16 @@ const int kFormExprLoc = 0x18;
 const int kLangC99 = 0x0c;
 const int kAteFloat = 0x04, kAteSigned = 0x05, kAteUnsignedChar = 0x08;
 
-const int kOpAddr = 0x03, kOpDeref = 0x06, kOpFbreg = 0x91;
+const int kOpAddr = 0x03, kOpDeref = 0x06, kOpPlusUconst = 0x23, kOpFbreg = 0x91;
+
+void uleb(std::vector<unsigned char> &out, unsigned long long v) {
+    do {
+        unsigned char byte = static_cast<unsigned char>(v & 0x7f);
+        v >>= 7;
+        if (v != 0) byte |= 0x80;
+        out.push_back(byte);
+    } while (v != 0);
+}
 
 enum Abbrev {
     kAbCompileUnit = 1,
@@ -388,10 +397,17 @@ void writeDwarf(std::string &out, const DwarfSpelling &sp, const std::string &fi
         num(out, "\t.byte", kAbGlobal);
         str(out, globals[i].name);
         typeRef(out, types.id(globals[i].type));
-        num(out, "\t.byte", 9);
+        // The block's own address, then the slot's offset as an operation: dsymutil keeps a
+        // variable whose address it can relocate, and `_shm_globals + 8` it dropped.
+        std::vector<unsigned char> offset;
+        if (globals[i].slot > 0) {
+            offset.push_back(kOpPlusUconst);
+            uleb(offset, 8ULL * static_cast<unsigned long long>(globals[i].slot));
+        }
+        num(out, "\t.byte", 9 + static_cast<long long>(offset.size()));
         num(out, "\t.byte", kOpAddr);
-        line(out, "\t.quad\t" + std::string(sp.symbolPrefix) + globalsSymbol + " + " +
-                      std::to_string(8 * globals[i].slot));
+        line(out, "\t.quad\t" + std::string(sp.symbolPrefix) + globalsSymbol);
+        for (std::size_t k = 0; k < offset.size(); k++) num(out, "\t.byte", offset[k]);
         num(out, "\t.byte", 1);
     }
 
