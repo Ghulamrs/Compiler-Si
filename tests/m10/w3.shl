@@ -1,0 +1,13 @@
+fun <> = main() {
+  int i : 100
+  for i : 0 to 2 {
+    t : i * 10
+    ? t
+  }
+  t : 7
+  if t > 5 {
+    u : t + 1
+    ? u
+  }
+  ? i t
+}

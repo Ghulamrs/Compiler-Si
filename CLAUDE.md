@@ -230,6 +230,48 @@ lldb's `frame variable` lists the outermost's, so one listing's `var` lines
 are compared in name order. `print OURS | THEIRS` lets the two programs spell
 one value differently - `n` in Shalimar, `*n` in C - under one label.
 
+## Rung D3: lexical blocks, 2026-10-13
+
+**A name made inside a block is the block's, and a debugger inside the block
+reads that one.** `tests/m10/w3.shl` beside `w3.c`: `int i : 100`, a `for i`
+whose counter hides it, a `t` made by first assignment inside the loop and
+another `t` made after it, and a `u` inside an `if`. At line 5 `print i` is
+0 and `print t` the loop's; at 12 they are 100 and 7; at 10 `vars` is `i`,
+`t`, `u`. **Mac, lldb: 19 agree, 0 differ (the `vars` lists hold the hidden
+names too, as C's do). Linux box, gdb: 19 agree, 0 differ.** No `vars` is
+asked inside the loop, because the outer `t` is in scope there and not yet
+set, in Shalimar and in C alike - the one value the two cannot agree on.
+
+**The checker numbers the blocks and the generator puts the labels round
+the same statements.** `Checker::openScope` asks `Function::openScope(parent)`
+for a number each time `scope_` is pushed - a branch's body, an else, a
+while's body, and for a `for` two: the counter's, round the whole loop, and the
+body's inside it - and the `Symbol` a declaration or a first assignment
+makes carries the number (`Symbol::scope`); a parameter is 0. The number goes
+on the node (`If::Branch::scope`, `elseScope`, `While::scope`,
+`For::counterScope`/`bodyScope`), so `CodeGen` can call `beginBlock` and
+`endBlock` round exactly the statements the checker scoped, with no second
+numbering to drift from the first. `Emitter::blockLabel` writes one label each
+- `Lblock.<symbol>.<n>.b` and `.e`, `.L` on ELF - into the
+`DebugFunction`'s block table, and `Dwarf.cpp` writes a `DW_TAG_lexical_block`
+for every block that declares something, nested as the parents say; one that
+declares nothing is flattened into its parent, as cpp11 does.
+
+**Where a block's labels fall is why `-g` still changes no code at `-O2`.**
+A branch body begins after its `jumpIfZero` and ends before the `jump` past
+the else; a loop body sits between labels and jumps; the counter's block
+begins after the statement's own `shm_line` call. Every one of those is
+already where the x86 optimizer's run ends, so the `raw` label flushes a run
+that was about to be flushed. The emit golden reads **0 of 248 changed**
+without `-g` at `-O0` and at `-O2`.
+
+**What Shalimar's rule makes of shadowing.** A declared name may not be
+redeclared in an inner block, and a first assignment to a name that already
+exists outside the block assigns the outer one - so a block-local name hides
+an outer one only when the outer one is made *later* in the function, which is
+what `w3` does with `t`, and a `for` counter always hides an `i` declared
+before it. Those are the two shapes, and both resolve as the contract asks.
+
 ## How this is built
 
 **One language feature at a time, green on all three targets before the

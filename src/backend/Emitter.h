@@ -87,9 +87,10 @@ public:
     virtual void describeFunction(const DebugFunction &) {}
     // Once, before the functions: the globals by name, type and slot.
     virtual void describeGlobals(const std::vector<DebugGlobal> &) {}
-    // A nested block's first instruction, and the point after its last - the lexical blocks a name hides inside.
-    virtual void beginBlock(int) {}
-    virtual void endBlock(int) {}
+    // A nested block's first instruction, and the point after its last - the lexical blocks a name
+    // hides inside. A label each, in the function being described, and nothing otherwise.
+    void beginBlock(int scope) { blockLabel(scope, true); }
+    void endBlock(int scope) { blockLabel(scope, false); }
 
     void setLine(int unit, int line) {
         loadIntConstant(line);
@@ -108,6 +109,19 @@ protected:
     void blank() { text_ += "\n"; }
 
     virtual void noteExternal(const std::string &) {}
+
+    // How this target spells a label of the file's own - `L` on Mach-O, `.L` on ELF, `$` for MASM.
+    virtual std::string localLabel(const std::string &name) const { return "L" + name; }
+
+    void blockLabel(int scope, bool begin) {
+        if (!describing() || scope <= 0 || debugFunctions_.empty()) return;
+        DebugFunction &d = debugFunctions_.back();
+        if (static_cast<size_t>(scope) >= d.blocks.size()) return;
+        const std::string label = localLabel("block." + d.symbol + "." + std::to_string(scope) +
+                                             (begin ? ".b" : ".e"));
+        (begin ? d.blocks[static_cast<size_t>(scope)].begin : d.blocks[static_cast<size_t>(scope)].end) = label;
+        raw(label + ":");
+    }
 
     static uint64_t bitsOf(double value);
 

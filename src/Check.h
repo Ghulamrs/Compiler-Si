@@ -86,6 +86,12 @@ private:
     // Every name the function DECLARED, at any depth, kept for the whole function so two sibling blocks may not each declare 't'; first-assignment names are NOT in here.
     std::set<std::string> declaredLocals_;
 
+    // The block being checked, as Function::openScope numbered it: 0 at the function's top.
+    std::vector<int> scopes_;
+    int currentScope() const { return scopes_.empty() ? 0 : scopes_.back(); }
+    int openScope();
+    void closeScope();
+
     Symbol *declareName(const std::string &name, const Type *type);
     const Symbol *lookup(const std::string &name) const;
     void reportUndefined(const std::string &name);
@@ -98,7 +104,7 @@ private:
     const Type *common(const Type *a, const Type *b) const;
 
     void checkCondition(ExprPtr &expr);
-    void checkBlock(Block &body);
+    int checkBlock(Block &body);
 
     const Type *literalType(ArrayLit &node);
     void coerceLiteral(ArrayLit &node, const Type *arrayType);

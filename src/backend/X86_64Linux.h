@@ -23,6 +23,7 @@ public:
 
 private:
     bool writesCfi() const override { return describing(); }
+    std::string localLabel(const std::string &name) const override { return ".L" + name; }
 
     std::string labelName(int id) const override { return ".Lshm" + std::to_string(id); }
     std::string bytesLabel(int id) const override { return ".Lshmb" + std::to_string(id); }
