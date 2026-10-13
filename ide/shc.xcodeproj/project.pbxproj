@@ -22,6 +22,10 @@
 		5F3CCC9B419809ED11F52685 /* Emitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FCA2B1EFFA4B55526B28A73C /* Emitter.cpp */; };
 		E449C770B3AB69E828AA4C23 /* Spelling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 67D0740B42D9A977D2929C12 /* Spelling.cpp */; };
 		A0C9FD398B419557406F5AFF /* Optimize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D70548B8A3ABDC45CF0410CF /* Optimize.cpp */; };
+		9B580F5362355E1FE8EE1106 /* Dwarf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44939D11634EA517FF5020E4 /* Dwarf.cpp */; };
+		3B9E54C39B30AE1A7AB99ABB /* CodeView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 014B716F8D60978411FBC05E /* CodeView.cpp */; };
+		C7C6D37DF6C822FC78E0DD54 /* CodeViewTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76C590DE0F8A42DDA636E0B6 /* CodeViewTypes.cpp */; };
+		07BC557E7D0AF41C0D48874A /* X86_64Coff.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2870F2CF8D440CB023E5ED3 /* X86_64Coff.cpp */; };
 		CEA9F161EB296A691B9FAD8F /* Arm64Darwin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 201EE94DC01106B98E56A367 /* Arm64Darwin.cpp */; };
 		7256C8F8CFCE9811BEB3DD95 /* X86_64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5B92A5AFCA2D7DCBF26819A /* X86_64.cpp */; };
 		DEA45A10FA3892FD4AE58700 /* X86_64Linux.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334CD99BDE8B6A591C8500E5 /* X86_64Linux.cpp */; };
@@ -63,6 +67,10 @@
 		FCA2B1EFFA4B55526B28A73C /* Emitter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Emitter.cpp; path = "../src/backend/Emitter.cpp"; sourceTree = "<group>"; };
 		67D0740B42D9A977D2929C12 /* Spelling.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Spelling.cpp; path = "../src/backend/Spelling.cpp"; sourceTree = "<group>"; };
 		D70548B8A3ABDC45CF0410CF /* Optimize.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Optimize.cpp; path = "../src/backend/Optimize.cpp"; sourceTree = "<group>"; };
+		44939D11634EA517FF5020E4 /* Dwarf.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Dwarf.cpp; path = "../src/backend/Dwarf.cpp"; sourceTree = "<group>"; };
+		014B716F8D60978411FBC05E /* CodeView.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = CodeView.cpp; path = "../src/backend/CodeView.cpp"; sourceTree = "<group>"; };
+		76C590DE0F8A42DDA636E0B6 /* CodeViewTypes.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = CodeViewTypes.cpp; path = "../src/backend/CodeViewTypes.cpp"; sourceTree = "<group>"; };
+		A2870F2CF8D440CB023E5ED3 /* X86_64Coff.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = X86_64Coff.cpp; path = "../src/backend/X86_64Coff.cpp"; sourceTree = "<group>"; };
 		201EE94DC01106B98E56A367 /* Arm64Darwin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Arm64Darwin.cpp; path = "../src/backend/Arm64Darwin.cpp"; sourceTree = "<group>"; };
 		B5B92A5AFCA2D7DCBF26819A /* X86_64.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = X86_64.cpp; path = "../src/backend/X86_64.cpp"; sourceTree = "<group>"; };
 		334CD99BDE8B6A591C8500E5 /* X86_64Linux.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = X86_64Linux.cpp; path = "../src/backend/X86_64Linux.cpp"; sourceTree = "<group>"; };
@@ -81,12 +89,17 @@
 		09DA33573098D30CEE791ADB /* Token.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Token.h; path = "../src/Token.h"; sourceTree = "<group>"; };
 		EFB2C2FE15E86CFA56F6C459 /* Type.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Type.h; path = "../src/Type.h"; sourceTree = "<group>"; };
 		343C1B79389BBF31FEC696F5 /* Arm64Darwin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Arm64Darwin.h; path = "../src/backend/Arm64Darwin.h"; sourceTree = "<group>"; };
+		B0E72217517AEE1C4F7940D4 /* CodeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CodeView.h; path = "../src/backend/CodeView.h"; sourceTree = "<group>"; };
+		CC53A700A44C79EF8CB09390 /* CodeViewTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CodeViewTypes.h; path = "../src/backend/CodeViewTypes.h"; sourceTree = "<group>"; };
+		E13368824B3C984CFCD45978 /* DebugInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DebugInfo.h; path = "../src/backend/DebugInfo.h"; sourceTree = "<group>"; };
+		4385E0CD8761F0F11B0131BB /* Dwarf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Dwarf.h; path = "../src/backend/Dwarf.h"; sourceTree = "<group>"; };
 		1A787A1C525B513D6D9F94F5 /* Emitter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Emitter.h; path = "../src/backend/Emitter.h"; sourceTree = "<group>"; };
 		64C9E73E720778ED2E4DC4BA /* Ins.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Ins.h; path = "../src/backend/Ins.h"; sourceTree = "<group>"; };
 		F52170683058D9389D8B594A /* Optimize.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Optimize.h; path = "../src/backend/Optimize.h"; sourceTree = "<group>"; };
 		A9A1194FC9BA4491688B00EC /* Spelling.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Spelling.h; path = "../src/backend/Spelling.h"; sourceTree = "<group>"; };
 		1A090AFCE8174A1DE49C9C54 /* Tms6747.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Tms6747.h; path = "../src/backend/Tms6747.h"; sourceTree = "<group>"; };
 		2FC033177BFAE261B2569086 /* X86_64.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = X86_64.h; path = "../src/backend/X86_64.h"; sourceTree = "<group>"; };
+		9C13A92EFCB330825B78EAC0 /* X86_64Coff.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = X86_64Coff.h; path = "../src/backend/X86_64Coff.h"; sourceTree = "<group>"; };
 		12A5F71977D26CEE2AF1E2A4 /* X86_64Linux.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = X86_64Linux.h; path = "../src/backend/X86_64Linux.h"; sourceTree = "<group>"; };
 		D9E2165876940A054181ABEA /* X86_64Windows.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = X86_64Windows.h; path = "../src/backend/X86_64Windows.h"; sourceTree = "<group>"; };
 		197F32351CFB2693896295D3 /* Debug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Debug.h; path = "../runtime/Debug.h"; sourceTree = "<group>"; };
@@ -173,6 +186,13 @@
 			children = (
 				201EE94DC01106B98E56A367 /* Arm64Darwin.cpp */,
 				343C1B79389BBF31FEC696F5 /* Arm64Darwin.h */,
+				014B716F8D60978411FBC05E /* CodeView.cpp */,
+				B0E72217517AEE1C4F7940D4 /* CodeView.h */,
+				76C590DE0F8A42DDA636E0B6 /* CodeViewTypes.cpp */,
+				CC53A700A44C79EF8CB09390 /* CodeViewTypes.h */,
+				E13368824B3C984CFCD45978 /* DebugInfo.h */,
+				44939D11634EA517FF5020E4 /* Dwarf.cpp */,
+				4385E0CD8761F0F11B0131BB /* Dwarf.h */,
 				FCA2B1EFFA4B55526B28A73C /* Emitter.cpp */,
 				1A787A1C525B513D6D9F94F5 /* Emitter.h */,
 				64C9E73E720778ED2E4DC4BA /* Ins.h */,
@@ -184,6 +204,8 @@
 				1A090AFCE8174A1DE49C9C54 /* Tms6747.h */,
 				B5B92A5AFCA2D7DCBF26819A /* X86_64.cpp */,
 				2FC033177BFAE261B2569086 /* X86_64.h */,
+				A2870F2CF8D440CB023E5ED3 /* X86_64Coff.cpp */,
+				9C13A92EFCB330825B78EAC0 /* X86_64Coff.h */,
 				334CD99BDE8B6A591C8500E5 /* X86_64Linux.cpp */,
 				12A5F71977D26CEE2AF1E2A4 /* X86_64Linux.h */,
 				80025E52DA32488A2EF7539F /* X86_64Windows.cpp */,
@@ -315,6 +337,10 @@
 				5F3CCC9B419809ED11F52685 /* Emitter.cpp in Sources */,
 				E449C770B3AB69E828AA4C23 /* Spelling.cpp in Sources */,
 				A0C9FD398B419557406F5AFF /* Optimize.cpp in Sources */,
+				9B580F5362355E1FE8EE1106 /* Dwarf.cpp in Sources */,
+				3B9E54C39B30AE1A7AB99ABB /* CodeView.cpp in Sources */,
+				C7C6D37DF6C822FC78E0DD54 /* CodeViewTypes.cpp in Sources */,
+				07BC557E7D0AF41C0D48874A /* X86_64Coff.cpp in Sources */,
 				CEA9F161EB296A691B9FAD8F /* Arm64Darwin.cpp in Sources */,
 				7256C8F8CFCE9811BEB3DD95 /* X86_64.cpp in Sources */,
 				DEA45A10FA3892FD4AE58700 /* X86_64Linux.cpp in Sources */,
