@@ -1,10 +1,15 @@
 #include "Arm64Darwin.h"
 
+#include "Dwarf.h"
+
 namespace shalimar {
 
 void Arm64DarwinEmitter::beginModule(const std::string &sourceName) {
     raw("// " + sourceName);
     raw("\t.section\t__TEXT,__text,regular,pure_instructions");
+    // -g: the files by unit, numbered from 1 as .loc wants them; the line program is the assembler's.
+    for (size_t i = 0; i < files_.size(); ++i)
+        raw("\t.file\t" + std::to_string(i + 1) + " \"" + files_[i] + "\"");
 }
 
 void Arm64DarwinEmitter::endModule() {
@@ -13,7 +18,32 @@ void Arm64DarwinEmitter::endModule() {
         raw("\t.section\t__TEXT,__const");
         text_ += data_;
     }
+    if (debugInfo()) {
+        blank();
+        writeDwarf(text_, kMachODwarf, files_.empty() ? std::string() : files_[0], compDir_,
+                   debugFunctions_, debugGlobals_, "shm_globals");
+    }
     blank();
+}
+
+void Arm64DarwinEmitter::sourceLine(int unit, int line) {
+    if (!debugInfo()) return;
+    raw("\t.loc\t" + std::to_string(unit + 1) + " " + std::to_string(line) + " 0");
+}
+
+// The function's first address and its own line go before the prologue, which is inserted at the
+// mark when the frame is known; .cfi_startproc opens the unwind data the prologue then describes.
+void Arm64DarwinEmitter::describeFunction(const DebugFunction &function) {
+    if (!debugInfo()) return;
+    DebugFunction d = function;
+    d.begin = "Lfunc.begin." + d.symbol;
+    d.end = "Lfunc.end." + d.symbol;
+    raw(d.begin + ":");
+    if (d.line > 0) raw("\t.loc\t" + std::to_string(d.unit + 1) + " " + std::to_string(d.line) + " 0");
+    raw("\t.cfi_startproc");
+    prologueMark_ = text_.size();
+    debugFunctions_.push_back(d);
+    describing_ = true;
 }
 
 void Arm64DarwinEmitter::scratchConstant(uint64_t value) {
@@ -72,6 +102,13 @@ void Arm64DarwinEmitter::endFunction(int slots) {
     adjustStack("add", frameBytes_);
     instruction("ldp\tx29, x30, [sp], #" + std::to_string(frameRecordBytes));
     instruction("ret");
+    if (describing()) {
+        // Slot k is at sp + 8k, and sp is x29 less the frame: the frame base is x29.
+        DebugFunction &d = debugFunctions_.back();
+        d.slotBias = -frameBytes_;
+        raw(d.end + ":");
+        raw("\t.cfi_endproc");
+    }
 
     const size_t bodyMark = text_.size();
     adjustStack("sub", frameBytes_);
@@ -81,8 +118,10 @@ void Arm64DarwinEmitter::endFunction(int slots) {
     std::string prologue;
     prologue += "\tstp\tx29, x30, [sp, #-" + std::to_string(frameRecordBytes) + "]!\n";
     prologue += "\tmov\tx29, sp\n";
+    if (describing()) prologue += "\t.cfi_def_cfa\tw29, 16\n\t.cfi_offset\tw30, -8\n\t.cfi_offset\tw29, -16\n";
     prologue += reservation;
     text_.insert(prologueMark_, prologue);
+    describing_ = false;
 }
 
 void Arm64DarwinEmitter::materialise(const std::string &reg, uint64_t bits, bool wide) {

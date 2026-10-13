@@ -5,6 +5,7 @@ shc.exe
 *.s
 *.asm
 tests/out/
+tests/out-*/
 .DS_Store
 
 # Xcode's per-user state, which is not the project
@@ -22,3 +23,4 @@ examples/*/prog.exe
 ide/x64/
 ide/build/
 *.vcxproj.user
+shalimar.exe

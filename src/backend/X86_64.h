@@ -125,6 +125,10 @@ protected:
     void emitEpilogue(int slots);
     int frameBytesFor(int slots) const;
 
+    // -g on a target whose assembler takes .cfi_*: the frame's unwind data, which is what lets a
+    // debugger walk the stack and which the MASM spelling has no words for.
+    virtual bool writesCfi() const { return false; }
+
     size_t prologueMark_ = 0;
 
     void noteExternal(const std::string &name) override;

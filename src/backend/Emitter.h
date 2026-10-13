@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "DebugInfo.h"
+
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -68,6 +70,27 @@ public:
 
     virtual void jumpIfZero(int id) = 0;
 
+    // **-g: what a debugger is told, and it changes no instruction.** The source files by unit,
+    // and the directory they were named from; until this is called nothing below emits a byte.
+    void setDebugInfo(const std::vector<std::string> &files, const std::string &compDir) {
+        debugInfo_ = true;
+        files_ = files;
+        compDir_ = compDir;
+    }
+    bool debugInfo() const { return debugInfo_; }
+    // Inside a function describeFunction opened: the one whose frame the unwind data describes.
+    bool describing() const { return describing_; }
+
+    // The position of the statement about to be generated, before its first instruction.
+    virtual void sourceLine(int, int) {}
+    // After beginFunction: the names, types and slots a debugger sees in this function.
+    virtual void describeFunction(const DebugFunction &) {}
+    // Once, before the functions: the globals by name, type and slot.
+    virtual void describeGlobals(const std::vector<DebugGlobal> &) {}
+    // A nested block's first instruction, and the point after its last - the lexical blocks a name hides inside.
+    virtual void beginBlock(int) {}
+    virtual void endBlock(int) {}
+
     void setLine(int unit, int line) {
         loadIntConstant(line);
         setArg(Slot::Int, 1);
@@ -91,6 +114,13 @@ protected:
     std::string data_;
 
     std::string text_;
+
+    bool debugInfo_ = false;
+    bool describing_ = false;
+    std::vector<std::string> files_;
+    std::string compDir_;
+    std::vector<DebugFunction> debugFunctions_;
+    std::vector<DebugGlobal> debugGlobals_;
 };
 
 }

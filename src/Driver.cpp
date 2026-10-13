@@ -62,6 +62,8 @@ void Driver::usage() const {
         "                     repeatable, linked in the order given\n"
         "  --no-search        do not look in the other files beside this one\n"
         "  --version          say which shc this is, and stop\n"
+        "  -g                 write debug information, so lldb, gdb or cdb can stop on\n"
+        "                     a line and show the variables; nothing else changes\n"
         "  --debug            link the runtime a debugger can stop, which\n"
         "                     changes nothing about what is compiled\n"
         "\n"
@@ -361,6 +363,8 @@ bool Driver::parseArguments(const std::vector<std::string> &arguments) {
             optimize_ = 2;
         } else if (a == "--debug") {
             debug_ = true;
+        } else if (a == "-g") {
+            debugInfo_ = true;
         } else if (a == "--version") {
             std::cout << bannerLine() << "\n";
             answered_ = true;
@@ -552,6 +556,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
 
     std::unique_ptr<Emitter> emitter = target->newEmitter();
     emitter->setOptimize(optimize_);
+    if (debugInfo_) emitter->setDebugInfo(files, workingDirectory());
     CodeGen generator(*emitter);
     generator.run(*program, input_, names);
 
@@ -627,12 +632,15 @@ int Driver::run(const std::vector<std::string> &arguments) {
     return 0;
 #else
     std::string command;
+    // -g on the link line too: on a Mac that is what makes clang run dsymutil, so the debug
+    // information outlives the object the driver assembled and discarded.
+    const std::string gnuDebug = debugInfo_ ? " -g" : "";
     if (objectOnly_) {
-        command = "c++ -c -o " + shellQuote(named ? output_ : output_ + ".o") + " " +
+        command = "c++" + gnuDebug + " -c -o " + shellQuote(named ? output_ : output_ + ".o") + " " +
                   shellQuote(assemblyPath);
     } else {
         // **-lm, named rather than relied upon:** a borrowed `sin` is a direct call to libm, which older glibc does not link without it - docs/FOREIGN.md.
-        command = "c++ -o " + shellQuote(output_) + " " + shellQuote(assemblyPath);
+        command = "c++" + gnuDebug + " -o " + shellQuote(output_) + " " + shellQuote(assemblyPath);
         // Before the runtime, because a library may call into it and a linker
         // reads left to right.
         for (std::size_t i = 0; i < libraries_.size(); ++i)
@@ -644,6 +652,18 @@ int Driver::run(const std::vector<std::string> &arguments) {
     std::remove(assemblyPath.c_str());
     if (status == 0) produced_.push_back(objectOnly_ && !named ? output_ + ".o" : output_);
     return status == 0 ? 0 : 2;
+#endif
+}
+
+// The directory a debugger resolves the source names against - DW_AT_comp_dir.
+std::string Driver::workingDirectory() {
+#ifdef _WIN32
+    char buffer[MAX_PATH];
+    const DWORD n = GetCurrentDirectoryA(sizeof buffer, buffer);
+    return n > 0 && n < sizeof buffer ? std::string(buffer) : std::string();
+#else
+    char buffer[PATH_MAX];
+    return getcwd(buffer, sizeof buffer) != nullptr ? std::string(buffer) : std::string();
 #endif
 }
 

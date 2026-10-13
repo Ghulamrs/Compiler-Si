@@ -610,6 +610,9 @@ public:
 
     int addHiddenSlot() { return frame_.addVariable(); }
 
+    // Every named slot - the parameters first, in order, then what the body declared or made - which is what -g describes to a debugger.
+    const std::vector<std::unique_ptr<Symbol>> &symbols() const { return symbols_; }
+
     int outPointerBase() const { return outPointerBase_; }
     void setOutPointerBase(int base) { outPointerBase_ = base; }
 
@@ -689,6 +692,10 @@ public:
     int addGlobalSlot() { return globalSlots_++; }
     int globalSlots() const { return globalSlots_; }
 
+    // The globals by name, type and slot, in the order made - for -g, which names each one at shm_globals + 8*slot.
+    void addGlobalSymbol(const Symbol *symbol) { globalSymbols_.push_back(symbol); }
+    const std::vector<const Symbol *> &globalSymbols() const { return globalSymbols_; }
+
     Function &initializer() { return initializer_; }
 
 private:
@@ -698,6 +705,7 @@ private:
     std::vector<Borrowed> borrowed_;
     std::vector<Prototype> foreign_;
     int globalSlots_ = 0;
+    std::vector<const Symbol *> globalSymbols_;
     Function initializer_{Prototype(), Block()};
 };
 

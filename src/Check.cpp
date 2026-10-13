@@ -62,6 +62,7 @@ Symbol *Checker::declareName(const std::string &name, const Type *type) {
     if (!inGlobalScope_) return function_->declare(name, type);
     Symbol *symbol = new Symbol(name, type, program_->addGlobalSlot(), Symbol::Storage::Global);
     globals_[name] = symbol;
+    program_->addGlobalSymbol(symbol);
     laterGlobals_.erase(name);
     return symbol;
 }

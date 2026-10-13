@@ -21,6 +21,17 @@ void CodeGen::run(Program &program, const std::string &sourceName,
     emitter_.beginModule(sourceName);
     emitter_.defineGlobals(program.globalSlots());
     units_ = units;
+    if (emitter_.debugInfo()) {
+        std::vector<DebugGlobal> globals;
+        for (const Symbol *symbol : program.globalSymbols()) {
+            DebugGlobal g;
+            g.name = symbol->name();
+            g.type = symbol->type();
+            g.slot = symbol->slot();
+            globals.push_back(g);
+        }
+        emitter_.describeGlobals(globals);
+    }
 
     std::set<int> named;
     for (std::unique_ptr<Function> &f : program.functions()) {
@@ -94,6 +105,7 @@ void CodeGen::generate(Function &function) {
     exitLabel_ = newLabel();
 
     emitter_.beginFunction(mangle(proto.name));
+    if (emitter_.debugInfo()) describe(function);
 
     const std::vector<Place> places = planArguments(proto);
     for (int pass = 0; pass < 2; ++pass) {
@@ -177,8 +189,33 @@ std::vector<CodeGen::Place> CodeGen::planArguments(const Prototype &proto) const
     return places;
 }
 
+// **-g: the function as a debugger sees it** - its name and line, its result, and every named slot:
+// the parameters first, in order, a by-reference one marked as holding an address, then what the
+// body declared or made by a first assignment. The hidden slots have no name and are not here.
+void CodeGen::describe(const Function &function) {
+    const Prototype &proto = function.proto();
+    DebugFunction d;
+    d.name = proto.name.empty() ? mangle(proto.name) : proto.name;
+    d.symbol = mangle(proto.name);
+    d.unit = proto.unit;
+    d.line = proto.line;
+    d.returns = proto.outputs.size() == 1 ? proto.outputs[0] : nullptr;
+    const std::vector<std::unique_ptr<Symbol>> &symbols = function.symbols();
+    for (size_t i = 0; i < symbols.size(); ++i) {
+        DebugLocal l;
+        l.name = symbols[i]->name();
+        l.type = symbols[i]->type();
+        l.slot = symbols[i]->slot();
+        l.isParam = i < proto.inputs.size();
+        l.indirect = symbols[i]->isReference();
+        d.locals.push_back(l);
+    }
+    emitter_.describeFunction(d);
+}
+
 void CodeGen::generate(Stmt &statement) {
 
+    emitter_.sourceLine(statement.unit(), statement.line());
     emitter_.setLine(statement.unit(), statement.line());
     statement.accept(*this);
 }
