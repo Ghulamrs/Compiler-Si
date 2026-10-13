@@ -42,6 +42,8 @@ make                      build shc and the host runtime
 ./tests/record.sh         re-record expected output from the app's interpreter
 ./tests/cross.sh          finding the rest of the program in the other files
 ./tests/debug.sh          stopping a program from inside itself
+./tests/m10.sh            the host's debugger on a -g build, beside the C compiler's (D1-D3)
+./tests/m10-tms6747.sh    vm6747 --debug and sim6747 --run --debug, beside cpp11's (D5)
 ./tests/linking.sh        what an object holds, and why it is a whole program
 ./tests/build-windows.sh  build shc itself on the Windows box, with cl
 ```
@@ -332,6 +334,57 @@ and for cl's alike - two `i`s in nested scopes are more than cdb's expression
 reader resolves - while `dv /t` lists both with their values and the S_BLOCK32
 is what cl writes too. Recorded as agreement, since it is, and not claimed as
 a value shown.
+
+## Rung D5: the C6747 - `.dwpsn`, vm6747 --debug and sim6747 --run --debug, 2026-10-13
+
+**`shalimar -g --target=tms6747` writes cl6x's `.dwpsn` before each statement,
+as cpp11 1.8 does, and a Shalimar program stops on a line, steps and walks
+its stack under `vm6747 --debug` on the assembly and under `sim6747 --run
+--debug` on the linked image.** The oracle is the only one the C6747 has:
+cpp11 -g's build of the same program written in C++ (`w1.c` with `printf`
+given C linkage - cpp11 compiles no C), under the same two debuggers.
+`tests/m10-tms6747.sh`, on the Mac: **vm6747 8 agree, 0 differ; sim6747 8
+agree, 0 differ** - a breakpoint on line 9, `bt`, a step over, a step into
+`twice` landing on its first statement, the two frames, `finish` back to
+line 10, and the end. The image is linked by asm6x 1.3 and lnk6x 1.2, which
+turn the `.dwpsn` into a `.debug_line` and carry it (their work of the same
+day), against TI's `rts6740_elf_eh.lib`; shc's own driver links it, given
+`SHALIMAR_AS`, `SHALIMAR_LD` and `SHALIMAR_TILIB`, so the `.out` is what a
+Shalimar build on this target makes.
+
+**What was written is small, as the review said it would be.**
+`Tms6747Emitter::sourceLine` writes `.dwpsn file "f",line N,column 0,is_stmt,
+isa 0` before the statement, and `describeFunction` the function's own line
+before the prologue, where cl6x and cpp11 put the entry's position - vm6747
+steps over it into the first statement, and with it *after* the prologue a
+step into `twice` stopped on line 1 instead of 2. No types, no locations and
+no frames are described, because the C6747 path carries none: `info locals`
+answers "No symbol table info available" for a Shalimar program and for
+cpp11's alike, and nothing is fabricated.
+
+**One spelling, under `-g` only.** vm6747's debug shell takes any label as a
+function unless it begins `$`, `.`, `L$` or `L.`, and this emitter's `Lshm<n>`
+and `Lshmr<n>` read as functions - the stack was `Lshmr9` over `Lshmr8` over
+`Lshmr7`, and a `next` thought it had entered one. Under `-g` the labels are
+`L$shm<n>`, `L$shmb<n>` and `L$shmr<n>`, which is how c90 and cpp11 spell
+theirs; without `-g` nothing moves and the emit golden reads 0 of 248 at `-O0`
+and `-O2`. Making the `L$` spelling unconditional is the tidier design and a
+one-line change that moves 62 golden files; left for the parent to decide.
+
+**The suites, on the three boxes, at the close.** Mac: `make test` 94/0,
+`tests/debug.sh` 19/0, `tests/tms6747.sh` 94/0, `tests/m10.sh` 3/0 (lldb),
+`tests/m10-tms6747.sh` 2/0. Linux box (g++ 11): 94/0, 19/0, gdb 13/0, 35/0,
+19/0. Windows box (cl): `build.bat` builds, cdb 15/0, 37/0, 19/0, and the
+MASM case suite `tests/remote-windows.sh` 58/0 with 36 diagnostic-only cases
+not sent - the Release path untouched. Nothing in VM6747, SIM6747, ASM6x or
+LNK6x was changed for this rung and nothing needed to be.
+
+**The suites a debugger rung runs**, beside the four above:
+`tests/m10.sh` (the host's debugger against clang's or gcc's C),
+`tests/windows/m10.cmd` (cdb against cl's, on the box, after `build.bat`),
+`tests/m10-tms6747.sh` (vm6747 and sim6747 against cpp11's), and the emit
+golden - every program for every target without `-g`, recorded before a rung
+and diffed after it, which is the claim "-g changes no code" made checkable.
 
 ## How this is built
 

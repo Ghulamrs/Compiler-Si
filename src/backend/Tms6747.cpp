@@ -35,6 +35,19 @@ void Tms6747Emitter::endModule() {
     blank();
 }
 
+void Tms6747Emitter::sourceLine(int unit, int line) {
+    if (!debugInfo() || unit < 0 || static_cast<size_t>(unit) >= files_.size()) return;
+    raw("\t.dwpsn\tfile \"" + files_[static_cast<size_t>(unit)] + "\",line " + std::to_string(line) +
+        ",column 0,is_stmt,isa 0");
+}
+
+// The function's own line, as cl6x's first .dwpsn names it; the frame and the slots are not described.
+void Tms6747Emitter::describeFunction(const DebugFunction &function) {
+    if (!debugInfo() || function.line <= 0) return;
+    sourceLine(function.unit, function.line);
+    prologueMark_ = text_.size();   // the entry's position goes before the prologue, as cl6x and cpp11 place it
+}
+
 void Tms6747Emitter::constant(const std::string &reg, int32_t value) {
     instruction("MVKL\t" + std::to_string(value) + ", " + reg);
     instruction("MVKH\t" + std::to_string(value) + ", " + reg);
@@ -72,8 +85,9 @@ void Tms6747Emitter::storeAt(Slot kind, const std::string &addrReg, const std::s
     else                   instruction("STDW\t" + pairOf(reg) + ", *" + addrReg);
 }
 
-std::string Tms6747Emitter::labelName(int id) { return "Lshm" + std::to_string(id); }
-std::string Tms6747Emitter::bytesLabel(int id) { return "Lshmb" + std::to_string(id); }
+std::string Tms6747Emitter::labelName(int id) const { return (debugInfo() ? "L$shm" : "Lshm") + std::to_string(id); }
+std::string Tms6747Emitter::bytesLabel(int id) const { return (debugInfo() ? "L$shmb" : "Lshmb") + std::to_string(id); }
+std::string Tms6747Emitter::returnLabel(int id) const { return (debugInfo() ? "L$shmr" : "Lshmr") + std::to_string(id); }
 
 void Tms6747Emitter::beginFunction(const std::string &name) {
     blank();
@@ -231,7 +245,7 @@ void Tms6747Emitter::spillOverflowArgument(Slot kind, int index, int slot) {
 }
 
 void Tms6747Emitter::call(const std::string &name) {
-    const std::string back = "Lshmr" + std::to_string(returns_++);
+    const std::string back = returnLabel(returns_++);
     instruction("MVKL\t" + back + ", B3");
     instruction("MVKH\t" + back + ", B3");
     instruction("B\t" + symbol(name));

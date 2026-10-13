@@ -1,0 +1,10 @@
+# D5, the C6747: a breakpoint on a line, the stack, a step over, a step in and out. Lines and
+# frames only - the C6747 path carries no types or locations, so no variable is asked for.
+break @:9
+run
+bt
+next
+step
+bt
+finish
+continue

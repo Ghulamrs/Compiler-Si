@@ -26,7 +26,7 @@ OUT=tests/out-m10
 mkdir -p "$OUT"
 HERE="$(pwd)"
 names="$*"
-[ -n "$names" ] || names=$(cd tests/m10 && ls *.script | sed 's/\.script$//')
+[ -n "$names" ] || names=$(cd tests/m10 && ls *.script | grep -v '\.c6x\.' | sed 's/\.script$//')
 
 pass=0
 fail=0

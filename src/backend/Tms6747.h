@@ -56,6 +56,13 @@ public:
     void jump(int id) override;
     void jumpIfZero(int id) override;
 
+    // -g: the statement's source position as cl6x spells it, `.dwpsn file "f",line N,column 0,is_stmt,isa 0`,
+    // which cpp11 -g writes too (its CLAUDE.md, Version 1.8): vm6747 --debug stops on it, asm6x 1.3 turns it
+    // into a .debug_line and lnk6x 1.2 carries that into the image for sim6747 --run --debug. No
+    // types and no locations: that is what the C6747 path supports today, and nothing is fabricated.
+    void sourceLine(int unit, int line) override;
+    void describeFunction(const DebugFunction &function) override;
+
 private:
     size_t prologueMark_ = 0;
     int returns_ = 0;
@@ -83,8 +90,12 @@ private:
     static std::string argRegister(int index);
     static std::string pairOf(const std::string &reg);
 
-    static std::string labelName(int id);
-    static std::string bytesLabel(int id);
+    // `Lshm<n>` - and under -g `L$shm<n>`, which is what vm6747 --debug reads as a compiler's own label
+    // (a name beginning `$`, `.`, `L$` or `L.`) rather than as a function of the program, as c90 and cpp11
+    // spell theirs. Without -g nothing moves: the suite's golden holds `Lshm`.
+    std::string labelName(int id) const;
+    std::string bytesLabel(int id) const;
+    std::string returnLabel(int id) const;
 };
 
 }

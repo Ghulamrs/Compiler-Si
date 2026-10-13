@@ -2,8 +2,14 @@
 """The debuggers, measured: a Shalimar program under lldb, gdb or cdb beside clang's or cl's
 build of the same program written in C, line for line, and the two sessions compared.
 
-    m10.py run     --debugger lldb|gdb|cdb PROGRAM SOURCE SCRIPT                 one session
-    m10.py compare --debugger lldb|gdb|cdb OURS SOURCE THEIRS SOURCE SCRIPT      both, and the difference
+    m10.py run     --debugger lldb|gdb|cdb|vm6747|sim6747 PROGRAM SOURCE SCRIPT            one session
+    m10.py compare --debugger ... OURS SOURCE THEIRS SOURCE SCRIPT                          both, and the difference
+
+vm6747 and sim6747 are the C6747's: `vm6747 --debug` on the assembly and `sim6747 --run --debug`
+on the linked image, each speaking gdb's words over stdin and stdout (D5). PROGRAM may then be
+several files, space-separated - the Shalimar assembly and its runtime directory - and M10_VM6747
+and M10_SIM6747 name the two programs where they are not beside the tree. A function is named
+there by its label, so `shm_user_main`, `shmf_twice` and `_Z5twicei` all read as the source's.
 
 SCRIPT is one command a line, in a vocabulary the three debuggers share; `@` in a breakpoint is
 the program's own source file, so one script serves the Shalimar program and the C one:
@@ -288,6 +294,86 @@ def cdb_session(program, script, marker):
     return d.raw, blocks
 
 
+def c6x_program(debugger):
+    env = os.environ.get("M10_VM6747" if debugger == "vm6747" else "M10_SIM6747")
+    if env:
+        return env
+    here = os.path.dirname(os.path.abspath(__file__))
+    ti = os.path.join(here, "..", "..", "..", "..", "TI")
+    beside = (os.path.join(ti, "VM6747", "vm6747.exe") if debugger == "vm6747"
+              else os.path.join(ti, "SIM6747", "sim6747.exe"))
+    return beside if os.path.exists(beside) else debugger
+
+
+def c6x_commands(script):
+    """gdb's words, as VM6747's and SIM6747's debug shells speak them: a `backtrace` after every
+    move says where it stopped, since the shells print no prompt to synchronise on."""
+    out = []
+    for line in script:
+        words = line.split()
+        if not words:
+            continue
+        c = words[0]
+        if c == "break":
+            out.append("break " + words[1])
+        elif c in ("run", "next", "step", "finish", "continue"):
+            out.append(c)
+            out.append("backtrace")
+        elif c == "up":
+            out.append("frame 1")
+        elif c == "down":
+            out.append("frame 0")
+        elif c == "bt":
+            out.append("backtrace")
+        elif c == "vars":
+            out.append("info locals")
+        elif c == "print":
+            out.append("print " + line[len("print"):].strip())
+        elif c == "set":
+            out.append("set variable " + line[len("set"):].strip())
+        else:
+            raise SystemExit("m10: unknown command " + line)
+    return out
+
+
+def c6x_session(debugger, program, script, marker):
+    cmds = c6x_commands(script)
+    files = program.split()
+    if debugger == "vm6747":
+        args = [c6x_program(debugger), "--debug"] + files
+    else:
+        args = [c6x_program(debugger), "--run", "--debug"] + files
+    text = ""
+    for c in cmds:
+        text += "echo %s %s\\n\n%s\n" % (marker, c, c)
+    text += "quit\n"
+    p = subprocess.run(args, input=text.encode("utf-8"), stdout=subprocess.PIPE,
+                       stderr=subprocess.STDOUT, timeout=300)
+    raw = p.stdout.decode("utf-8", "replace")
+    blocks = []
+    current = None
+    for line in raw.splitlines():
+        if marker in line:
+            current = [line.split(marker, 1)[1].strip(), []]
+            blocks.append(current)
+        elif current is not None:
+            current[1].append(line)
+    return raw, blocks
+
+
+# A function on the C6747 is named by its label: the program's main is `shm_user_main`, a Shalimar
+# function `shmf_<name>`, and cpp11's C++ counterpart is mangled - each reads as the source's name.
+def c6xName(name):
+    if name == "shm_user_main":
+        return "main"
+    if name.startswith("shmf_"):
+        return name[5:]
+    m = re.match(r"^_Z(\d+)(.*)$", name)
+    if m:
+        return m.group(2)[:int(m.group(1))]
+    return name
+
+
 def run_session(debugger, program, source, script, which=0):
     labels = {}
     chosen = []
@@ -313,6 +399,9 @@ def run_session(debugger, program, source, script, which=0):
         args += ["-ex", "kill", "--args", program]
     elif debugger == "cdb":
         raw, blocks = cdb_session(program, script, marker)
+        return raw, blocks, labels
+    elif debugger in ("vm6747", "sim6747"):
+        raw, blocks = c6x_session(debugger, program, script, marker)
         return raw, blocks, labels
     else:
         raise SystemExit("m10: no such debugger " + debugger)
@@ -390,6 +479,39 @@ def normalise(debugger, blocks, labels=None):
                 out.append("print %s = %s" % (labels.get(expr, expr), number(m.group(1)) if m else "<error>"))
             elif "exited with status" in text:
                 out.append("exited")
+        elif debugger in ("vm6747", "sim6747"):
+            if command == "backtrace":
+                frames = []
+                for line in lines:
+                    if not line.startswith("#"):
+                        continue
+                    m = FRAME_GDB.search(line)
+                    if not m:
+                        break
+                    frames.append((c6xName(m.group(2)), stem(m.group(3)), m.group(4)))
+                    if frames[-1][0] == "main":
+                        break
+                # After a move the first frame is the stop; asked for as `bt` it is the whole walk.
+                if frames and getattr(normalise, "lastWasMove", False):
+                    out.append("stop %s:%s %s" % (frames[0][1], frames[0][2], frames[0][0]))
+                elif not frames and getattr(normalise, "lastWasMove", False):
+                    out.append("exited" if getattr(normalise, "lastExited", False) else "stop <no source>")
+                else:
+                    for n, f in enumerate(frames):
+                        out.append("frame %d %s %s:%s" % (n, f[0], f[1], f[2]))
+                normalise.lastWasMove = False
+            elif command in ("run", "next", "step", "finish", "continue"):
+                normalise.lastWasMove = True
+                normalise.lastExited = "exited" in text
+            elif command == "info locals":
+                for line in lines:
+                    m = re.match(r"^(\S+) = (.*)$", line)
+                    if m:
+                        out.append("var %s = %s" % (m.group(1), number(m.group(2))))
+            elif word == "print":
+                expr = command[len("print"):].strip()
+                m = re.search(r"\$\d+ = (.*)$", text)
+                out.append("print %s = %s" % (labels.get(expr, expr), number(m.group(1)) if m else "<error>"))
         elif debugger == "gdb":
             if command == "frame":
                 m = FRAME_GDB.search(text)
