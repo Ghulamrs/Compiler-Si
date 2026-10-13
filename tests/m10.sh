@@ -36,7 +36,7 @@ for w in $names; do
     cp "$src" "$OUT/$w.shl"
     cp "tests/m10/$w.c" "$OUT/$w.c"
     # Built from inside the output directory, so the source names the debugger resolves are plain.
-    (cd "$OUT" && "$SHC" -nologo -g "$w.shl" -o "$w" >/dev/null 2>&1 && "$CC" -g -O0 -o "${w}c" "$w.c") || {
+    (cd "$OUT" && "$SHC" -nologo -g --no-search "$w.shl" -o "$w" >/dev/null 2>&1 && "$CC" -g -O0 -o "${w}c" "$w.c") || {
         echo "FAIL $w (did not build)"; fail=$((fail+1)); continue; }
     if (cd "$OUT" && python3 "$HERE/tests/m10/m10.py" compare --debugger $DEBUGGER \
             "./$w" "$w.shl" "./${w}c" "$w.c" "$HERE/tests/m10/$w.script" > "$w.m10" 2>&1); then

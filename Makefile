@@ -53,6 +53,9 @@ SOURCES := \
   src/backend/Spelling.cpp \
   src/backend/Optimize.cpp \
   src/backend/Dwarf.cpp \
+  src/backend/CodeView.cpp \
+  src/backend/CodeViewTypes.cpp \
+  src/backend/X86_64Coff.cpp \
   src/backend/Arm64Darwin.cpp \
   src/backend/X86_64.cpp \
   src/backend/X86_64Linux.cpp \

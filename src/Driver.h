@@ -41,6 +41,7 @@ private:
     // -g: debug information for the debuggers RIDE drives. It adds sections and changes no code.
     bool debugInfo_ = false;
     static std::string workingDirectory();
+    static std::string windowsClang();
     // -O0, -O1 or -O2: how hard the emitter optimizes what it writes.
     int optimize_ = 0;
 

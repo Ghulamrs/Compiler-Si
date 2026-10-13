@@ -554,7 +554,7 @@ int Driver::run(const std::vector<std::string> &arguments) {
         return 1;
     }
 
-    std::unique_ptr<Emitter> emitter = target->newEmitter();
+    std::unique_ptr<Emitter> emitter = debugInfo_ ? target->newDebugEmitter() : target->newEmitter();
     emitter->setOptimize(optimize_);
     if (debugInfo_) emitter->setDebugInfo(files, workingDirectory());
     CodeGen generator(*emitter);
@@ -572,7 +572,8 @@ int Driver::run(const std::vector<std::string> &arguments) {
     }
 
     const std::string assemblyPath =
-        assemblyOnly_ ? output_ : output_ + target->assemblyExtension();
+        assemblyOnly_ ? output_ : output_ + (debugInfo_ ? target->debugAssemblyExtension()
+                                                        : target->assemblyExtension());
     if (!writeFile(assemblyPath, emitter->text())) {
         std::cerr << program::kName << ": cannot write " << assemblyPath << "\n";
         return 2;
@@ -601,6 +602,21 @@ int Driver::run(const std::vector<std::string> &arguments) {
     const std::string assembler = (as != nullptr && as[0] != '\0') ? shellQuote(as) : "ml64";
     std::string command = assembler + " /nologo /c /Fo" + shellQuote(objectPath) + " " +
                           shellQuote(assemblyPath);
+    // **-g is the GNU spelling, and clang assembles it** - the road cpp11 took: MASM has no words
+    // for a line table, and clang's COFF assembler writes the CodeView that link.exe /DEBUG makes a PDB of.
+    if (debugInfo_) {
+        const std::string clang = windowsClang();
+        if (clang.empty()) {
+            std::cerr << program::kName << ": -g on this target needs clang to assemble the debug information,\n"
+                         "     and none was found - Visual Studio's 'C++ Clang tools' component, LLVM under\n"
+                         "     Program Files, or clang.exe on the PATH; " << program::env("CLANG")
+                      << " names one\n";
+            std::remove(assemblyPath.c_str());
+            return 2;
+        }
+        command = shellQuote(clang) + " -target x86_64-pc-windows-msvc -c -x assembler -o " +
+                  shellQuote(objectPath) + " " + shellQuote(assemblyPath);
+    }
     int status = shell(command);
     if (status != 0) {
         std::cerr << program::kName << ": the assembler failed - the command was:\n  " << command << "\n";
@@ -615,8 +631,10 @@ int Driver::run(const std::vector<std::string> &arguments) {
     // command line - the project's own does - else Microsoft's.
     const char *ld = std::getenv(program::env("LD").c_str());
     const std::string linker = (ld != nullptr && ld[0] != '\0') ? shellQuote(ld) : "link";
-    command = linker + " /nologo /subsystem:console /out:" + shellQuote(output_) + " " +
-              shellQuote(objectPath);
+    // /debug makes the PDB cdb reads; /incremental:no with it, or every call goes through an
+    // ILT thunk the linker adds and a debugger stepping into a runtime call lands in the thunk.
+    command = linker + " /nologo /subsystem:console" + (debugInfo_ ? " /debug /incremental:no" : "") +
+              " /out:" + shellQuote(output_) + " " + shellQuote(objectPath);
     for (std::size_t i = 0; i < libraries_.size(); ++i)
         command += " " + shellQuote(libraries_[i]);
     command += " " + shellQuote(runtimeObject_);
@@ -652,6 +670,33 @@ int Driver::run(const std::vector<std::string> &arguments) {
     std::remove(assemblyPath.c_str());
     if (status == 0) produced_.push_back(objectOnly_ && !named ? output_ + ".o" : output_);
     return status == 0 ? 0 : 2;
+#endif
+}
+
+// **Wherever a clang is, on the Windows box**: SHALIMAR_CLANG, Visual Studio's own (the "C++ Clang
+// tools" component, in any edition), a standalone LLVM, then the PATH - cpp11's search, measured there.
+std::string Driver::windowsClang() {
+#ifdef _WIN32
+    const char *env = std::getenv(program::env("CLANG").c_str());
+    if (env != nullptr && env[0] != '\0') return env;
+    std::vector<std::string> tries;
+    const std::string llvm = "\\VC\\Tools\\Llvm\\x64\\bin\\clang.exe";
+    const char *vc = std::getenv("VCINSTALLDIR");
+    if (vc != nullptr && vc[0] != '\0') tries.push_back(std::string(vc) + "Tools\\Llvm\\x64\\bin\\clang.exe");
+    const char *pf = std::getenv("ProgramFiles");
+    if (pf != nullptr && pf[0] != '\0') {
+        static const char *const editions[] = {"Community", "Professional", "Enterprise", "BuildTools"};
+        for (const char *e : editions)
+            tries.push_back(std::string(pf) + "\\Microsoft Visual Studio\\2022\\" + e + llvm);
+        tries.push_back(std::string(pf) + "\\LLVM\\bin\\clang.exe");
+    }
+    char onPath[MAX_PATH];
+    if (SearchPathA(nullptr, "clang.exe", nullptr, MAX_PATH, onPath, nullptr) > 0) tries.push_back(onPath);
+    for (std::size_t i = 0; i < tries.size(); i++)
+        if (exists(tries[i])) return tries[i];
+    return std::string();
+#else
+    return "clang";
 #endif
 }
 

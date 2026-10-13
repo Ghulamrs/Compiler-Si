@@ -3,6 +3,7 @@
 #include "backend/Arm64Darwin.h"
 #include "backend/X86_64Linux.h"
 #include "backend/X86_64Windows.h"
+#include "backend/X86_64Coff.h"
 #include "backend/Tms6747.h"
 
 namespace shalimar {
@@ -31,6 +32,10 @@ public:
     std::unique_ptr<Emitter> newEmitter() const override {
         return std::unique_ptr<Emitter>(new X86_64WindowsEmitter());
     }
+    std::unique_ptr<Emitter> newDebugEmitter() const override {
+        return std::unique_ptr<Emitter>(new X86_64CoffEmitter());
+    }
+    std::string debugAssemblyExtension() const override { return ".s"; }
 };
 
 // The fourth target: nothing here assembles it, so shalimar stops at the text

@@ -1,4 +1,6 @@
 # D1: a breakpoint on a line, the stack, a step over, a step in and out, the frames walked.
+# After the step into `twice` only the parameter is read: lldb stops past the prologue on line 2
+# and cdb on the function's own line 1, so a local is not yet set under one of them.
 break @:9
 run
 bt
@@ -6,8 +8,7 @@ vars
 next
 step
 bt
-next
-vars
+print n
 up
 vars
 down

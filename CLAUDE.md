@@ -272,6 +272,67 @@ an outer one only when the outer one is made *later* in the function, which is
 what `w3` does with `t`, and a `for` counter always hides an `i` declared
 before it. Those are the two shapes, and both resolve as the contract asks.
 
+## Rung D4: x86_64-windows - the GNU spelling, clang's assembler, CodeView, cdb, 2026-10-13
+
+**`shalimar -g` on x86_64-windows writes the GNU spelling for clang's COFF
+assembler, with CodeView after the code, and cdb stops a Shalimar program on
+a line, steps it, walks its stack and reads its variables** - the road cpp11
+took on 2026-09-10 and in M10. Measured on the Windows box with `shc` built
+there by `cl` (`build.bat`), each program built by `shc -g` and its C
+counterpart by `cl /Zi /Od`, both under cdb through `tests/m10/m10.py`
+(`tests/windows/m10.cmd w1 w2 w3`): **w1 15 agree, 0 differ; w2 37 agree, 0
+differ; w3 19 agree, 0 differ.** The suites are unchanged - `make test` 94,
+`tests/debug.sh` 19, `tests/tms6747.sh` 94, `tests/m10.sh` 3/3 under lldb -
+and the emit golden reads 0 of 248 without `-g` at `-O0` and `-O2`: a Release
+build on Windows is the MASM it always was, byte for byte.
+
+**What was written.** `src/backend/X86_64Coff.cpp` is a third x86-64 emitter:
+the same instruction stream and the same Microsoft ABI as the MASM one,
+rendered by `GnuSpelling`, with COFF round it - `.text`, `.section
+.rdata,"dr"`, `.bss` with `.zero`, `.Lshm` labels - and, per described
+function, `.seh_proc`, `.seh_pushreg %rbp`, `.seh_setframe %rbp, 0`,
+`.seh_stackalloc`, `.seh_endprologue` and `.seh_endproc`, from which the
+assembler builds the `.pdata` and `.xdata` a stack walk needs; `.cv_file`
+per unit with an absolute path, `.cv_func_id` per function and `.cv_loc` per
+statement, once per run of a line. `X86_64Emitter::prologue` grew four hooks
+- `afterPush`, `afterSetFrame`, `afterAlloc`, `endPrologue` - which Linux
+fills with its `.cfi_*` and this with its `.seh_*`. `CodeView.cpp` and
+`CodeViewTypes.cpp` are cpp11's writers over `DebugInfo.h`: S_OBJNAME,
+S_COMPILE3 (C), per function S_GPROC32, S_FRAMEPROC and an S_REGREL32 off
+RBP per slot at `shadow + 8k - frame` (negative - RBP is taken before the
+allocation here), S_BLOCK32 per block, `.cv_linetable`; S_GDATA32 per global
+at `shm_globals + 8*slot`; the types with cl's own numbers - T_INT4,
+T_REAL64, T_UCHAR - and an array an LF_POINTER to an LF_STRUCTURE
+`{count, element, data}` named by the Shalimar type, a by-reference parameter
+an LF_POINTER in reference mode. `Target::newDebugEmitter` chooses the
+emitter under `-g`; the driver then assembles with clang (`SHALIMAR_CLANG`,
+Visual Studio's own, LLVM's, or the PATH - cpp11's search) and links with
+`link /debug /incremental:no`. `build.bat` lists the four new sources.
+
+**Three things cdb taught, each a line in the harness or the driver.**
+*`/incremental:no`.* `link /debug` links incrementally by default, and every
+call then goes through an ILT thunk - `w1!ILT+14790(shm_line)` - so a step
+into a Shalimar call landed in a thunk with no source; cl's counterpart is
+linked the same way in `m10.cmd`, for the same reason. *A step is not one
+`t`.* cdb's `t` enters any call, lines or none, and a Shalimar statement
+begins with `shm_line`; lldb and gdb step past a function they have no lines
+for. So the harness drives cdb a command at a time over its stdin (`??` takes
+the rest of a line, so a `-c` string cannot carry one), sets `.step_filter
+"*!shm_*;*!shm::*"` and `Sources.SkipCrtCode`, and repeats a step while it
+leaves the program on the same line further on - RIDE's own rule - and steps
+once more into a function it entered, since cdb stops on the callee's own
+line before its parameters are stored where lldb stops on its first
+statement; cpp11's M10 W5 made RIDE's F6 do the same. *A reference is shown
+as the pointer it holds.* `?? n` on the by-reference parameter prints `int *
+0x...`; `?? *n` prints the value, and the script's third spelling says so.
+
+**One difference the measurement keeps, and it is cdb's.** `?? i` and `?? t`
+inside `w3`'s loop answer `Ambiguous symbol error` for the Shalimar program
+and for cl's alike - two `i`s in nested scopes are more than cdb's expression
+reader resolves - while `dv /t` lists both with their values and the S_BLOCK32
+is what cl writes too. Recorded as agreement, since it is, and not claimed as
+a value shown.
+
 ## How this is built
 
 **One language feature at a time, green on all three targets before the

@@ -9,14 +9,16 @@ SCRIPT is one command a line, in a vocabulary the three debuggers share; `@` in 
 the program's own source file, so one script serves the Shalimar program and the C one:
 
     break @:LINE      run   next   step   finish   continue   up   down
+                      (a step is repeated while it stays on the same line, further on)
     bt                the frames that have a source position, innermost first
     vars              the parameters and locals of the frame, by name and value
     print EXPR        one expression
     set VAR = VALUE   write a variable (then `print` it: the write itself says nothing)
 
 Every stop is reported as `stop FILE:LINE FUNCTION` with the file's extension dropped, so a
-Shalimar program and the C program beside it read the same; a frame the debugger has no source
-for ends the backtrace, since what is above a program's main differs by runtime, not by compiler.
+Shalimar program and the C program beside it read the same; the backtrace ends at `main`, or at
+the first frame the debugger has no source for, since what is above a program's main differs by
+runtime, not by compiler.
 Written for Compiler-Si's rungs D1 to D5 (docs/REVIEW-SHALIMAR-DEBUG-2026-10-12.md in cpp11),
 on the lines of cpp11's M10 harness.
 """
@@ -38,6 +40,15 @@ def number(text):
     if m:
         return "%.9g" % float(text)
     m = re.match(r"^(-?\d+)\s+'(.*)'$", text)      # gdb's `65 'A'`
+    if m:
+        return "'" + m.group(2) + "'"
+    m = re.match(r"^0n(-?\d+)$", text)             # cdb's `0n2`
+    if m:
+        return m.group(1)
+    m = re.match(r"^0x([0-9a-f]+)`([0-9a-f]+)$", text)   # cdb's `0x000000ed`c2bbf8b0`
+    if m:
+        return "<pointer>" if int(m.group(1) + m.group(2), 16) != 0 else "<null>"
+    m = re.match(r"^(\d+) '(.)'$", text)
     if m:
         return "'" + m.group(2) + "'"
     m = re.match(r"^0x([0-9a-fA-F]+)(?: <\S+>)?$", text)      # gdb's `0x404030 <vs>`
@@ -143,21 +154,145 @@ def cdb_commands(script):
     return out
 
 
-# `print OURS | THEIRS`: the two programs spell one value differently - a by-reference parameter
-# is `n` in Shalimar and `*n` in C - and the line reads as the first spelling for both.
-def side(line, which):
+# `print OURS | THEIRS [| OURS-UNDER-CDB]`: the two programs spell one value differently - a
+# by-reference parameter is `n` in Shalimar and `*n` in C, and under cdb, which shows a
+# reference as the pointer it holds, `*n` for the Shalimar one too - and the line reads as the
+# first spelling for both.
+def side(line, which, debugger="lldb"):
     if "|" in line and line.split()[0] in ("print", "set"):
         word, rest = line.split(None, 1)
-        ours, theirs = [p.strip() for p in rest.split("|", 1)]
+        parts = [p.strip() for p in rest.split("|")]
+        ours, theirs = parts[0], parts[1]
+        if which == 0 and debugger == "cdb" and len(parts) > 2:
+            return word + " " + parts[2], ours
         return word + " " + (ours if which == 0 else theirs), ours
     return line, None
+
+
+# **cdb is driven a command at a time**, over its own stdin, rather than from one `-c` line: `??`
+# takes the rest of a line as its expression, and a step has to be judged before the next command
+# is chosen. A step is repeated while it leaves the program on the same line, further on - the
+# rule RIDE's Debugger applies (help/08-debugging.md, "A step that appears to do nothing") - so
+# that `t` over the runtime calls a Shalimar statement begins with reaches the callee, as lldb's
+# and gdb's step past a function without lines does.
+class Cdb:
+    PROMPT = re.compile(r"(?:\d+:\d{3}|NoTarget)> $")
+
+    def __init__(self, program):
+        self.p = subprocess.Popen(["cdb", "-G", "-lines", program], stdin=subprocess.PIPE,
+                                  stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        self.raw = ""
+        self.readToPrompt()
+
+    def readToPrompt(self):
+        got = b""
+        while True:
+            chunk = self.p.stdout.read1(4096) if hasattr(self.p.stdout, "read1") else self.p.stdout.read(1)
+            if not chunk:
+                break
+            got += chunk
+            text = got.decode("utf-8", "replace")
+            if self.PROMPT.search(text):
+                break
+        text = got.decode("utf-8", "replace").replace("\r", "")
+        self.raw += text
+        return self.PROMPT.sub("", text)
+
+    def cmd(self, c):
+        try:
+            self.p.stdin.write((c + "\n").encode("utf-8"))
+            self.p.stdin.flush()
+        except (BrokenPipeError, OSError):
+            return ""
+        return self.readToPrompt()
+
+    def quit(self):
+        try:
+            self.cmd("q")
+        except Exception:
+            pass
+        try:
+            self.p.wait(timeout=10)
+        except Exception:
+            self.p.kill()
+
+
+def cdb_place(text):
+    """(function, file, line, offset) of the frame `.frame` printed, or None."""
+    m = FRAME_CDB.search(text)
+    if not m:
+        return None
+    off = re.search(r"\+0x([0-9a-f]+)", text)
+    return (m.group(1), m.group(2), m.group(3), int(off.group(1), 16) if off else 0)
+
+
+def cdb_session(program, script, marker):
+    d = Cdb(program)
+    blocks = []
+    def run(c):
+        out = d.cmd(c)
+        blocks.append([c, out.splitlines()])
+        return out
+    d.cmd(".lines -e")
+    d.cmd("l+t")
+    d.cmd('.step_filter "*!shm_*;*!shm::*"')
+    # And the CRT's own code, which the symbol server gives lines to: a runtime call's
+    # __security_check_cookie is not where a step into a Shalimar function should land.
+    d.cmd(".settings set Sources.SkipCrtCode = true")
+    for line in script:
+        words = line.split()
+        if not words:
+            continue
+        c = words[0]
+        if c == "break":
+            f, l = words[1].split(":")
+            run("bp `%s:%s`" % (f, l))
+        elif c in ("run", "continue"):
+            run("g")
+            run(".frame")
+        elif c in ("next", "step"):
+            before = cdb_place(d.cmd(".frame"))
+            where = ""
+            for attempt in range(12):
+                run("p" if c == "next" else "t")
+                where = d.cmd(".frame")
+                after = cdb_place(where)
+                if before is None or after is None:
+                    break
+                if after[:3] == before[:3] and after[3] > before[3]:
+                    continue
+                # **Into a function, once more**: cdb stops on the callee's own line, before its
+                # parameters are stored, where lldb and gdb stop on its first statement; RIDE's F6
+                # steps once more from such a stop (cpp11's M10 W5), and so does this.
+                if c == "step" and after[0] != before[0]:
+                    run("p")
+                    where = d.cmd(".frame")
+                break
+            blocks.append([".frame", where.splitlines()])
+        elif c == "finish":
+            run("gu")
+            run(".frame")
+        elif c == "up":
+            run(".f+")
+        elif c == "down":
+            run(".f-")
+        elif c == "bt":
+            run("k")
+        elif c == "vars":
+            run("dv /t")
+        elif c in ("print", "set"):
+            run("?? " + line[len(c):].strip())
+        else:
+            raise SystemExit("m10: unknown command " + line)
+    d.quit()
+    return d.raw, blocks
 
 
 def run_session(debugger, program, source, script, which=0):
     labels = {}
     chosen = []
     for line in script:
-        line, label = side(line, which)
+        line, label = side(line, which, debugger)
         if label is not None:
             labels[line.split(None, 1)[1].strip()] = label
         chosen.append(line)
@@ -177,12 +312,8 @@ def run_session(debugger, program, source, script, which=0):
             args += ["-ex", "echo %s %s\\n" % (marker, c), "-ex", c]
         args += ["-ex", "kill", "--args", program]
     elif debugger == "cdb":
-        cmds = cdb_commands(script)
-        text = ""
-        for c in cmds:
-            text += ".echo %s %s;%s;" % (marker, c, c)
-        text += "q"
-        args = ["cdb", "-G", "-lines", "-c", text, program]
+        raw, blocks = cdb_session(program, script, marker)
+        return raw, blocks, labels
     else:
         raise SystemExit("m10: no such debugger " + debugger)
     p = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=120)
@@ -205,8 +336,10 @@ def run_session(debugger, program, source, script, which=0):
 
 FRAME_LLDB = re.compile(r"frame #(\d+): 0x[0-9a-f]+ \S+?`(\S+?)(?:\(.*?\))? at ([^:]+):(\d+)")
 FRAME_GDB = re.compile(r"#(\d+)\s+(?:0x[0-9a-f]+ in )?(\S+) \(.*?\) at ([^:]+):(\d+)")
-FRAME_CDB = re.compile(r"^([0-9a-f]+) [0-9a-f`]+ [0-9a-f`]+ (?:\S+!)?(\S+?)(?:\+0x[0-9a-f]+)? \[(.*?) @ (\d+)\]")
-FRAME_CDB_ONE = re.compile(r"^([0-9a-f]+) [0-9a-f`]+ [0-9a-f`]+ (?:\S+!)?(\S+?)(?:\+0x[0-9a-f]+)? \[(.*?) @ (\d+)\]")
+# `k`: `000000ed`c2bbf8b0 00007ff7`3d65cab0     w1!main+0x69 [C:\...\w1.shl @ 9]`; `.frame` has a number in front.
+FRAME_CDB = re.compile(r"^(?:[0-9a-f]+ )?[0-9a-f`]+ [0-9a-f`]+\s+(?:\S+!)?(\S+?)(?:\+0x[0-9a-f]+)? \[(.*?) @ (\d+)\]")
+FRAME_CDB_ONE = FRAME_CDB
+FRAME_CDB_ANY = re.compile(r"^(?:[0-9a-f]+ )?[0-9a-f`]+ [0-9a-f`]+\s+\S")
 
 
 def sortedVars(out, start):
@@ -241,6 +374,7 @@ def normalise(debugger, blocks, labels=None):
                         break
                     out.append("frame %d %s %s:%s" % (n, m.group(2), stem(m.group(3)), m.group(4)))
                     n += 1
+                    if m.group(2) == "main": break
             elif command == "frame variable":
                 start = len(out)
                 for line in lines:
@@ -275,6 +409,7 @@ def normalise(debugger, blocks, labels=None):
                         break
                     out.append("frame %d %s %s:%s" % (n, m.group(2), stem(m.group(3)), m.group(4)))
                     n += 1
+                    if m.group(2) == "main": break
             elif command in ("info args", "info locals"):
                 start = len(out)
                 for line in lines:
@@ -297,8 +432,8 @@ def normalise(debugger, blocks, labels=None):
             if command == ".frame" or command in (".f+", ".f-"):
                 m = FRAME_CDB_ONE.search(text)
                 if m:
-                    out.append("stop %s:%s %s" % (stem(m.group(3)), m.group(4), m.group(2)))
-                elif "exit" in text.lower():
+                    out.append("stop %s:%s %s" % (stem(m.group(2)), m.group(3), m.group(1)))
+                elif "exited" in text.lower() or "No runnable debuggees" in text:
                     out.append("exited")
                 else:
                     out.append("stop <no source>")
@@ -307,11 +442,14 @@ def normalise(debugger, blocks, labels=None):
                 for line in lines:
                     m = FRAME_CDB.match(line)
                     if not m:
-                        if re.match(r"^[0-9a-f]+ [0-9a-f`]+ [0-9a-f`]+ ", line):
+                        if FRAME_CDB_ANY.match(line):
                             break
                         continue
-                    out.append("frame %d %s %s:%s" % (n, m.group(2), stem(m.group(3)), m.group(4)))
+                    out.append("frame %d %s %s:%s" % (n, m.group(1), stem(m.group(2)), m.group(3)))
                     n += 1
+                    if m.group(1) == "main": break
+            elif command in ("g", "p", "t", "gu") and ("exited" in text.lower() or "No runnable debuggees" in text):
+                out.append("exited")
             elif command == "dv /t":
                 start = len(out)
                 for line in lines:

@@ -24,7 +24,7 @@ print t->count
 print counter
 print scale
 step
-print n | *n
+print n | *n | *n
 continue
 print counter
 set counter = 10 | counter = 10
