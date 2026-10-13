@@ -35,10 +35,10 @@
 namespace shalimar {
 
 // **1.2 is the first version this compiler has had a number for**, numbered alongside the RStudio that drives it - see CLAUDE.md.
-const char *shcVersion() { return "1.2"; }
+const char *shcVersion() { return "1.3"; }
 
 // The line printed before each compile and by --version. `-nologo` omits it.
-const char *Driver::bannerLine() { return "©2026 G. R. Akhtar - Shalimar 1.2"; }
+const char *Driver::bannerLine() { return "©2026 G. R. Akhtar - Shalimar 1.3"; }
 
 
 void Driver::usage() const {
