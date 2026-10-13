@@ -1,0 +1,15 @@
+# D1: a breakpoint on a line, the stack, a step over, a step in and out, the frames walked.
+break @:9
+run
+bt
+vars
+next
+step
+bt
+next
+vars
+up
+vars
+down
+finish
+continue

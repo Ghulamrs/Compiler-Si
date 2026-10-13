@@ -107,8 +107,82 @@ variables and watches. The reasoning and the plan are in
   stay as they are: they are still what reports a runtime error's line and
   the only way to stop a program on the C6747.
 
-Until D1 lands, nothing here emits debug information; RIDE's help and
-`toolchain.cpp` say so, and come down rung by rung, not ahead of them.
+D1 landed 2026-10-13 (below); RIDE's help and `toolchain.cpp` come down rung by
+rung, not ahead of them.
+
+## Rung D1: `-g`, lines and frames on arm64-darwin and x86_64-linux, 2026-10-13
+
+**`shalimar -g` writes DWARF for the two GNU targets, and lldb and gdb stop a
+Shalimar program on a line, step it and walk its stack.** Measured the way
+cpp11's M10 was: `tests/m10/m10.py` puts the program under the host's debugger
+beside clang's or gcc's build of the same program written in C line for line
+(`tests/m10/w1.shl`, `w1.c`, one script `w1.script`), and compares where each
+stopped, what the stack held and what the variables read. On the Mac, lldb: **17
+agree, 0 differ**; on the Linux box, gdb 16.3: **15 agree, 0 differ** - a
+breakpoint on line 9, `bt`, a step over, a step into `twice` and its stack
+(`twice` at 2 over `main` at 10), a step out, `up` and the caller's variables.
+`tests/m10.sh` is the suite, and it needs the host's C compiler and debugger.
+
+**What was written, and where** - the plan of the review (section 5) held:
+
+- `src/backend/DebugInfo.h` is the adapter: `DebugFunction` (name, symbol,
+  unit and line, result type, `DebugLocal`s by slot, blocks), `DebugGlobal`
+  by slot. `CodeGen::describe` fills one per function from
+  `Function::symbols()` - the parameters first, a by-reference one marked
+  `indirect` - and `Program::globalSymbols()`, which the checker now keeps.
+- `src/backend/Dwarf.cpp` is cpp11's writer brought across and fed from the
+  adapter: the abbreviations, the compile unit (DW_LANG_C99, so the C
+  expression reader serves `p a->count`), a subprogram per function with
+  DW_AT_frame_base the frame register, a parameter or variable per slot at
+  `DW_OP_fbreg slotBias + 8*slot` (`DW_OP_deref` for a by-reference one), a
+  variable per global at `shm_globals + 8*slot`, and the types - the four of
+  them, an array being a pointer to a structure `{int32 count; int32
+  element; data}` whose `data` points at the elements, which is exactly what
+  the runtime's `Array` is. The line program is the assembler's, from `.file`
+  and `.loc`.
+- Each `Emitter` has four hooks that do nothing until `setDebugInfo`:
+  `sourceLine` before a statement's first instruction - before the `shm_line`
+  call, so the stop is where the statement begins - `describeFunction`,
+  `describeGlobals`, and `beginBlock`/`endBlock` for D3. The two GNU emitters
+  write `.file` per unit, `.loc unit+1 line`, `Lfunc.begin`/`Lfunc.end`
+  labels, and `.cfi_startproc` / `.cfi_def_cfa` / `.cfi_offset` /
+  `.cfi_endproc` round the prologue - the unwind data a stack walk needs,
+  which neither target had. Slot k is at `rbp + shadow + 8k - frame` on
+  x86-64 and `x29 + 8k - frame` on arm64; the emitter alone knows the frame,
+  so it fills `slotBias` at `endFunction`.
+- `-g` goes on the `c++` link line too: on a Mac that is what makes clang run
+  `dsymutil`, so the DWARF outlives the object the driver assembled and threw
+  away.
+
+**`-g` adds sections and changes no code.** The emit golden - every program in
+`tests/cases`, `tests/load`, `tests/debug` and `examples/` for all four
+targets, 248 emissions, recorded before the first line of this was written -
+reads **0 of 248 changed** without `-g`, at `-O0` and at `-O2`. The `.loc`
+before a statement is a `raw` line, which flushes the x86 optimizer's run; it
+cannot change what the peephole folds, because every statement already begins
+with `shm_line`'s `call`, which ends a run, and no fold spans a statement.
+`make test` 94/0, `tests/debug.sh` 19/0, `tests/tms6747.sh` 94/0 before and
+after; the Linux box builds with g++ 11 and passes the same.
+
+**Two things found by running it.** The `.cfi_*` lines went into *every*
+prologue the moment `-g` was on, `shm_name_files` included, where no
+`.cfi_startproc` had opened one, and clang refused the file: a function is
+described only between `describeFunction` and the end of the function it
+opened (`Emitter::describing()`). And `describing_` was cleared before the
+prologue text was composed, so `twice`'s frame carried no CFA rule and lldb's
+`bt` from inside it showed `twice` twice; the flag now outlives the insertion.
+
+**The function is named as the program names it** - `main`, not
+`shm_user_main` - so a stack reads `twice` over `main` over the runtime's
+`main`, which has no source and ends the walk. `tests/debug.sh` and
+`docs/DEBUGGING.md`'s session are untouched: `shm_line` is still emitted in
+every build and is still what names a runtime error's line.
+
+**What D1 does not claim**: variables and globals are D2, whose measurement is
+the next section; the names are in the DWARF already because the adapter was
+written whole, and `w1`'s `vars` lines agreeing with clang's is their first
+sighting, not their proof. x86_64-windows and tms6747 are D4 and D5 - `-g` on
+those targets writes nothing yet and says nothing, which D4 will mend.
 
 ## How this is built
 
