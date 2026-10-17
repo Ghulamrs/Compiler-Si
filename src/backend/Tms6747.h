@@ -65,6 +65,9 @@ public:
 
 private:
     size_t prologueMark_ = 0;
+    // -g: the function's variables, written as .dwtag once endFunction knows where its slots are
+    DebugFunction described_;
+    bool hasDescription_ = false;
     int returns_ = 0;
     int globalSlots_ = 0;
     // The TI assembler wants an undefined name declared: what was called, less what this file defines, is `.ref`ed when the module ends.

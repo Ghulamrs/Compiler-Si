@@ -41,11 +41,53 @@ void Tms6747Emitter::sourceLine(int unit, int line) {
         ",column 0,is_stmt,isa 0");
 }
 
-// The function's own line, as cl6x's first .dwpsn names it; the frame and the slots are not described.
+// The function's own line, as cl6x's first .dwpsn names it; its variables follow at endFunction, when
+// the frame - and so where each slot is - is known.
 void Tms6747Emitter::describeFunction(const DebugFunction &function) {
     if (!debugInfo() || function.line <= 0) return;
     sourceLine(function.unit, function.line);
     prologueMark_ = text_.size();   // the entry's position goes before the prologue, as cl6x and cpp11 place it
+    described_ = function;
+    hasDescription_ = true;
+}
+
+// -g: the variables in TI's .dwtag spelling (GRIDEd docs\C6747-LOCALS-DESIGN.md), each named from A15 - TI's
+// DWARF register 15 - at its slot: A15 - (save area + every slot) + 8k. A by-reference parameter's slot holds
+// the variable's address. Parameters first, in order.
+// The type and what it is made of, as .dwtag after the function's block: int, real and char as base types
+// (an int in four bytes, a real in eight, a char in one), an array as the runtime's {count, element, data}
+// that the variable points to, its rows arrays of the same shape.
+static void typeTags(const Type *t, std::string &s, std::string &done) {
+    if (t == nullptr) return;
+    const std::string name = t->spelling();
+    if (done.find("|" + name + "|") != std::string::npos) return;
+    done += "|" + name + "|";
+    if (t->isArray()) {
+        s += "\t.dwtag\tDW_TAG_array_type, DW_AT_name(\"" + name + "\"), DW_AT_type(\"" + t->element()->spelling() +
+             "\"), DW_AT_GRIDE_runtime_array, DW_AT_byte_size(4)\n\t.dwendtag\n";
+        typeTags(t->element(), s, done);
+        return;
+    }
+    const char *size = t->kind() == Type::Kind::Real ? "8" : t->kind() == Type::Kind::Char ? "1" : "4";
+    const char *enc = t->kind() == Type::Kind::Real ? "DW_ATE_float" : t->kind() == Type::Kind::Char ? "DW_ATE_unsigned_char" : "DW_ATE_signed";
+    s += "\t.dwtag\tDW_TAG_base_type, DW_AT_name(\"" + name + "\"), DW_AT_byte_size(" + size + "), DW_AT_encoding(" + enc + ")\n\t.dwendtag\n";
+}
+
+static std::string variableTags(const DebugFunction &f, const std::string &label, int slots) {
+    const int base = kSaveBytes + 8 * slots;
+    std::string s = "\t.dwtag\tDW_TAG_subprogram, DW_AT_name(\"" + f.name + "\"), DW_AT_low_pc(" + label + ")\n";
+    for (int pass = 0; pass < 2; pass++)
+        for (const DebugLocal &l : f.locals) {
+            if (l.isParam != (pass == 0) || l.name.empty()) continue;
+            s += std::string("\t.dwtag\t") + (l.isParam ? "DW_TAG_formal_parameter" : "DW_TAG_variable") +
+                 ", DW_AT_name(\"" + l.name + "\"), DW_AT_type(\"" + (l.type != nullptr ? l.type->spelling() : std::string()) +
+                 "\"), DW_AT_location[DW_OP_breg15 " + std::to_string(8 * l.slot - base) +
+                 (l.indirect ? ", DW_OP_deref" : "") + "]\n";
+        }
+    s += "\t.dwendtag\n";
+    std::string done;
+    for (const DebugLocal &l : f.locals) typeTags(l.type, s, done);
+    return s;
 }
 
 void Tms6747Emitter::constant(const std::string &reg, int32_t value) {
@@ -134,6 +176,7 @@ void Tms6747Emitter::endFunction(int slots) {
     prologue += "\tMVKL\t" + std::to_string(frame) + ", A3\n";
     prologue += "\tMVKH\t" + std::to_string(frame) + ", A3\n";
     prologue += "\tSUB\tB15, A3, B15\n";
+    if (hasDescription_) { prologue = variableTags(described_, currentFunction_, slots) + prologue; hasDescription_ = false; }
     text_.insert(prologueMark_, prologue);
 
     for (size_t k = 1; k < saved.size(); k++)
